@@ -1,0 +1,178 @@
+<div class="container mt-4" *ngIf="cliente">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div>
+        <h3>Parcelas do Cliente</h3>
+        <p class="mb-0 text-muted">{{ cliente.nome }} - Contrato: {{ cliente.compra.numeroContrato }}</p>
+      </div>
+      <button class="btn btn-secondary" (click)="voltar()">
+        <i class="bi bi-arrow-left"></i> Voltar
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <strong>Valor Total:</strong> {{ cliente.compra.valorTotal | currency:'BRL' }}
+        </div>
+        <div class="col-md-3">
+          <strong>Número de Parcelas:</strong> {{ cliente.compra.numeroParcelas }}
+        </div>
+        <div class="col-md-3">
+          <strong>Valor da Parcela:</strong> {{ cliente.compra.valorParcela | currency:'BRL' }}
+        </div>
+        <div class="col-md-3">
+          <strong>Dia de Vencimento:</strong> {{ cliente.compra.diaVencimento }}
+        </div>
+      </div>
+
+      <div *ngIf="parcelas.length === 0" class="alert alert-info">
+        Nenhuma parcela encontrada. As parcelas são geradas automaticamente ao cadastrar o cliente.
+      </div>
+
+      <div class="table-responsive" *ngIf="parcelas.length > 0">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Parcela</th>
+              <th>Vencimento</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Data Pagamento</th>
+              <th>Dias de Atraso</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let parcela of parcelas">
+              <td><strong>{{ parcela.numeroParcela }}/{{ cliente.compra.numeroParcelas }}</strong></td>
+              <td>{{ parcela.dataVencimento | date:'dd/MM/yyyy' }}</td>
+              <td>{{ parcela.valorParcela | currency:'BRL' }}</td>
+              <td>
+                <span class="badge bg-{{ getStatusClass(parcela.status) }}">
+                  {{ getStatusText(parcela.status) }}
+                </span>
+              </td>
+              <td>
+                <span *ngIf="parcela.dataPagamento">
+                  {{ parcela.dataPagamento | date:'dd/MM/yyyy' }}
+                </span>
+                <span *ngIf="!parcela.dataPagamento" class="text-muted">-</span>
+              </td>
+              <td>
+                <span *ngIf="parcela.diasAtraso > 0" class="badge bg-danger">
+                  {{ parcela.diasAtraso }} dia(s)
+                </span>
+                <span *ngIf="parcela.diasAtraso === 0" class="text-success">
+                  Em dia
+                </span>
+              </td>
+              <td>
+                <button 
+                  *ngIf="parcela.status !== 'pago'"
+                  class="btn btn-sm btn-success"
+                  (click)="abrirModalPagamento(parcela)"
+                  title="Registrar Pagamento">
+                  <i class="bi bi-check-circle"></i> Pagar
+                </button>
+                <span *ngIf="parcela.status === 'pago'" class="text-success">
+                  <i class="bi bi-check-circle-fill"></i> Pago
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Resumo -->
+      <div class="row mt-4" *ngIf="parcelas.length > 0">
+        <div class="col-md-12">
+          <div class="card bg-light">
+            <div class="card-body">
+              <h5>Resumo</h5>
+              <div class="row">
+                <div class="col-md-3">
+                  <strong>Pagas:</strong> {{ contarPorStatus('pago') }}
+                </div>
+                <div class="col-md-3">
+                  <strong>Pendentes:</strong> {{ contarPorStatus('pendente') }}
+                </div>
+                <div class="col-md-3">
+                  <strong>Atrasadas:</strong> {{ contarPorStatus('atrasado') }}
+                </div>
+                <div class="col-md-3">
+                  <strong>Total Pago:</strong> 
+                  {{ calcularTotalPago() | currency:'BRL' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Registro de Pagamento -->
+<div class="modal fade show d-block" *ngIf="parcelaEditando" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Registrar Pagamento</h5>
+        <button type="button" class="btn-close" (click)="cancelarPagamento()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <p><strong>Cliente:</strong> {{ parcelaEditando.clienteNome }}</p>
+          <p><strong>Parcela:</strong> {{ parcelaEditando.numeroParcela }}/{{ cliente?.compra?.numeroParcelas }}</p>
+          <p><strong>Vencimento:</strong> {{ parcelaEditando.dataVencimento | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Valor da Parcela:</strong> {{ parcelaEditando.valorParcela | currency:'BRL' }}</p>
+        </div>
+
+        <hr>
+
+        <div class="mb-3">
+          <label for="dataPagamento" class="form-label">Data do Pagamento *</label>
+          <input 
+            type="date" 
+            class="form-control" 
+            id="dataPagamento" 
+            [(ngModel)]="dataPagamentoInput"
+            required>
+        </div>
+
+        <div class="mb-3">
+          <label for="valorPago" class="form-label">Valor Pago *</label>
+          <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="valorPago" 
+              [(ngModel)]="valorPagoInput"
+              step="0.01"
+              required>
+          </div>
+          <small class="text-muted">Valor padrão: {{ parcelaEditando.valorParcela | currency:'BRL' }}</small>
+        </div>
+
+        <div class="mb-3">
+          <label for="observacao" class="form-label">Observação</label>
+          <textarea 
+            class="form-control" 
+            id="observacao" 
+            [(ngModel)]="observacaoInput"
+            rows="2"
+            placeholder="Observação opcional"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelarPagamento()">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-success" (click)="confirmarPagamento()">
+          <i class="bi bi-check-circle"></i> Confirmar Pagamento
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,94 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Clientes</h2>
+    <button class="btn btn-primary" (click)="novoCliente()">
+      <i class="bi bi-plus-circle"></i> Novo Cliente
+    </button>
+  </div>
+
+  <!-- Campo de Busca -->
+  <div class="row mb-4" *ngIf="clientes.length > 0">
+    <div class="col-md-6">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Buscar cliente por nome..."
+          [(ngModel)]="filtroNome"
+          (ngModelChange)="aplicarFiltro()">
+        <button 
+          class="btn btn-outline-secondary" 
+          type="button"
+          *ngIf="filtroNome"
+          (click)="filtroNome = ''; aplicarFiltro()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <small class="text-muted" *ngIf="clientesFiltrados.length !== clientes.length">
+        Mostrando {{ clientesFiltrados.length }} de {{ clientes.length }} cliente(s)
+      </small>
+    </div>
+  </div>
+
+  <div *ngIf="clientes.length === 0" class="alert alert-info text-center">
+    <h4>Nenhum cliente cadastrado</h4>
+    <p>Clique em "Novo Cliente" para começar</p>
+  </div>
+
+  <div *ngIf="clientes.length > 0 && clientesFiltrados.length === 0" class="alert alert-warning text-center">
+    <h5>Nenhum cliente encontrado</h5>
+    <p>Tente buscar por outro nome</p>
+  </div>
+
+  <div class="row" *ngIf="clientesFiltrados.length > 0">
+    <div class="col-md-4 mb-4" *ngFor="let cliente of clientesFiltrados">
+      <div class="card h-100 shadow-sm hover-card" (click)="verDetalhes(cliente.id)" style="cursor: pointer;">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-person-circle"></i> {{ cliente.nome }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="mb-2">
+            <strong><i class="bi bi-telephone"></i> Telefone:</strong><br>
+            {{ cliente.telefone }}
+          </p>
+          <p class="mb-2">
+            <strong><i class="bi bi-envelope"></i> E-mail:</strong><br>
+            {{ cliente.email }}
+          </p>
+          <hr>
+          <p class="mb-2">
+            <strong><i class="bi bi-cart"></i> Valor da Compra:</strong><br>
+            <span class="fs-5 text-primary">{{ cliente.compra.valorTotal | currency:'BRL' }}</span>
+          </p>
+          <p class="mb-2">
+            <strong>Parcelas:</strong> {{ cliente.compra.numeroParcelas }}x de {{ cliente.compra.valorParcela | currency:'BRL' }}
+          </p>
+          
+          <div *ngIf="getResumo(cliente.id) as resumo">
+            <hr>
+            <div class="row text-center">
+              <div class="col-6">
+                <small class="text-muted">Total Pago</small>
+                <p class="mb-0 text-success fw-bold">{{ resumo.totalPago | currency:'BRL' }}</p>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Saldo Devedor</small>
+                <p class="mb-0 text-danger fw-bold">{{ resumo.saldoDevedor | currency:'BRL' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer text-center">
+          <small class="text-muted">
+            <i class="bi bi-calendar"></i> Cadastrado em {{ cliente.dataCadastro | date:'dd/MM/yyyy' }}
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

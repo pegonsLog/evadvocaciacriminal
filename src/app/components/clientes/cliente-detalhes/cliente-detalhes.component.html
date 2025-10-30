@@ -1,0 +1,106 @@
+<div class="container mt-4" *ngIf="cliente">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Detalhes do Cliente</h2>
+    <div>
+      <button class="btn btn-secondary me-2" (click)="voltar()">
+        <i class="bi bi-arrow-left"></i> Voltar
+      </button>
+      <button class="btn btn-warning" (click)="editar()">
+        <i class="bi bi-pencil"></i> Editar
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Dados do Cliente -->
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Informações Pessoais</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Nome:</strong> {{ cliente.nome }}</p>
+          <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
+          <p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+          <p><strong>E-mail:</strong> {{ cliente.email }}</p>
+          <p><strong>Endereço:</strong> {{ cliente.endereco }}</p>
+          <p><strong>Data de Cadastro:</strong> {{ cliente.dataCadastro | date:'dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dados da Compra -->
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">Informações da Compra</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Número do Contrato:</strong> {{ cliente.compra.numeroContrato }}</p>
+          <p><strong>Valor da Entrada:</strong> {{ cliente.compra.valorEntrada | currency:'BRL' }}</p>
+          <p><strong>Valor Total:</strong> {{ cliente.compra.valorTotal | currency:'BRL' }}</p>
+          <p><strong>Número de Parcelas:</strong> {{ cliente.compra.numeroParcelas }}x</p>
+          <p><strong>Valor da Parcela:</strong> {{ cliente.compra.valorParcela | currency:'BRL' }}</p>
+          <p><strong>Dia de Vencimento:</strong> Todo dia {{ cliente.compra.diaVencimento }}</p>
+          <p><strong>Data da Compra:</strong> {{ cliente.compra.dataCompra | date:'dd/MM/yyyy' }}</p>
+          <p *ngIf="cliente.compra.estimativaValorPrevisto">
+            <strong>Estimativa Valor Previsto no Mês:</strong> {{ cliente.compra.estimativaValorPrevisto | currency:'BRL' }}
+          </p>
+          <p *ngIf="cliente.compra.relatorioContratosPendentes">
+            <strong>Relatório Contratos Pendentes:</strong><br>
+            <span class="text-muted">{{ cliente.compra.relatorioContratosPendentes }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumo de Pagamentos -->
+  <div class="card mb-4">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Resumo de Pagamentos</h5>
+      <button class="btn btn-light btn-sm" (click)="verPagamentos()">
+        <i class="bi bi-cash-stack"></i> Gerenciar Pagamentos
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="alert alert-success">
+            <strong>Total Pago:</strong><br>
+            <h4>{{ totalPago | currency:'BRL' }}</h4>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="alert alert-warning">
+            <strong>Saldo Devedor:</strong><br>
+            <h4>{{ saldoDevedor | currency:'BRL' }}</h4>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="alert alert-info">
+            <strong>Pagamentos Realizados:</strong><br>
+            <h4>{{ parcelasPagas }}</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensagem -->
+      <div class="alert alert-secondary mt-3">
+        <p class="mb-0">
+          <i class="bi bi-info-circle"></i> 
+          Clique em "Gerenciar Pagamentos" para ver todas as parcelas e registrar pagamentos.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4" *ngIf="!cliente">
+  <div class="alert alert-danger">
+    Cliente não encontrado.
+  </div>
+  <button class="btn btn-secondary" (click)="voltar()">
+    <i class="bi bi-arrow-left"></i> Voltar
+  </button>
+</div>

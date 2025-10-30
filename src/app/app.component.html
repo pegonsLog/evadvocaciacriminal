@@ -1,13 +1,37 @@
-<div class="app-container">
-  <header class="header">
-    <h1>{{ title }}</h1>
-  </header>
-  
-  <main class="main-content">
-    <router-outlet></router-outlet>
-  </main>
-  
-  <footer class="footer">
-    <p>&copy; 2025 EV Advocacia Criminal. Todos os direitos reservados.</p>
-  </footer>
-</div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/home">
+      <i class="bi bi-briefcase"></i> {{ title }}
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/home" routerLinkActive="active">
+            <i class="bi bi-house"></i> Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/clientes" routerLinkActive="active">
+            <i class="bi bi-people"></i> Clientes
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/controle-pagamentos" routerLinkActive="active">
+            <i class="bi bi-cash-stack"></i> Controle de Pagamentos
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="footer bg-dark text-white text-center py-3 mt-5">
+  <p class="mb-0">&copy; 2025 EV Advocacia Criminal. Todos os direitos reservados.</p>
+</footer>
