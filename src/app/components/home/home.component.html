@@ -63,10 +63,10 @@
           <hr>
           <p class="mb-2">
             <strong><i class="bi bi-cart"></i> Valor da Compra:</strong><br>
-            <span class="fs-5 text-primary">{{ cliente.compra.valorTotal | currency:'BRL' }}</span>
+            <span class="fs-5 text-primary">{{ cliente.compra.valorTotal | currency }}</span>
           </p>
           <p class="mb-2">
-            <strong>Parcelas:</strong> {{ cliente.compra.numeroParcelas }}x de {{ cliente.compra.valorParcela | currency:'BRL' }}
+            <strong>Parcelas:</strong> {{ cliente.compra.numeroParcelas }}x de {{ cliente.compra.valorParcela | currency }}
           </p>
           
           <div *ngIf="getResumo(cliente.id) as resumo">
@@ -74,11 +74,11 @@
             <div class="row text-center">
               <div class="col-6">
                 <small class="text-muted">Total Pago</small>
-                <p class="mb-0 text-success fw-bold">{{ resumo.totalPago | currency:'BRL' }}</p>
+                <p class="mb-0 text-success fw-bold">{{ resumo.totalPago | currency }}</p>
               </div>
               <div class="col-6">
                 <small class="text-muted">Saldo Devedor</small>
-                <p class="mb-0 text-danger fw-bold">{{ resumo.saldoDevedor | currency:'BRL' }}</p>
+                <p class="mb-0 text-danger fw-bold">{{ resumo.saldoDevedor | currency }}</p>
               </div>
             </div>
           </div>

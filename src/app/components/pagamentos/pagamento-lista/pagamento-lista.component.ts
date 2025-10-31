@@ -20,13 +20,15 @@ export class PagamentoListaComponent implements OnInit {
   dataPagamentoInput: string = '';
   valorPagoInput: string = '';
   observacaoInput: string = '';
+  editandoData: boolean = false;
+  novaDataPagamentoInput: string = '';
 
   constructor(
     private clienteService: ClienteService,
     private parcelaService: ParcelaService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -46,8 +48,12 @@ export class PagamentoListaComponent implements OnInit {
 
   abrirModalPagamento(parcela: Parcela): void {
     this.parcelaEditando = parcela;
+    // Converter data atual para formato local sem problemas de fuso horário
     const hoje = new Date();
-    this.dataPagamentoInput = hoje.toISOString().split('T')[0];
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    this.dataPagamentoInput = `${ano}-${mes}-${dia}`;
     this.valorPagoInput = parcela.valorParcela.toString();
     this.observacaoInput = '';
   }
@@ -65,7 +71,9 @@ export class PagamentoListaComponent implements OnInit {
       return;
     }
 
-    const data = new Date(this.dataPagamentoInput);
+    // Criar data no fuso horário local para evitar problemas de UTC
+    const [ano, mes, dia] = this.dataPagamentoInput.split('-').map(Number);
+    const data = new Date(ano, mes - 1, dia);
     const valor = parseFloat(this.valorPagoInput) || this.parcelaEditando.valorParcela;
 
     try {
@@ -107,6 +115,75 @@ export class PagamentoListaComponent implements OnInit {
 
   contarPorStatus(status: string): number {
     return this.parcelas.filter(p => p.status === status).length;
+  }
+
+  editarDataPagamento(parcela: Parcela): void {
+    this.parcelaEditando = parcela;
+    this.editandoData = true;
+    if (parcela.dataPagamento) {
+      // Converter data para formato local sem problemas de fuso horário
+      const data = new Date(parcela.dataPagamento);
+      const ano = data.getFullYear();
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const dia = String(data.getDate()).padStart(2, '0');
+      this.novaDataPagamentoInput = `${ano}-${mes}-${dia}`;
+    }
+  }
+
+  cancelarEdicaoData(): void {
+    this.parcelaEditando = undefined;
+    this.editandoData = false;
+    this.novaDataPagamentoInput = '';
+  }
+
+  async confirmarEdicaoData(): Promise<void> {
+    if (!this.parcelaEditando || !this.novaDataPagamentoInput) {
+      alert('Preencha a nova data do pagamento!');
+      return;
+    }
+
+    // Criar data no fuso horário local para evitar problemas de UTC
+    const [ano, mes, dia] = this.novaDataPagamentoInput.split('-').map(Number);
+    const novaData = new Date(ano, mes - 1, dia);
+
+    try {
+      await this.parcelaService.editarDataPagamento(
+        this.parcelaEditando.id,
+        novaData
+      );
+      alert('Data de pagamento alterada com sucesso!');
+      this.cancelarEdicaoData();
+    } catch (error) {
+      console.error('Erro ao alterar data de pagamento:', error);
+      alert('Erro ao alterar data de pagamento.');
+    }
+  }
+
+  async limparDataPagamento(): Promise<void> {
+    if (!this.parcelaEditando) {
+      return;
+    }
+
+    const confirmacao = confirm(
+      `Tem certeza que deseja limpar a data de pagamento da parcela ${this.parcelaEditando.numeroParcela}?\n\n` +
+      'Esta ação irá:\n' +
+      '• Remover a data de pagamento\n' +
+      '• Alterar o status para "Pendente"\n' +
+      '• Recalcular os dias de atraso'
+    );
+
+    if (!confirmacao) {
+      return;
+    }
+
+    try {
+      await this.parcelaService.limparDataPagamento(this.parcelaEditando.id);
+      alert('Data de pagamento removida com sucesso! A parcela voltou ao status pendente.');
+      this.cancelarEdicaoData();
+    } catch (error) {
+      console.error('Erro ao limpar data de pagamento:', error);
+      alert('Erro ao limpar data de pagamento.');
+    }
   }
 
   voltar(): void {

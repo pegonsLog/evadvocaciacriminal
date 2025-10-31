@@ -94,11 +94,13 @@ export class PagamentoFormComponent implements OnInit {
     if (this.pagamentoForm.valid && this.cliente) {
       const formValue = this.pagamentoForm.value;
       
-      // Remove formatação do valor
+      // Remove formatação do valor e garante que seja número
       let valorPago = formValue.valorPago;
       if (typeof valorPago === 'string') {
         valorPago = parseFloat(valorPago.replace(/\./g, '').replace(',', '.'));
       }
+      // Garante que é um número válido
+      valorPago = Number(valorPago) || 0;
       
       const pagamento: Pagamento = {
         id: this.pagamentoId || '',

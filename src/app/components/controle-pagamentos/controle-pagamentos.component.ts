@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ClienteService } from '../../services/cliente.service';
 import { ResumoPagamento } from '../../models/cliente.model';
+import { Subscription, combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-controle-pagamentos',
@@ -11,11 +12,13 @@ import { ResumoPagamento } from '../../models/cliente.model';
   templateUrl: './controle-pagamentos.component.html',
   styleUrl: './controle-pagamentos.component.scss'
 })
-export class ControlePagamentosComponent implements OnInit {
+export class ControlePagamentosComponent implements OnInit, OnDestroy {
   resumos: ResumoPagamento[] = [];
   totalGeralCompras = 0;
   totalGeralPago = 0;
   totalGeralDevedor = 0;
+  
+  private subscription?: Subscription;
 
   constructor(
     private clienteService: ClienteService,
@@ -23,7 +26,22 @@ export class ControlePagamentosComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.carregarResumos();
+    // Observa mudanças em clientes e pagamentos
+    this.subscription = combineLatest([
+      this.clienteService.getClientes(),
+      this.clienteService.getPagamentos()
+    ]).subscribe({
+      next: () => {
+        this.carregarResumos();
+      },
+      error: (error) => {
+        console.error('Erro ao carregar dados:', error);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 
   carregarResumos(): void {

@@ -12,13 +12,13 @@
     <div class="card-body">
       <div class="row mb-3">
         <div class="col-md-3">
-          <strong>Valor Total:</strong> {{ cliente.compra.valorTotal | currency:'BRL' }}
+          <strong>Valor Total:</strong> {{ cliente.compra.valorTotal | currency }}
         </div>
         <div class="col-md-3">
           <strong>Número de Parcelas:</strong> {{ cliente.compra.numeroParcelas }}
         </div>
         <div class="col-md-3">
-          <strong>Valor da Parcela:</strong> {{ cliente.compra.valorParcela | currency:'BRL' }}
+          <strong>Valor da Parcela:</strong> {{ cliente.compra.valorParcela | currency }}
         </div>
         <div class="col-md-3">
           <strong>Dia de Vencimento:</strong> {{ cliente.compra.diaVencimento }}
@@ -46,7 +46,7 @@
             <tr *ngFor="let parcela of parcelas">
               <td><strong>{{ parcela.numeroParcela }}/{{ cliente.compra.numeroParcelas }}</strong></td>
               <td>{{ parcela.dataVencimento | date:'dd/MM/yyyy' }}</td>
-              <td>{{ parcela.valorParcela | currency:'BRL' }}</td>
+              <td>{{ parcela.valorParcela | currency }}</td>
               <td>
                 <span class="badge bg-{{ getStatusClass(parcela.status) }}">
                   {{ getStatusText(parcela.status) }}
@@ -101,7 +101,7 @@
                 </div>
                 <div class="col-md-3">
                   <strong>Total Pago:</strong> 
-                  {{ calcularTotalPago() | currency:'BRL' }}
+                  {{ calcularTotalPago() | currency }}
                 </div>
               </div>
             </div>
@@ -125,7 +125,7 @@
           <p><strong>Cliente:</strong> {{ parcelaEditando.clienteNome }}</p>
           <p><strong>Parcela:</strong> {{ parcelaEditando.numeroParcela }}/{{ cliente?.compra?.numeroParcelas }}</p>
           <p><strong>Vencimento:</strong> {{ parcelaEditando.dataVencimento | date:'dd/MM/yyyy' }}</p>
-          <p><strong>Valor da Parcela:</strong> {{ parcelaEditando.valorParcela | currency:'BRL' }}</p>
+          <p><strong>Valor da Parcela:</strong> {{ parcelaEditando.valorParcela | currency }}</p>
         </div>
 
         <hr>
@@ -152,7 +152,7 @@
               step="0.01"
               required>
           </div>
-          <small class="text-muted">Valor padrão: {{ parcelaEditando.valorParcela | currency:'BRL' }}</small>
+          <small class="text-muted">Valor padrão: {{ parcelaEditando.valorParcela | currency }}</small>
         </div>
 
         <div class="mb-3">

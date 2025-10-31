@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ClienteService } from '../../../services/cliente.service';
 import { Cliente } from '../../../models/cliente.model';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-cliente-lista',
@@ -13,6 +14,7 @@ import { Cliente } from '../../../models/cliente.model';
 })
 export class ClienteListaComponent implements OnInit {
   clientes: Cliente[] = [];
+  private authService = inject(AuthService);
 
   constructor(
     private clienteService: ClienteService,
@@ -34,6 +36,12 @@ export class ClienteListaComponent implements OnInit {
   }
 
   excluirCliente(id: string): void {
+    // Apenas administradores podem deletar
+    if (!this.authService.isAdmin()) {
+      alert('Apenas administradores podem excluir clientes.');
+      return;
+    }
+
     if (confirm('Tem certeza que deseja excluir este cliente?')) {
       this.clienteService.deleteCliente(id);
     }
@@ -45,5 +53,9 @@ export class ClienteListaComponent implements OnInit {
 
   verParcelas(id: string): void {
     this.router.navigate(['/parcelas', id]);
+  }
+
+  isAdmin(): boolean {
+    return this.authService.isAdmin();
   }
 }

@@ -9,7 +9,7 @@ import { Parcela, Cliente } from '../models/cliente.model';
 export class ParcelaService {
   private firestore = inject(Firestore);
   private parcelasCollection = collection(this.firestore, 'parcelas');
-  
+
   private parcelas: Parcela[] = [];
   private parcelasSubject = new BehaviorSubject<Parcela[]>([]);
 
@@ -76,16 +76,49 @@ export class ParcelaService {
   async registrarPagamento(parcelaId: string, valorPago: number, dataPagamento: Date, observacao?: string): Promise<void> {
     const parcelaDoc = doc(this.firestore, `parcelas/${parcelaId}`);
     const parcela = this.getParcelaById(parcelaId);
-    
+
     if (parcela) {
       const diasAtraso = this.calcularDiasAtraso(parcela.dataVencimento, dataPagamento);
-      
+
       await updateDoc(parcelaDoc, {
         dataPagamento: dataPagamento,
         valorPago: valorPago,
         diasAtraso: diasAtraso,
         status: 'pago',
         observacao: observacao || ''
+      });
+    }
+  }
+
+  async editarDataPagamento(parcelaId: string, novaDataPagamento: Date): Promise<void> {
+    const parcelaDoc = doc(this.firestore, `parcelas/${parcelaId}`);
+    const parcela = this.getParcelaById(parcelaId);
+
+    if (parcela && parcela.status === 'pago') {
+      const diasAtraso = this.calcularDiasAtraso(parcela.dataVencimento, novaDataPagamento);
+
+      await updateDoc(parcelaDoc, {
+        dataPagamento: novaDataPagamento,
+        diasAtraso: diasAtraso
+      });
+    }
+  }
+
+  async limparDataPagamento(parcelaId: string): Promise<void> {
+    const parcelaDoc = doc(this.firestore, `parcelas/${parcelaId}`);
+    const parcela = this.getParcelaById(parcelaId);
+
+    if (parcela && parcela.status === 'pago') {
+      const hoje = new Date();
+      const diasAtraso = this.calcularDiasAtraso(parcela.dataVencimento, hoje);
+      const novoStatus = diasAtraso > 0 ? 'atrasado' : 'pendente';
+
+      await updateDoc(parcelaDoc, {
+        dataPagamento: null,
+        valorPago: null,
+        diasAtraso: diasAtraso,
+        status: novoStatus,
+        observacao: ''
       });
     }
   }
@@ -113,13 +146,13 @@ export class ParcelaService {
   private calcularDiasAtraso(dataVencimento: Date, dataReferencia: Date): number {
     const vencimento = new Date(dataVencimento);
     const referencia = new Date(dataReferencia);
-    
+
     vencimento.setHours(0, 0, 0, 0);
     referencia.setHours(0, 0, 0, 0);
-    
+
     const diffTime = referencia.getTime() - vencimento.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     return diffDays > 0 ? diffDays : 0;
   }
 

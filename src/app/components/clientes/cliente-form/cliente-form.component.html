@@ -5,17 +5,13 @@
     </div>
     <div class="card-body">
       <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
-        
+
         <!-- Dados do Cliente -->
         <h5 class="mb-3">Dados do Cliente</h5>
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="nome" class="form-label">Nome Completo *</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="nome" 
-              formControlName="nome"
+            <input type="text" class="form-control" id="nome" formControlName="nome"
               [class.is-invalid]="f['nome'].invalid && f['nome'].touched">
             <div class="invalid-feedback" *ngIf="f['nome'].invalid && f['nome'].touched">
               <div *ngIf="f['nome'].errors?.['required']">Nome é obrigatório</div>
@@ -25,14 +21,8 @@
 
           <div class="col-md-6 mb-3">
             <label for="cpf" class="form-label">CPF *</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="cpf" 
-              formControlName="cpf"
-              mask="000.000.000-00"
-              placeholder="000.000.000-00"
-              [class.is-invalid]="f['cpf'].invalid && f['cpf'].touched">
+            <input type="text" class="form-control" id="cpf" formControlName="cpf" mask="000.000.000-00"
+              placeholder="000.000.000-00" [class.is-invalid]="f['cpf'].invalid && f['cpf'].touched">
             <div class="invalid-feedback" *ngIf="f['cpf'].invalid && f['cpf'].touched">
               CPF é obrigatório
             </div>
@@ -42,13 +32,8 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="telefone" class="form-label">Telefone *</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="telefone" 
-              formControlName="telefone"
-              mask="(00) 00000-0000||(00) 0000-0000"
-              placeholder="(00) 00000-0000"
+            <input type="text" class="form-control" id="telefone" formControlName="telefone"
+              mask="(00) 00000-0000||(00) 0000-0000" placeholder="(00) 00000-0000"
               [class.is-invalid]="f['telefone'].invalid && f['telefone'].touched">
             <div class="invalid-feedback" *ngIf="f['telefone'].invalid && f['telefone'].touched">
               Telefone é obrigatório
@@ -57,11 +42,7 @@
 
           <div class="col-md-6 mb-3">
             <label for="email" class="form-label">E-mail *</label>
-            <input 
-              type="email" 
-              class="form-control" 
-              id="email" 
-              formControlName="email"
+            <input type="email" class="form-control" id="email" formControlName="email"
               [class.is-invalid]="f['email'].invalid && f['email'].touched">
             <div class="invalid-feedback" *ngIf="f['email'].invalid && f['email'].touched">
               <div *ngIf="f['email'].errors?.['required']">E-mail é obrigatório</div>
@@ -72,11 +53,7 @@
 
         <div class="mb-3">
           <label for="endereco" class="form-label">Endereço *</label>
-          <textarea 
-            class="form-control" 
-            id="endereco" 
-            formControlName="endereco"
-            rows="2"
+          <textarea class="form-control" id="endereco" formControlName="endereco" rows="2"
             [class.is-invalid]="f['endereco'].invalid && f['endereco'].touched"></textarea>
           <div class="invalid-feedback" *ngIf="f['endereco'].invalid && f['endereco'].touched">
             Endereço é obrigatório
@@ -87,15 +64,11 @@
 
         <!-- Dados da Compra -->
         <h5 class="mb-3">Dados do Contrato</h5>
-        
+
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="numeroContrato" class="form-label">Número do Contrato *</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="numeroContrato" 
-              formControlName="numeroContrato"
+            <input type="text" class="form-control" id="numeroContrato" formControlName="numeroContrato"
               [class.is-invalid]="f['numeroContrato'].invalid && f['numeroContrato'].touched">
             <div class="invalid-feedback" *ngIf="f['numeroContrato'].invalid && f['numeroContrato'].touched">
               Número do contrato é obrigatório
@@ -106,14 +79,8 @@
             <label for="valorEntrada" class="form-label">Valor da Entrada *</label>
             <div class="input-group">
               <span class="input-group-text">R$</span>
-              <input 
-                type="text" 
-                class="form-control no-spinners" 
-                id="valorEntrada" 
-                formControlName="valorEntrada"
-                mask="separator.2"
-                thousandSeparator="."
-                separatorLimit="9999999"
+              <input type="text" class="form-control no-spinners" id="valorEntrada" formControlName="valorEntrada"
+                mask="separator.2" thousandSeparator="." separatorLimit="999999999"
                 [class.is-invalid]="f['valorEntrada'].invalid && f['valorEntrada'].touched">
               <div class="invalid-feedback" *ngIf="f['valorEntrada'].invalid && f['valorEntrada'].touched">
                 Valor da entrada é obrigatório
@@ -127,14 +94,8 @@
             <label for="valorTotal" class="form-label">Valor Total *</label>
             <div class="input-group">
               <span class="input-group-text">R$</span>
-              <input 
-                type="text" 
-                class="form-control no-spinners" 
-                id="valorTotal" 
-                formControlName="valorTotal"
-                mask="separator.2"
-                thousandSeparator="."
-                separatorLimit="9999999"
+              <input type="text" class="form-control no-spinners" id="valorTotal" formControlName="valorTotal"
+                mask="separator.2" thousandSeparator="." separatorLimit="999999999"
                 [class.is-invalid]="f['valorTotal'].invalid && f['valorTotal'].touched">
               <div class="invalid-feedback" *ngIf="f['valorTotal'].invalid && f['valorTotal'].touched">
                 <div *ngIf="f['valorTotal'].errors?.['required']">Valor é obrigatório</div>
@@ -145,13 +106,8 @@
 
           <div class="col-md-4 mb-3">
             <label for="numeroParcelas" class="form-label">Número de Parcelas *</label>
-            <input 
-              type="text" 
-              class="form-control no-spinners" 
-              id="numeroParcelas" 
-              formControlName="numeroParcelas"
-              mask="0*"
-              [class.is-invalid]="f['numeroParcelas'].invalid && f['numeroParcelas'].touched">
+            <input type="text" class="form-control no-spinners" id="numeroParcelas" formControlName="numeroParcelas"
+              mask="0*" [class.is-invalid]="f['numeroParcelas'].invalid && f['numeroParcelas'].touched">
             <div class="invalid-feedback" *ngIf="f['numeroParcelas'].invalid && f['numeroParcelas'].touched">
               <div *ngIf="f['numeroParcelas'].errors?.['required']">Número de parcelas é obrigatório</div>
               <div *ngIf="f['numeroParcelas'].errors?.['min']">Deve ter no mínimo 1 parcela</div>
@@ -162,13 +118,8 @@
             <label for="valorParcela" class="form-label">Valor da Parcela *</label>
             <div class="input-group">
               <span class="input-group-text">R$</span>
-              <input 
-                type="text" 
-                class="form-control no-spinners" 
-                id="valorParcela" 
-                formControlName="valorParcela"
-                readonly
-                [class.is-invalid]="f['valorParcela'].invalid && f['valorParcela'].touched">
+              <input type="text" class="form-control no-spinners" id="valorParcela" formControlName="valorParcela"
+                readonly [class.is-invalid]="f['valorParcela'].invalid && f['valorParcela'].touched">
             </div>
             <small class="text-muted">Calculado automaticamente</small>
           </div>
@@ -177,18 +128,13 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="diaVencimento" class="form-label">Dia do Vencimento *</label>
-            <input 
-              type="number" 
-              class="form-control" 
-              id="diaVencimento" 
-              formControlName="diaVencimento"
-              min="1"
-              max="31"
-              placeholder="Ex: 10 (todo dia 10 do mês)"
+            <input type="number" class="form-control" id="diaVencimento" formControlName="diaVencimento" min="1"
+              max="31" placeholder="Ex: 10 (todo dia 10 do mês)"
               [class.is-invalid]="f['diaVencimento'].invalid && f['diaVencimento'].touched">
             <div class="invalid-feedback" *ngIf="f['diaVencimento'].invalid && f['diaVencimento'].touched">
               <div *ngIf="f['diaVencimento'].errors?.['required']">Dia de vencimento é obrigatório</div>
-              <div *ngIf="f['diaVencimento'].errors?.['min'] || f['diaVencimento'].errors?.['max']">Dia deve estar entre 1 e 31</div>
+              <div *ngIf="f['diaVencimento'].errors?.['min'] || f['diaVencimento'].errors?.['max']">Dia deve estar entre
+                1 e 31</div>
             </div>
             <small class="text-muted">Dia do mês em que as parcelas vencem</small>
           </div>
@@ -197,26 +143,18 @@
             <label for="estimativaValorPrevisto" class="form-label">Estimativa do Valor Previsto no Mês</label>
             <div class="input-group">
               <span class="input-group-text">R$</span>
-              <input 
-                type="text" 
-                class="form-control no-spinners" 
-                id="estimativaValorPrevisto" 
-                formControlName="estimativaValorPrevisto"
-                mask="separator.2"
-                thousandSeparator="."
-                separatorLimit="9999999">
+              <input type="text" class="form-control no-spinners" id="estimativaValorPrevisto"
+                formControlName="estimativaValorPrevisto" mask="separator.2" thousandSeparator="."
+                separatorLimit="999999999">
             </div>
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="relatorioContratosPendentes" class="form-label">Relatório dos Contratos com Valores Pendentes</label>
-          <textarea 
-            class="form-control" 
-            id="relatorioContratosPendentes" 
-            formControlName="relatorioContratosPendentes"
-            rows="3"
-            placeholder="Adicione observações sobre contratos pendentes"></textarea>
+          <label for="relatorioContratosPendentes" class="form-label">Relatório dos Contratos com Valores
+            Pendentes</label>
+          <textarea class="form-control" id="relatorioContratosPendentes" formControlName="relatorioContratosPendentes"
+            rows="3" placeholder="Adicione observações sobre contratos pendentes"></textarea>
         </div>
 
         <div class="d-flex justify-content-end gap-2 mt-4">

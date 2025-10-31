@@ -22,22 +22,18 @@
         <tbody>
           <tr *ngFor="let resumo of resumos">
             <td>{{ resumo.clienteNome }}</td>
-            <td>{{ resumo.valorCompra | currency:'BRL' }}</td>
+            <td>{{ resumo.valorCompra | currency }}</td>
             <td>{{ resumo.numeroParcelas }}x</td>
-            <td>{{ resumo.valorParcela | currency:'BRL' }}</td>
-            <td class="text-success fw-bold">{{ resumo.totalPago | currency:'BRL' }}</td>
-            <td class="text-danger fw-bold">{{ resumo.saldoDevedor | currency:'BRL' }}</td>
+            <td>{{ resumo.valorParcela | currency }}</td>
+            <td class="text-success fw-bold">{{ resumo.totalPago | currency }}</td>
+            <td class="text-danger fw-bold">{{ resumo.saldoDevedor | currency }}</td>
             <td>
               <div class="btn-group" role="group">
-                <button 
-                  class="btn btn-sm btn-info btn-action" 
-                  (click)="verDetalhes(resumo.clienteId)"
+                <button class="btn btn-sm btn-info btn-action" (click)="verDetalhes(resumo.clienteId)"
                   title="Ver Detalhes">
                   <i class="bi bi-eye"></i>
                 </button>
-                <button 
-                  class="btn btn-sm btn-primary btn-action" 
-                  (click)="verPagamentos(resumo.clienteId)"
+                <button class="btn btn-sm btn-success btn-action" (click)="verPagamentos(resumo.clienteId)"
                   title="Pagamentos">
                   <i class="bi bi-cash-stack"></i>
                 </button>
@@ -48,10 +44,10 @@
         <tfoot class="table-secondary">
           <tr class="fw-bold">
             <td>TOTAIS</td>
-            <td>{{ totalGeralCompras | currency:'BRL' }}</td>
+            <td>{{ totalGeralCompras | currency }}</td>
             <td colspan="2"></td>
-            <td class="text-success">{{ totalGeralPago | currency:'BRL' }}</td>
-            <td class="text-danger">{{ totalGeralDevedor | currency:'BRL' }}</td>
+            <td class="text-success">{{ totalGeralPago | currency }}</td>
+            <td class="text-danger">{{ totalGeralDevedor | currency }}</td>
             <td></td>
           </tr>
         </tfoot>
