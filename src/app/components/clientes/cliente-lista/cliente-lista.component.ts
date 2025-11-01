@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { ClienteService } from '../../../services/cliente.service';
 import { Cliente } from '../../../models/cliente.model';
 import { AuthService } from '../../../services/auth.service';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-cliente-lista',
@@ -18,7 +19,8 @@ export class ClienteListaComponent implements OnInit {
 
   constructor(
     private clienteService: ClienteService,
-    private router: Router
+    private router: Router,
+    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
@@ -38,7 +40,7 @@ export class ClienteListaComponent implements OnInit {
   excluirCliente(id: string): void {
     // Apenas administradores podem deletar
     if (!this.authService.isAdmin()) {
-      alert('Apenas administradores podem excluir clientes.');
+      this.modalService.showWarning('Apenas administradores podem excluir clientes.');
       return;
     }
 

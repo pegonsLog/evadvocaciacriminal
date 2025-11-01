@@ -37,14 +37,14 @@
         </div>
         <div class="card-body">
           <p><strong>Número do Contrato:</strong> {{ cliente.compra.numeroContrato }}</p>
-          <p><strong>Valor da Entrada:</strong> {{ cliente.compra.valorEntrada | currency }}</p>
-          <p><strong>Valor Total:</strong> {{ cliente.compra.valorTotal | currency }}</p>
+          <p><strong>Valor da Entrada:</strong> {{ cliente.compra.valorEntrada | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
+          <p><strong>Valor Total:</strong> {{ cliente.compra.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
           <p><strong>Número de Parcelas:</strong> {{ cliente.compra.numeroParcelas }}x</p>
-          <p><strong>Valor da Parcela:</strong> {{ cliente.compra.valorParcela | currency }}</p>
+          <p><strong>Valor da Parcela:</strong> {{ cliente.compra.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
           <p><strong>Dia de Vencimento:</strong> Todo dia {{ cliente.compra.diaVencimento }}</p>
           <p><strong>Data da Compra:</strong> {{ cliente.compra.dataCompra | date:'dd/MM/yyyy' }}</p>
           <p *ngIf="cliente.compra.estimativaValorPrevisto">
-            <strong>Estimativa Valor Previsto no Mês:</strong> {{ cliente.compra.estimativaValorPrevisto | currency }}
+            <strong>Estimativa Valor Previsto no Mês:</strong> {{ cliente.compra.estimativaValorPrevisto | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
           </p>
           <p *ngIf="cliente.compra.relatorioContratosPendentes">
             <strong>Relatório Contratos Pendentes:</strong><br>
@@ -68,13 +68,13 @@
         <div class="col-md-4">
           <div class="alert alert-success">
             <strong>Total Pago:</strong><br>
-            <h4>{{ totalPago | currency }}</h4>
+            <h4>{{ totalPago | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</h4>
           </div>
         </div>
         <div class="col-md-4">
           <div class="alert alert-warning">
             <strong>Saldo Devedor:</strong><br>
-            <h4>{{ saldoDevedor | currency }}</h4>
+            <h4>{{ saldoDevedor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</h4>
           </div>
         </div>
         <div class="col-md-4">

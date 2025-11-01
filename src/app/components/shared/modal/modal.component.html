@@ -1,0 +1,35 @@
+<div class="modal fade show d-block" *ngIf="modalData" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" [ngClass]="getHeaderClass()">
+        <h5 class="modal-title d-flex align-items-center">
+          <i class="bi me-2" [ngClass]="getIconClass()"></i>
+          {{ modalData.title }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="close()" 
+                *ngIf="modalData.type !== 'confirm'"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0" [innerHTML]="modalData.message"></p>
+      </div>
+      <div class="modal-footer">
+        <!-- Botões para modal de confirmação -->
+        <ng-container *ngIf="modalData.type === 'confirm'">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">
+            {{ modalData.cancelText || 'Cancelar' }}
+          </button>
+          <button type="button" class="btn btn-primary" (click)="onConfirm()">
+            {{ modalData.confirmText || 'Confirmar' }}
+          </button>
+        </ng-container>
+        
+        <!-- Botão para outros tipos de modal -->
+        <ng-container *ngIf="modalData.type !== 'confirm'">
+          <button type="button" class="btn btn-primary" (click)="close()">
+            OK
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

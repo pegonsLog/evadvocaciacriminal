@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ClienteService } from '../../../services/cliente.service';
 import { ParcelaService } from '../../../services/parcela.service';
 import { Cliente, Parcela } from '../../../models/cliente.model';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-pagamento-lista',
@@ -21,13 +22,13 @@ export class PagamentoListaComponent implements OnInit {
   valorPagoInput: string = '';
   observacaoInput: string = '';
   editandoData: boolean = false;
-  novaDataPagamentoInput: string = '';
 
   constructor(
     private clienteService: ClienteService,
     private parcelaService: ParcelaService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private modalService: ModalService
   ) { }
 
   ngOnInit(): void {
@@ -44,6 +45,11 @@ export class PagamentoListaComponent implements OnInit {
         .filter(p => p.clienteId === clienteId)
         .sort((a, b) => a.numeroParcela - b.numeroParcela);
     });
+    
+    // Atualizar status das parcelas após carregar (com delay para não interferir em operações recentes)
+    setTimeout(() => {
+      this.parcelaService.atualizarStatusParcelas();
+    }, 1000);
   }
 
   abrirModalPagamento(parcela: Parcela): void {
@@ -66,28 +72,46 @@ export class PagamentoListaComponent implements OnInit {
   }
 
   async confirmarPagamento(): Promise<void> {
+    console.log('💰 Iniciando confirmação de pagamento');
+    console.log('📝 Dados do formulário:', {
+      parcelaEditando: this.parcelaEditando?.id,
+      dataPagamentoInput: this.dataPagamentoInput,
+      valorPagoInput: this.valorPagoInput,
+      observacaoInput: this.observacaoInput
+    });
+
     if (!this.parcelaEditando || !this.dataPagamentoInput) {
-      alert('Preencha a data do pagamento!');
+      console.log('❌ Validação falhou - dados obrigatórios não preenchidos');
+      this.modalService.showWarning('Preencha a data do pagamento!');
       return;
     }
 
-    // Criar data no fuso horário local para evitar problemas de UTC
+    // Criar data no meio-dia para evitar problemas de fuso horário
     const [ano, mes, dia] = this.dataPagamentoInput.split('-').map(Number);
-    const data = new Date(ano, mes - 1, dia);
+    const data = new Date(ano, mes - 1, dia, 12, 0, 0, 0);
     const valor = parseFloat(this.valorPagoInput) || this.parcelaEditando.valorParcela;
 
+    console.log('📊 Dados processados:', {
+      data: data,
+      valor: valor,
+      parcelaId: this.parcelaEditando.id
+    });
+
     try {
+      console.log('🚀 Chamando registrarPagamento...');
       await this.parcelaService.registrarPagamento(
         this.parcelaEditando.id,
         valor,
         data,
         this.observacaoInput
       );
-      alert('Pagamento registrado com sucesso!');
-      this.cancelarPagamento();
+      console.log('✅ Pagamento registrado, mostrando modal de sucesso');
+      this.modalService.showSuccess('Pagamento registrado com sucesso!', 'Sucesso', () => {
+        this.cancelarPagamento();
+      });
     } catch (error) {
-      console.error('Erro ao registrar pagamento:', error);
-      alert('Erro ao registrar pagamento.');
+      console.error('💥 Erro ao registrar pagamento:', error);
+      this.modalService.showError('Erro ao registrar pagamento.');
     }
   }
 
@@ -103,7 +127,7 @@ export class PagamentoListaComponent implements OnInit {
     switch (status) {
       case 'pago': return 'Pago';
       case 'atrasado': return 'Atrasado';
-      default: return 'Pendente';
+      default: return 'Em Aberto';
     }
   }
 
@@ -120,43 +144,11 @@ export class PagamentoListaComponent implements OnInit {
   editarDataPagamento(parcela: Parcela): void {
     this.parcelaEditando = parcela;
     this.editandoData = true;
-    if (parcela.dataPagamento) {
-      // Converter data para formato local sem problemas de fuso horário
-      const data = new Date(parcela.dataPagamento);
-      const ano = data.getFullYear();
-      const mes = String(data.getMonth() + 1).padStart(2, '0');
-      const dia = String(data.getDate()).padStart(2, '0');
-      this.novaDataPagamentoInput = `${ano}-${mes}-${dia}`;
-    }
   }
 
   cancelarEdicaoData(): void {
     this.parcelaEditando = undefined;
     this.editandoData = false;
-    this.novaDataPagamentoInput = '';
-  }
-
-  async confirmarEdicaoData(): Promise<void> {
-    if (!this.parcelaEditando || !this.novaDataPagamentoInput) {
-      alert('Preencha a nova data do pagamento!');
-      return;
-    }
-
-    // Criar data no fuso horário local para evitar problemas de UTC
-    const [ano, mes, dia] = this.novaDataPagamentoInput.split('-').map(Number);
-    const novaData = new Date(ano, mes - 1, dia);
-
-    try {
-      await this.parcelaService.editarDataPagamento(
-        this.parcelaEditando.id,
-        novaData
-      );
-      alert('Data de pagamento alterada com sucesso!');
-      this.cancelarEdicaoData();
-    } catch (error) {
-      console.error('Erro ao alterar data de pagamento:', error);
-      alert('Erro ao alterar data de pagamento.');
-    }
   }
 
   async limparDataPagamento(): Promise<void> {
@@ -164,26 +156,34 @@ export class PagamentoListaComponent implements OnInit {
       return;
     }
 
-    const confirmacao = confirm(
-      `Tem certeza que deseja limpar a data de pagamento da parcela ${this.parcelaEditando.numeroParcela}?\n\n` +
-      'Esta ação irá:\n' +
-      '• Remover a data de pagamento\n' +
-      '• Alterar o status para "Pendente"\n' +
-      '• Recalcular os dias de atraso'
+    this.modalService.showConfirm(
+      `Tem certeza que deseja limpar a data de pagamento da parcela ${this.parcelaEditando.numeroParcela}?<br><br>` +
+      'Esta ação irá:<br>' +
+      '• Remover a data de pagamento<br>' +
+      '• Alterar o status para "Em Aberto"<br>' +
+      '• Recalcular os dias de atraso',
+      async () => {
+        console.log('🚀 Callback de confirmação executado');
+        console.log('📝 Parcela sendo editada:', {
+          id: this.parcelaEditando?.id,
+          status: this.parcelaEditando?.status,
+          dataPagamento: this.parcelaEditando?.dataPagamento
+        });
+        
+        try {
+          await this.parcelaService.limparDataPagamento(this.parcelaEditando!.id);
+          console.log('🎉 Serviço executado, mostrando modal de sucesso');
+          this.modalService.showSuccess('Data de pagamento removida com sucesso! A parcela voltou ao status em aberto.', 'Sucesso', () => {
+            console.log('🔄 Callback de sucesso executado, cancelando edição');
+            this.cancelarEdicaoData();
+          });
+        } catch (error) {
+          console.error('❌ Erro ao limpar data de pagamento:', error);
+          this.modalService.showError('Erro ao limpar data de pagamento.');
+        }
+      },
+      'Confirmar Limpeza'
     );
-
-    if (!confirmacao) {
-      return;
-    }
-
-    try {
-      await this.parcelaService.limparDataPagamento(this.parcelaEditando.id);
-      alert('Data de pagamento removida com sucesso! A parcela voltou ao status pendente.');
-      this.cancelarEdicaoData();
-    } catch (error) {
-      console.error('Erro ao limpar data de pagamento:', error);
-      alert('Erro ao limpar data de pagamento.');
-    }
   }
 
   voltar(): void {

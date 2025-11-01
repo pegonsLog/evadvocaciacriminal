@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ParcelaService } from '../../../services/parcela.service';
 import { ClienteService } from '../../../services/cliente.service';
 import { Parcela, Cliente } from '../../../models/cliente.model';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-parcela-lista',
@@ -22,7 +23,8 @@ export class ParcelaListaComponent implements OnInit {
     private parcelaService: ParcelaService,
     private clienteService: ClienteService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
@@ -39,6 +41,11 @@ export class ParcelaListaComponent implements OnInit {
         .filter(p => p.clienteId === this.clienteId)
         .sort((a, b) => a.numeroParcela - b.numeroParcela);
     });
+    
+    // Atualizar status das parcelas após carregar (com delay para não interferir em operações recentes)
+    setTimeout(() => {
+      this.parcelaService.atualizarStatusParcelas();
+    }, 1000);
   }
 
   parcelaEditando?: Parcela;
@@ -48,9 +55,12 @@ export class ParcelaListaComponent implements OnInit {
 
   abrirModalPagamento(parcela: Parcela): void {
     this.parcelaEditando = parcela;
-    // Preencher com a data de hoje por padrão
+    // Converter data atual para formato local sem problemas de fuso horário
     const hoje = new Date();
-    this.dataPagamentoInput = hoje.toISOString().split('T')[0];
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    this.dataPagamentoInput = `${ano}-${mes}-${dia}`;
     this.valorPagoInput = parcela.valorParcela.toString();
     this.observacaoInput = '';
   }
@@ -64,11 +74,13 @@ export class ParcelaListaComponent implements OnInit {
 
   async confirmarPagamento(): Promise<void> {
     if (!this.parcelaEditando || !this.dataPagamentoInput) {
-      alert('Preencha a data do pagamento!');
+      this.modalService.showWarning('Preencha a data do pagamento!');
       return;
     }
 
-    const data = new Date(this.dataPagamentoInput);
+    // Criar data no meio-dia para evitar problemas de fuso horário
+    const [ano, mes, dia] = this.dataPagamentoInput.split('-').map(Number);
+    const data = new Date(ano, mes - 1, dia, 12, 0, 0, 0);
     const valor = parseFloat(this.valorPagoInput) || this.parcelaEditando.valorParcela;
 
     try {
@@ -78,11 +90,12 @@ export class ParcelaListaComponent implements OnInit {
         data,
         this.observacaoInput
       );
-      alert('Pagamento registrado com sucesso!');
-      this.cancelarPagamento();
+      this.modalService.showSuccess('Pagamento registrado com sucesso!', 'Sucesso', () => {
+        this.cancelarPagamento();
+      });
     } catch (error) {
       console.error('Erro ao registrar pagamento:', error);
-      alert('Erro ao registrar pagamento.');
+      this.modalService.showError('Erro ao registrar pagamento.');
     }
   }
 
@@ -98,7 +111,7 @@ export class ParcelaListaComponent implements OnInit {
     switch (status) {
       case 'pago': return 'Pago';
       case 'atrasado': return 'Atrasado';
-      default: return 'Pendente';
+      default: return 'Em Aberto';
     }
   }
 
@@ -114,5 +127,10 @@ export class ParcelaListaComponent implements OnInit {
 
   contarPorStatus(status: string): number {
     return this.parcelas.filter(p => p.status === status).length;
+  }
+
+  editarParcela(parcela: Parcela): void {
+    // Redirecionar para a página de pagamentos onde há mais opções de edição
+    this.router.navigate(['/pagamentos', this.clienteId]);
   }
 }

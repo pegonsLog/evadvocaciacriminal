@@ -11,12 +11,12 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Verifica se o usuário é administrador (usando custom claims seria melhor, mas simplificando por ora)
+    // Verifica se o usuário é administrador (usando email específico)
     function isAdmin() {
       return isAuthenticated() && request.auth.token.email == 'evadvocaciacriminal@gmail.com';
     }
 
-    // Verifica se o usuário está ativo (simplificado para evitar loops de permissão)
+    // Verifica se o usuário está ativo (simplificado)
     function isActiveUser() {
       return isAuthenticated();
     }
@@ -57,11 +57,11 @@ service cloud.firestore {
     // ==========================================
 
     match /clientes/{clienteId} {
-      // Leitura: Qualquer usuário autenticado e ativo pode ler
-      allow read: if isActiveUser();
+      // Leitura: Qualquer usuário autenticado pode ler
+      allow read: if isAuthenticated();
 
-      // Criação e Atualização: Qualquer usuário autenticado e ativo pode criar e atualizar
-      allow create, update: if isActiveUser() &&
+      // Criação e Atualização: Qualquer usuário autenticado pode criar e atualizar
+      allow create, update: if isAuthenticated() &&
                                request.resource.data.keys().hasAll(['nome', 'cpf', 'telefone', 'compra']) &&
                                request.resource.data.nome is string &&
                                request.resource.data.cpf is string &&
@@ -69,7 +69,7 @@ service cloud.firestore {
                                request.resource.data.compra is map;
 
       // Deleção: Apenas administradores podem deletar clientes
-      allow delete: if isAdmin() && isActiveUser();
+      allow delete: if isAdmin();
     }
 
     // ==========================================
@@ -77,22 +77,22 @@ service cloud.firestore {
     // ==========================================
 
     match /parcelas/{parcelaId} {
-      // Leitura: Qualquer usuário autenticado e ativo pode ler
-      allow read: if isActiveUser();
+      // Leitura: Qualquer usuário autenticado pode ler
+      allow read: if isAuthenticated();
 
-      // Criação: Qualquer usuário autenticado e ativo pode criar com todos os campos obrigatórios
-      allow create: if isActiveUser() &&
+      // Criação: Qualquer usuário autenticado pode criar
+      allow create: if isAuthenticated() &&
                        request.resource.data.keys().hasAll(['clienteId', 'numeroParcela', 'valorParcela', 'dataVencimento', 'status']) &&
                        request.resource.data.clienteId is string &&
                        request.resource.data.numeroParcela is number &&
                        request.resource.data.valorParcela is number &&
                        request.resource.data.status in ['pendente', 'pago', 'atrasado'];
 
-      // Atualização: Qualquer usuário autenticado e ativo pode atualizar (permite atualizações parciais)
-      allow update: if isActiveUser();
+      // Atualização: Qualquer usuário autenticado pode atualizar
+      allow update: if isAuthenticated();
 
       // Deleção: Apenas administradores podem deletar parcelas
-      allow delete: if isAdmin() && isActiveUser();
+      allow delete: if isAdmin();
     }
 
     // ==========================================
@@ -100,17 +100,17 @@ service cloud.firestore {
     // ==========================================
 
     match /pagamentos/{pagamentoId} {
-      // Leitura: Qualquer usuário autenticado e ativo pode ler
-      allow read: if isActiveUser();
+      // Leitura: Qualquer usuário autenticado pode ler
+      allow read: if isAuthenticated();
 
-      // Criação e Atualização: Qualquer usuário autenticado e ativo pode criar e atualizar
-      allow create, update: if isActiveUser() &&
+      // Criação e Atualização: Qualquer usuário autenticado pode criar e atualizar
+      allow create, update: if isAuthenticated() &&
                                request.resource.data.keys().hasAll(['clienteId', 'valor', 'dataPagamento']) &&
                                request.resource.data.clienteId is string &&
                                request.resource.data.valor is number;
 
       // Deleção: Apenas administradores podem deletar pagamentos
-      allow delete: if isAdmin() && isActiveUser();
+      allow delete: if isAdmin();
     }
 
     // ==========================================

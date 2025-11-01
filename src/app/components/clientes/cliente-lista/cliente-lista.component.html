@@ -28,9 +28,9 @@
           <td>{{ cliente.nome }}</td>
           <td>{{ cliente.cpf }}</td>
           <td>{{ cliente.telefone }}</td>
-          <td>{{ cliente.compra.valorTotal | currency }}</td>
+          <td>{{ cliente.compra.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
           <td>{{ cliente.compra.numeroParcelas }}x</td>
-          <td>{{ cliente.compra.valorParcela | currency }}</td>
+          <td>{{ cliente.compra.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
           <td>
             <div class="btn-group" role="group">
               <button class="btn btn-sm btn-success btn-action" (click)="verParcelas(cliente.id)" title="Ver Parcelas">

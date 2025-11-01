@@ -1,0 +1,11 @@
+# Comando para matar processo na porta 4200
+
+## macOS/Linux:
+lsof -ti:4200 | xargs kill -9
+
+## Alternativa macOS/Linux:
+sudo kill -9 $(lsof -ti:4200)
+
+## Windows:
+netstat -ano | findstr :4200
+taskkill /PID <PID_NUMBER> /F

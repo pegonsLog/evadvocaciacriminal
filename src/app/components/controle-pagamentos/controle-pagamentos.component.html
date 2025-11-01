@@ -22,11 +22,11 @@
         <tbody>
           <tr *ngFor="let resumo of resumos">
             <td>{{ resumo.clienteNome }}</td>
-            <td>{{ resumo.valorCompra | currency }}</td>
+            <td>{{ resumo.valorCompra | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
             <td>{{ resumo.numeroParcelas }}x</td>
-            <td>{{ resumo.valorParcela | currency }}</td>
-            <td class="text-success fw-bold">{{ resumo.totalPago | currency }}</td>
-            <td class="text-danger fw-bold">{{ resumo.saldoDevedor | currency }}</td>
+            <td>{{ resumo.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+            <td class="text-success fw-bold">{{ resumo.totalPago | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+            <td class="text-danger fw-bold">{{ resumo.saldoDevedor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
             <td>
               <div class="btn-group" role="group">
                 <button class="btn btn-sm btn-info btn-action" (click)="verDetalhes(resumo.clienteId)"
@@ -44,10 +44,10 @@
         <tfoot class="table-secondary">
           <tr class="fw-bold">
             <td>TOTAIS</td>
-            <td>{{ totalGeralCompras | currency }}</td>
+            <td>{{ totalGeralCompras | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
             <td colspan="2"></td>
-            <td class="text-success">{{ totalGeralPago | currency }}</td>
-            <td class="text-danger">{{ totalGeralDevedor | currency }}</td>
+            <td class="text-success">{{ totalGeralPago | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+            <td class="text-danger">{{ totalGeralDevedor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
             <td></td>
           </tr>
         </tfoot>

@@ -12,13 +12,13 @@
     <div class="card-body">
       <div class="row mb-3">
         <div class="col-md-3">
-          <strong>Valor Total:</strong> {{ cliente.compra.valorTotal | currency }}
+          <strong>Valor Total:</strong> {{ cliente.compra.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
         </div>
         <div class="col-md-3">
           <strong>Número de Parcelas:</strong> {{ cliente.compra.numeroParcelas }}
         </div>
         <div class="col-md-3">
-          <strong>Valor da Parcela:</strong> {{ cliente.compra.valorParcela | currency }}
+          <strong>Valor da Parcela:</strong> {{ cliente.compra.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
         </div>
         <div class="col-md-3">
           <strong>Dia de Vencimento:</strong> {{ cliente.compra.diaVencimento }}
@@ -46,7 +46,7 @@
             <tr *ngFor="let parcela of parcelas">
               <td><strong>{{ parcela.numeroParcela }}/{{ cliente.compra.numeroParcelas }}</strong></td>
               <td>{{ parcela.dataVencimento | date:'dd/MM/yyyy' }}</td>
-              <td>{{ parcela.valorParcela | currency }}</td>
+              <td>{{ parcela.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
               <td>
                 <span class="badge bg-{{ getStatusClass(parcela.status) }}">
                   {{ getStatusText(parcela.status) }}
@@ -67,17 +67,15 @@
                 </span>
               </td>
               <td>
-                <div class="btn-group" role="group" *ngIf="parcela.status !== 'pago'">
+                <div class="btn-group" role="group">
                   <button class="btn btn-sm btn-success btn-action" (click)="abrirModalPagamento(parcela)"
-                    title="Registrar Pagamento">
+                    title="Registrar Pagamento" *ngIf="parcela.status !== 'pago'">
                     <i class="bi bi-check-circle"></i>
                   </button>
-                </div>
-                <div class="btn-group" role="group" *ngIf="parcela.status === 'pago'">
-                  <span class="text-success me-2">
+                  <span class="text-success me-2" *ngIf="parcela.status === 'pago'">
                     <i class="bi bi-check-circle-fill"></i> Pago
                   </span>
-                  <button class="btn btn-sm btn-warning btn-action" (click)="editarDataPagamento(parcela)"
+                  <button class="btn btn-sm btn-danger btn-action" (click)="editarDataPagamento(parcela)"
                     title="Editar Data de Pagamento">
                     <i class="bi bi-pencil"></i>
                   </button>
@@ -99,14 +97,14 @@
                   <strong>Pagas:</strong> {{ contarPorStatus('pago') }}
                 </div>
                 <div class="col-md-3">
-                  <strong>Pendentes:</strong> {{ contarPorStatus('pendente') }}
+                  <strong>Em Aberto:</strong> {{ contarPorStatus('pendente') }}
                 </div>
                 <div class="col-md-3">
                   <strong>Atrasadas:</strong> {{ contarPorStatus('atrasado') }}
                 </div>
                 <div class="col-md-3">
                   <strong>Total Pago:</strong>
-                  {{ calcularTotalPago() | currency }}
+                  {{ calcularTotalPago() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
                 </div>
               </div>
             </div>
@@ -131,7 +129,7 @@
           <p><strong>Cliente:</strong> {{ parcelaEditando.clienteNome }}</p>
           <p><strong>Parcela:</strong> {{ parcelaEditando.numeroParcela }}/{{ cliente?.compra?.numeroParcelas }}</p>
           <p><strong>Vencimento:</strong> {{ parcelaEditando.dataVencimento | date:'dd/MM/yyyy' }}</p>
-          <p><strong>Valor da Parcela:</strong> {{ parcelaEditando.valorParcela | currency }}</p>
+          <p><strong>Valor da Parcela:</strong> {{ parcelaEditando.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
         </div>
 
         <hr>
@@ -147,7 +145,7 @@
             <span class="input-group-text">R$</span>
             <input type="number" class="form-control" id="valorPago" [(ngModel)]="valorPagoInput" step="0.01" required>
           </div>
-          <small class="text-muted">Valor padrão: {{ parcelaEditando.valorParcela | currency }}</small>
+          <small class="text-muted">Valor padrão: {{ parcelaEditando.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</small>
         </div>
 
         <div class="mb-3">
@@ -172,7 +170,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Editar Data de Pagamento</h5>
+        <h5 class="modal-title">Gerenciar Pagamento</h5>
         <button type="button" class="btn-close" (click)="cancelarEdicaoData()"></button>
       </div>
       <div class="modal-body">
@@ -180,31 +178,22 @@
           <p><strong>Cliente:</strong> {{ parcelaEditando.clienteNome }}</p>
           <p><strong>Parcela:</strong> {{ parcelaEditando.numeroParcela }}/{{ cliente?.compra?.numeroParcelas }}</p>
           <p><strong>Vencimento:</strong> {{ parcelaEditando.dataVencimento | date:'dd/MM/yyyy' }}</p>
-          <p><strong>Valor Pago:</strong> {{ parcelaEditando.valorPago | currency }}</p>
-          <p><strong>Data Atual:</strong> {{ parcelaEditando.dataPagamento | date:'dd/MM/yyyy' }}</p>
-        </div>
-
-        <hr>
-
-        <div class="mb-3">
-          <label for="novaDataPagamento" class="form-label">Nova Data do Pagamento *</label>
-          <input type="date" class="form-control" id="novaDataPagamento" [(ngModel)]="novaDataPagamentoInput" required>
+          <p><strong>Valor da Parcela:</strong> {{ parcelaEditando.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
+          <p *ngIf="parcelaEditando.valorPago"><strong>Valor Pago:</strong> {{ parcelaEditando.valorPago | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
+          <p *ngIf="parcelaEditando.dataPagamento"><strong>Data de Pagamento:</strong> {{ parcelaEditando.dataPagamento | date:'dd/MM/yyyy' }}</p>
         </div>
 
         <div class="alert alert-warning">
           <i class="bi bi-exclamation-triangle"></i>
-          <strong>Atenção:</strong> Esta ação irá alterar a data de pagamento registrada para esta parcela.
+          <strong>Atenção:</strong> Esta ação irá remover completamente o pagamento registrado e voltar a parcela para o status "Em Aberto".
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="cancelarEdicaoData()">
           Cancelar
         </button>
-        <button type="button" class="btn btn-danger btn-action" (click)="limparDataPagamento()">
-          <i class="bi bi-x-circle"></i> Limpar Data
-        </button>
-        <button type="button" class="btn btn-warning btn-action" (click)="confirmarEdicaoData()">
-          <i class="bi bi-pencil"></i> Alterar Data
+        <button type="button" class="btn btn-danger" (click)="limparDataPagamento()">
+          <i class="bi bi-x-circle"></i> Remover Pagamento
         </button>
       </div>
     </div>

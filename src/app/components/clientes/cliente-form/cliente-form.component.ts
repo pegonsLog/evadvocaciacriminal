@@ -6,6 +6,7 @@ import { ClienteService } from '../../../services/cliente.service';
 import { ParcelaService } from '../../../services/parcela.service';
 import { Cliente } from '../../../models/cliente.model';
 import { provideNgxMask, NgxMaskDirective } from 'ngx-mask';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-cliente-form',
@@ -25,7 +26,8 @@ export class ClienteFormComponent implements OnInit {
     private clienteService: ClienteService,
     private parcelaService: ParcelaService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
@@ -153,6 +155,9 @@ export class ClienteFormComponent implements OnInit {
       try {
         if (this.isEditMode) {
           await this.clienteService.updateCliente(cliente);
+          this.modalService.showSuccess('Cliente atualizado com sucesso!', 'Sucesso', () => {
+            this.router.navigate(['/clientes']);
+          });
         } else {
           // Adicionar cliente e obter o ID gerado
           const clienteId = await this.clienteService.addCliente(cliente);
@@ -163,12 +168,13 @@ export class ClienteFormComponent implements OnInit {
           // Gerar parcelas automaticamente com o ID correto
           await this.parcelaService.gerarParcelas(cliente);
           
-          alert(`Cliente cadastrado com sucesso! ${cliente.compra.numeroParcelas} parcelas foram geradas.`);
+          this.modalService.showSuccess(`Cliente cadastrado com sucesso! ${cliente.compra.numeroParcelas} parcelas foram geradas.`, 'Sucesso', () => {
+            this.router.navigate(['/clientes']);
+          });
         }
-        this.router.navigate(['/clientes']);
       } catch (error) {
         console.error('Erro ao salvar cliente:', error);
-        alert('Erro ao salvar cliente. Verifique o console para mais detalhes.');
+        this.modalService.showError('Erro ao salvar cliente. Verifique o console para mais detalhes.');
       }
     } else {
       this.marcarCamposComoTocados();
