@@ -367,6 +367,9 @@ $shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
             justify-content: center;
             transition: all 0.2s ease;
             cursor: pointer;
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
 
             &.details {
               background: rgba(20, 184, 166, 0.1);
@@ -545,6 +548,19 @@ $shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
       flex-direction: column !important;
       gap: 1rem !important;
       text-align: center !important;
+      
+      .action-buttons {
+        justify-content: center !important;
+        
+        .action-btn {
+          width: 40px !important;
+          height: 40px !important;
+          font-size: 1rem !important;
+          position: relative !important;
+          z-index: 20 !important;
+          pointer-events: auto !important;
+        }
+      }
     }
   }
 }
