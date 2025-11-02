@@ -1,4 +1,302 @@
-/* Remove as setas dos inputs numéricos */
+$primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+$warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+$shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+$shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+
+.form-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.header-section {
+  background: $primary;
+  padding: 2.5rem 0 1.5rem;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  color: white;
+
+  .page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .page-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    font-weight: 300;
+    margin: 0;
+  }
+
+  .form-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    .progress-circle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+
+      &.active {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+    }
+
+    .progress-line {
+      width: 40px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+.modern-form {
+  margin-top: -1.5rem;
+  position: relative;
+  z-index: 2;
+
+  .form-section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: $shadow;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-hover;
+    }
+
+    .section-header {
+      padding: 2rem;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      .section-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+
+        &.personal {
+          background: $primary;
+        }
+
+        &.contract {
+          background: $success;
+        }
+      }
+
+      .section-title h4 {
+        color: #2d3748;
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+      }
+
+      .section-title p {
+        color: #718096;
+        margin: 0;
+        font-size: 0.95rem;
+      }
+    }
+
+    .section-content {
+      padding: 2rem;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      color: #4a5568;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+
+      i {
+        color: #a0aec0;
+      }
+    }
+
+    .modern-input {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #fafafa;
+
+      &:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: white;
+      }
+
+      &.calculated-field {
+        background: #f8fafc;
+        color: #718096;
+        font-style: italic;
+      }
+
+      &.is-invalid {
+        border-color: #e53e3e;
+        box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+      }
+    }
+
+    .modern-input-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .input-prefix {
+        position: absolute;
+        left: 1rem;
+        color: #718096;
+        font-weight: 600;
+        z-index: 3;
+        background: #fafafa;
+        padding: 0 0.5rem;
+      }
+
+      .modern-input {
+        padding-left: 3rem;
+      }
+    }
+
+    .form-hint {
+      display: flex;
+      align-items: center;
+      color: #718096;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+
+      i {
+        color: #a0aec0;
+      }
+    }
+
+    .invalid-feedback {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #e53e3e;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+
+      &::before {
+        content: '⚠';
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .financial-grid {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+  }
+}
+
+.form-actions {
+  background: white;
+  border-radius: 16px;
+  box-shadow: $shadow;
+  overflow: hidden;
+
+  .actions-content {
+    padding: 2rem;
+
+    .form-validation-summary {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(229, 62, 62, 0.1);
+      border: 1px solid rgba(229, 62, 62, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+
+      .validation-icon {
+        color: #e53e3e;
+        font-size: 1.25rem;
+      }
+
+      .validation-text {
+        color: #c53030;
+        font-size: 0.95rem;
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+
+      .btn {
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+
+        &.btn-outline-secondary {
+          border: 2px solid #e2e8f0;
+          color: #718096;
+
+          &:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+          }
+        }
+
+        &.btn-primary {
+          background: $primary;
+          border: none;
+
+          &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Remove spinners from number inputs
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -17,4 +315,71 @@ input[type="number"] {
 
 .no-spinners {
   -moz-appearance: textfield;
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.75rem !important;
+    text-align: center;
+  }
+
+  .page-subtitle {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .form-progress {
+    margin-top: 1.5rem;
+  }
+
+  .section-header {
+    flex-direction: column !important;
+    text-align: center;
+    gap: 1rem !important;
+
+    .section-title {
+      text-align: center;
+    }
+  }
+
+  .action-buttons {
+    flex-direction: column !important;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .modern-input-group .input-prefix {
+    background: white !important;
+  }
+}
+
+// Small Mobile Styles
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.5rem !important;
+    
+    i {
+      font-size: 1.25rem !important;
+      margin-right: 0.5rem !important;
+    }
+  }
+
+  .page-subtitle {
+    font-size: 0.9rem !important;
+  }
+
+  .form-card {
+    margin: 0.5rem !important;
+    
+    .form-header {
+      padding: 1.25rem !important;
+      
+      h4 {
+        font-size: 1.1rem !important;
+      }
+    }
+  }
 }

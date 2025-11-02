@@ -1,62 +1,146 @@
-<div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <h2>EV Advocacia Criminal</h2>
-      <p class="subtitle">Sistema de Gestão de Pagamentos</p>
+<div class="modern-login-container">
+  <!-- Background Elements -->
+  <div class="background-elements">
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+    <div class="floating-shape shape-4"></div>
+  </div>
+
+  <!-- Login Card -->
+  <div class="modern-login-card">
+    <!-- Brand Section -->
+    <div class="brand-section">
+      <div class="brand-logo">
+        <div class="logo-icon">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">EV Advocacia</h1>
+          <p class="brand-subtitle">Criminal</p>
+        </div>
+      </div>
+      <p class="welcome-text">Sistema de Gestão de Pagamentos</p>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
-        {{ errorMessage }}
+    <!-- Login Form -->
+    <div class="login-section">
+      <div class="form-header">
+        <h2>Bem-vindo de volta</h2>
+        <p>Entre com suas credenciais para acessar o sistema</p>
       </div>
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          class="form-control"
-          formControlName="email"
-          placeholder="seu@email.com"
-          [class.is-invalid]="email?.invalid && email?.touched"
-        />
-        <div class="invalid-feedback" *ngIf="email?.invalid && email?.touched">
-          <span *ngIf="email?.errors?.['required']">Email é obrigatório</span>
-          <span *ngIf="email?.errors?.['email']">Email inválido</span>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="modern-login-form">
+        <!-- Error Alert -->
+        <div class="modern-alert error" *ngIf="errorMessage" role="alert">
+          <div class="alert-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <div class="alert-content">
+            <strong>Erro de autenticação</strong>
+            <p>{{ errorMessage }}</p>
+          </div>
+        </div>
+
+        <!-- Email Field -->
+        <div class="modern-form-group">
+          <label for="email" class="modern-label">
+            <i class="bi bi-envelope me-2"></i>
+            Email
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="email"
+              id="email"
+              class="modern-input"
+              formControlName="email"
+              placeholder="Digite seu email"
+              [class.error]="email?.invalid && email?.touched"
+            />
+            <div class="input-icon">
+              <i class="bi bi-person"></i>
+            </div>
+          </div>
+          <div class="error-message" *ngIf="email?.invalid && email?.touched">
+            <i class="bi bi-exclamation-circle me-1"></i>
+            <span *ngIf="email?.errors?.['required']">Email é obrigatório</span>
+            <span *ngIf="email?.errors?.['email']">Email inválido</span>
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="modern-form-group">
+          <label for="password" class="modern-label">
+            <i class="bi bi-lock me-2"></i>
+            Senha
+          </label>
+          <div class="input-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              class="modern-input"
+              formControlName="password"
+              placeholder="Digite sua senha"
+              [class.error]="password?.invalid && password?.touched"
+            />
+            <button 
+              type="button" 
+              class="password-toggle"
+              (click)="togglePassword()"
+              tabindex="-1">
+              <i class="bi" [class]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="password?.invalid && password?.touched">
+            <i class="bi bi-exclamation-circle me-1"></i>
+            <span *ngIf="password?.errors?.['required']">Senha é obrigatória</span>
+            <span *ngIf="password?.errors?.['minlength']">Senha deve ter no mínimo 6 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Login Button -->
+        <button
+          type="submit"
+          class="modern-login-btn"
+          [disabled]="loading || loginForm.invalid"
+          [class.loading]="loading"
+        >
+          <span class="btn-content" *ngIf="!loading">
+            <i class="bi bi-box-arrow-in-right me-2"></i>
+            Entrar no Sistema
+          </span>
+          <span class="btn-content loading-content" *ngIf="loading">
+            <div class="modern-spinner"></div>
+            Autenticando...
+          </span>
+        </button>
+      </form>
+
+      <!-- Additional Options -->
+      <div class="login-options">
+        <div class="divider">
+          <span>ou</span>
+        </div>
+        <button type="button" class="forgot-password-btn" disabled>
+          <i class="bi bi-question-circle me-2"></i>
+          Esqueceu sua senha?
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modern-footer">
+      <div class="footer-content">
+        <p class="copyright">© 2025 EV Advocacia Criminal</p>
+        <div class="footer-links">
+          <span class="version">v1.0.0</span>
+          <span class="separator">•</span>
+          <span class="secure">
+            <i class="bi bi-shield-lock me-1"></i>
+            Conexão Segura
+          </span>
         </div>
       </div>
-
-      <div class="form-group">
-        <label for="password">Senha</label>
-        <input
-          type="password"
-          id="password"
-          class="form-control"
-          formControlName="password"
-          placeholder="••••••••"
-          [class.is-invalid]="password?.invalid && password?.touched"
-        />
-        <div class="invalid-feedback" *ngIf="password?.invalid && password?.touched">
-          <span *ngIf="password?.errors?.['required']">Senha é obrigatória</span>
-          <span *ngIf="password?.errors?.['minlength']">Senha deve ter no mínimo 6 caracteres</span>
-        </div>
-      </div>
-
-      <button
-        type="submit"
-        class="btn btn-primary btn-block"
-        [disabled]="loading"
-      >
-        <span *ngIf="!loading">Entrar</span>
-        <span *ngIf="loading">
-          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          Entrando...
-        </span>
-      </button>
-    </form>
-
-    <div class="login-footer">
-      <p class="text-muted">© 2025 EV Advocacia Criminal</p>
     </div>
   </div>
 </div>

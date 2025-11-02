@@ -50,23 +50,34 @@ export class ModalComponent implements OnInit, OnDestroy {
 
   getIconClass(): string {
     switch (this.modalData?.type) {
-      case 'success': return 'bi-check-circle-fill text-success';
-      case 'error': return 'bi-x-circle-fill text-danger';
-      case 'warning': return 'bi-exclamation-triangle-fill text-warning';
-      case 'info': return 'bi-info-circle-fill text-info';
-      case 'confirm': return 'bi-question-circle-fill text-primary';
-      default: return 'bi-info-circle-fill text-info';
+      case 'success': return 'bi-check-circle-fill';
+      case 'error': return 'bi-x-circle-fill';
+      case 'warning': return 'bi-exclamation-triangle-fill';
+      case 'info': return 'bi-info-circle-fill';
+      case 'confirm': return 'bi-question-circle-fill';
+      default: return 'bi-info-circle-fill';
     }
   }
 
-  getHeaderClass(): string {
+  getIconContainerClass(): string {
     switch (this.modalData?.type) {
-      case 'success': return 'bg-success text-white';
-      case 'error': return 'bg-danger text-white';
-      case 'warning': return 'bg-warning text-dark';
-      case 'info': return 'bg-info text-white';
-      case 'confirm': return 'bg-primary text-white';
-      default: return 'bg-info text-white';
+      case 'success': return 'icon-success';
+      case 'error': return 'icon-error';
+      case 'warning': return 'icon-warning';
+      case 'info': return 'icon-info';
+      case 'confirm': return 'icon-confirm';
+      default: return 'icon-info';
+    }
+  }
+
+  getModalClass(): string {
+    switch (this.modalData?.type) {
+      case 'success': return 'modal-success';
+      case 'error': return 'modal-error';
+      case 'warning': return 'modal-warning';
+      case 'info': return 'modal-info';
+      case 'confirm': return 'modal-confirm';
+      default: return 'modal-info';
     }
   }
 }

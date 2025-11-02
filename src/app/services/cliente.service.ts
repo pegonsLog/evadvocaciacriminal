@@ -2,12 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, collectionSnapshots, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, onSnapshot } from '@angular/fire/firestore';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Cliente, Pagamento, ResumoPagamento } from '../models/cliente.model';
+import { ParcelaService } from './parcela.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClienteService {
   private firestore = inject(Firestore);
+  private parcelaService = inject(ParcelaService);
   private clientesCollection = collection(this.firestore, 'clientes');
   private pagamentosCollection = collection(this.firestore, 'pagamentos');
   
@@ -53,7 +55,9 @@ export class ClienteService {
 
   async deleteCliente(id: string): Promise<void> {
     const clienteDoc = doc(this.firestore, `clientes/${id}`);
-    await deleteDoc(clienteDoc);
+    
+    // Deletar parcelas relacionadas
+    await this.parcelaService.deleteParcelasByCliente(id);
     
     // Deletar pagamentos relacionados
     const pagamentosQuery = query(this.pagamentosCollection, where('clienteId', '==', id));
@@ -61,6 +65,9 @@ export class ClienteService {
     snapshot.forEach(async (docSnapshot) => {
       await deleteDoc(docSnapshot.ref);
     });
+    
+    // Deletar o cliente
+    await deleteDoc(clienteDoc);
   }
 
   // Pagamentos

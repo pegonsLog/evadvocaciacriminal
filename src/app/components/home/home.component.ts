@@ -78,6 +78,50 @@ export class HomeComponent implements OnInit {
     return this.resumos.get(clienteId) || { totalPago: 0, saldoDevedor: 0, parcelasPagas: 0 };
   }
 
+  getTotalRecebido(): number {
+    return Array.from(this.resumos.values())
+      .reduce((total, resumo) => total + resumo.totalPago, 0);
+  }
+
+  getTotalPendente(): number {
+    return Array.from(this.resumos.values())
+      .reduce((total, resumo) => total + resumo.saldoDevedor, 0);
+  }
+
+  getPercentualRecebido(): number {
+    const totalRecebido = this.getTotalRecebido();
+    const totalGeral = totalRecebido + this.getTotalPendente();
+    return totalGeral > 0 ? Math.round((totalRecebido / totalGeral) * 100) : 0;
+  }
+
+  getStatusClass(clienteId: string): string {
+    const resumo = this.getResumo(clienteId);
+    const cliente = this.clientes.find(c => c.id === clienteId);
+    if (!cliente) return 'status-neutral';
+    
+    const percentualPago = (resumo.parcelasPagas / cliente.compra.numeroParcelas) * 100;
+    
+    if (percentualPago === 100) return 'status-success';
+    if (percentualPago >= 50) return 'status-warning';
+    return 'status-danger';
+  }
+
+  getStatusIcon(clienteId: string): string {
+    const resumo = this.getResumo(clienteId);
+    const cliente = this.clientes.find(c => c.id === clienteId);
+    if (!cliente) return 'bi-circle';
+    
+    const percentualPago = (resumo.parcelasPagas / cliente.compra.numeroParcelas) * 100;
+    
+    if (percentualPago === 100) return 'bi-check-circle-fill';
+    if (percentualPago >= 50) return 'bi-clock-fill';
+    return 'bi-exclamation-circle-fill';
+  }
+
+  trackByClienteId(index: number, cliente: Cliente): string {
+    return cliente.id;
+  }
+
   verDetalhes(clienteId: string): void {
     this.router.navigate(['/clientes', clienteId]);
   }

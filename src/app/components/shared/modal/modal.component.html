@@ -1,32 +1,44 @@
-<div class="modal fade show d-block" *ngIf="modalData" style="background-color: rgba(0,0,0,0.5);">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header" [ngClass]="getHeaderClass()">
-        <h5 class="modal-title d-flex align-items-center">
-          <i class="bi me-2" [ngClass]="getIconClass()"></i>
-          {{ modalData.title }}
-        </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="close()" 
-                *ngIf="modalData.type !== 'confirm'"></button>
+<div class="elegant-modal-overlay" *ngIf="modalData" (click)="close()">
+  <div class="elegant-modal-container" (click)="$event.stopPropagation()">
+    <div class="elegant-modal-card" [ngClass]="getModalClass()">
+      
+      <!-- Close Button (for non-confirm modals) -->
+      <button type="button" class="elegant-close-btn" (click)="close()" 
+              *ngIf="modalData.type !== 'confirm'">
+        <i class="bi bi-x"></i>
+      </button>
+
+      <!-- Modal Icon -->
+      <div class="modal-icon-container" [ngClass]="getIconContainerClass()">
+        <div class="icon-background">
+          <div class="icon-circle">
+            <i class="bi modal-icon" [ngClass]="getIconClass()"></i>
+          </div>
+        </div>
       </div>
-      <div class="modal-body">
-        <p class="mb-0" [innerHTML]="modalData.message"></p>
+
+      <!-- Modal Content -->
+      <div class="modal-content-section">
+        <h3 class="modal-title">{{ modalData.title }}</h3>
+        <div class="modal-message" [innerHTML]="modalData.message"></div>
       </div>
-      <div class="modal-footer">
+
+      <!-- Modal Actions -->
+      <div class="modal-actions">
         <!-- Botões para modal de confirmação -->
         <ng-container *ngIf="modalData.type === 'confirm'">
-          <button type="button" class="btn btn-secondary" (click)="onCancel()">
-            {{ modalData.cancelText || 'Cancelar' }}
+          <button type="button" class="elegant-btn cancel-btn" (click)="onCancel()">
+            <span class="btn-text">{{ modalData.cancelText || 'Cancelar' }}</span>
           </button>
-          <button type="button" class="btn btn-primary" (click)="onConfirm()">
-            {{ modalData.confirmText || 'Confirmar' }}
+          <button type="button" class="elegant-btn confirm-btn" (click)="onConfirm()">
+            <span class="btn-text">{{ modalData.confirmText || 'Confirmar' }}</span>
           </button>
         </ng-container>
         
         <!-- Botão para outros tipos de modal -->
         <ng-container *ngIf="modalData.type !== 'confirm'">
-          <button type="button" class="btn btn-primary" (click)="close()">
-            OK
+          <button type="button" class="elegant-btn primary-btn" (click)="close()">
+            <span class="btn-text">Entendi</span>
           </button>
         </ng-container>
       </div>

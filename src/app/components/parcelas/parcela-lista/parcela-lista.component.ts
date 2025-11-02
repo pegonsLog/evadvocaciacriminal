@@ -133,4 +133,17 @@ export class ParcelaListaComponent implements OnInit {
     // Redirecionar para a página de pagamentos onde há mais opções de edição
     this.router.navigate(['/pagamentos', this.clienteId]);
   }
+
+  getStatusIcon(status: string): string {
+    switch (status) {
+      case 'pago': return 'bi-check-circle-fill';
+      case 'atrasado': return 'bi-exclamation-triangle-fill';
+      default: return 'bi-clock-fill';
+    }
+  }
+
+  editarDataPagamento(parcela: Parcela): void {
+    // Redirecionar para a página de pagamentos onde há mais opções de edição
+    this.router.navigate(['/pagamentos', this.clienteId]);
+  }
 }

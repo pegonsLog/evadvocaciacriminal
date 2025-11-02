@@ -1,59 +1,102 @@
 <ng-container *ngIf="currentUser$ | async as user; else loginView">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" routerLink="/home">
-        <i class="bi bi-briefcase"></i> {{ title }}
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/home" routerLinkActive="active">
-              <i class="bi bi-house"></i> Home
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/clientes" routerLinkActive="active">
-              <i class="bi bi-people"></i> Clientes
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/controle-pagamentos" routerLinkActive="active">
-              <i class="bi bi-cash-stack"></i> Controle de Pagamentos
-            </a>
-          </li>
-
-          <!-- Menu exclusivo para administradores -->
-          <li class="nav-item" *ngIf="user.role === UserRole.ADMIN">
-            <a class="nav-link" routerLink="/usuarios" routerLinkActive="active">
-              <i class="bi bi-person-gear"></i> Usuários
-            </a>
-          </li>
-        </ul>
-
-        <!-- Informações do usuário e botão de logout -->
-        <div class="d-flex align-items-center">
-          <span class="navbar-text me-3">
-            <i class="bi bi-person-circle"></i>
-            <strong>{{ user.displayName }}</strong>
-
-          </span>
-          <button class="btn btn-outline-light btn-sm" (click)="logout()">
-            <i class="bi bi-box-arrow-right"></i> Sair
-          </button>
+  <header class="modern-header">
+    <nav class="navbar">
+      <div class="container-fluid">
+        <!-- Brand Section -->
+        <div class="brand-section">
+          <a class="brand-link" routerLink="/home">
+            <div class="brand-icon">
+              <i class="bi bi-shield-check"></i>
+            </div>
+            <div class="brand-content">
+              <h1 class="brand-title">{{ title }}</h1>
+              <span class="brand-subtitle">Sistema de Gestão</span>
+            </div>
+          </a>
         </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-toggle" type="button" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen">
+          <span class="toggle-line"></span>
+          <span class="toggle-line"></span>
+          <span class="toggle-line"></span>
+        </button>
+
+        <!-- Navigation Menu -->
+        <div class="nav-menu" [class.mobile-open]="isMobileMenuOpen">
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/home" routerLinkActive="active" (click)="closeMobileMenu()">
+                <div class="nav-icon">
+                  <i class="bi bi-house-door"></i>
+                </div>
+                <span class="nav-text">Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/clientes" routerLinkActive="active" (click)="closeMobileMenu()">
+                <div class="nav-icon">
+                  <i class="bi bi-people"></i>
+                </div>
+                <span class="nav-text">Clientes</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/controle-pagamentos" routerLinkActive="active" (click)="closeMobileMenu()">
+                <div class="nav-icon">
+                  <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <span class="nav-text">Pagamentos</span>
+              </a>
+            </li>
+            <li class="nav-item" *ngIf="user.role === UserRole.ADMIN">
+              <a class="nav-link" routerLink="/usuarios" routerLinkActive="active" (click)="closeMobileMenu()">
+                <div class="nav-icon">
+                  <i class="bi bi-person-gear"></i>
+                </div>
+                <span class="nav-text">Usuários</span>
+              </a>
+            </li>
+          </ul>
+
+          <!-- User Section -->
+          <div class="user-section">
+            <div class="user-info">
+              <div class="user-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <div class="user-details">
+                <span class="user-name">{{ user.displayName }}</span>
+                <span class="user-role">{{ getUserRoleText(user.role) }}</span>
+              </div>
+            </div>
+            
+            <div class="user-actions">
+              <button class="action-btn logout-btn" (click)="logout()" title="Sair">
+                <i class="bi bi-box-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Backdrop for mobile menu -->
+        <div class="mobile-backdrop" [class.active]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
       </div>
-    </div>
-  </nav>
+    </nav>
+  </header>
 
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>
 
-  <footer class="footer bg-dark text-white text-center py-3 mt-5">
-    <p class="mb-0">&copy; 2025 EV Advocacia Criminal</p>
+  <footer class="modern-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-copyright">
+          <p>&copy; 2025 EV Advocacia Criminal. Todos os direitos reservados.</p>
+        </div>
+      </div>
+    </div>
   </footer>
 </ng-container>
 

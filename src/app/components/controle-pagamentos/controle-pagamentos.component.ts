@@ -55,6 +55,10 @@ export class ControlePagamentosComponent implements OnInit, OnDestroy {
     this.totalGeralDevedor = this.resumos.reduce((sum, r) => sum + r.saldoDevedor, 0);
   }
 
+  trackByClienteId(index: number, resumo: ResumoPagamento): string {
+    return resumo.clienteId;
+  }
+
   verDetalhes(clienteId: string): void {
     this.router.navigate(['/clientes', clienteId]);
   }

@@ -1,106 +1,281 @@
-<div class="container mt-4" *ngIf="cliente">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Detalhes do Cliente</h2>
-    <div>
-      <button class="btn btn-secondary me-2" (click)="voltar()">
-        <i class="bi bi-arrow-left"></i> Voltar
-      </button>
-      <button class="btn btn-warning" (click)="editar()">
-        <i class="bi bi-pencil"></i> Editar
-      </button>
-    </div>
-  </div>
-
-  <div class="row">
-    <!-- Dados do Cliente -->
-    <div class="col-md-6 mb-4">
-      <div class="card">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">Informações Pessoais</h5>
+<div class="client-details-container" *ngIf="cliente">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <div class="client-header-info">
+            <div class="client-avatar-large">
+              <i class="bi bi-person-circle"></i>
+            </div>
+            <div class="client-title-info">
+              <h1 class="client-title">{{ cliente.nome }}</h1>
+              <p class="client-subtitle">Cliente desde {{ cliente.dataCadastro | date:'dd/MM/yyyy' }}</p>
+            </div>
+          </div>
         </div>
-        <div class="card-body">
-          <p><strong>Nome:</strong> {{ cliente.nome }}</p>
-          <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
-          <p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
-          <p><strong>E-mail:</strong> {{ cliente.email }}</p>
-          <p><strong>Endereço:</strong> {{ cliente.endereco }}</p>
-          <p><strong>Data de Cadastro:</strong> {{ cliente.dataCadastro | date:'dd/MM/yyyy' }}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dados da Compra -->
-    <div class="col-md-6 mb-4">
-      <div class="card">
-        <div class="card-header bg-success text-white">
-          <h5 class="mb-0">Informações da Compra</h5>
-        </div>
-        <div class="card-body">
-          <p><strong>Número do Contrato:</strong> {{ cliente.compra.numeroContrato }}</p>
-          <p><strong>Valor da Entrada:</strong> {{ cliente.compra.valorEntrada | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
-          <p><strong>Valor Total:</strong> {{ cliente.compra.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
-          <p><strong>Número de Parcelas:</strong> {{ cliente.compra.numeroParcelas }}x</p>
-          <p><strong>Valor da Parcela:</strong> {{ cliente.compra.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
-          <p><strong>Dia de Vencimento:</strong> Todo dia {{ cliente.compra.diaVencimento }}</p>
-          <p><strong>Data da Compra:</strong> {{ cliente.compra.dataCompra | date:'dd/MM/yyyy' }}</p>
-          <p *ngIf="cliente.compra.estimativaValorPrevisto">
-            <strong>Estimativa Valor Previsto no Mês:</strong> {{ cliente.compra.estimativaValorPrevisto | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
-          </p>
-          <p *ngIf="cliente.compra.relatorioContratosPendentes">
-            <strong>Relatório Contratos Pendentes:</strong><br>
-            <span class="text-muted">{{ cliente.compra.relatorioContratosPendentes }}</span>
-          </p>
+        <div class="col-lg-4 text-lg-end">
+          <div class="header-actions">
+            <button class="btn btn-outline-light me-2" (click)="voltar()">
+              <i class="bi bi-arrow-left me-2"></i>
+              Voltar
+            </button>
+            <button class="btn btn-light" (click)="editar()">
+              <i class="bi bi-pencil me-2"></i>
+              Editar
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Resumo de Pagamentos -->
-  <div class="card mb-4">
-    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Resumo de Pagamentos</h5>
-      <button class="btn btn-light btn-sm" (click)="verPagamentos()">
-        <i class="bi bi-cash-stack"></i> Gerenciar Pagamentos
-      </button>
+  <div class="container mt-4">
+
+    <!-- Quick Stats -->
+    <div class="quick-stats mb-5">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="stat-card success">
+            <div class="stat-icon">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <h3>{{ totalPago | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</h3>
+              <p>Total Pago</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card warning">
+            <div class="stat-icon">
+              <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="stat-content">
+              <h3>{{ saldoDevedor | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</h3>
+              <p>Saldo Devedor</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card info">
+            <div class="stat-icon">
+              <i class="bi bi-list-check"></i>
+            </div>
+            <div class="stat-content">
+              <h3>{{ parcelasPagas }}/{{ cliente.compra.numeroParcelas }}</h3>
+              <p>Parcelas Pagas</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-4">
-          <div class="alert alert-success">
-            <strong>Total Pago:</strong><br>
-            <h4>{{ totalPago | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</h4>
+
+    <div class="row g-4">
+      <!-- Personal Information -->
+      <div class="col-lg-6">
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="info-icon personal">
+              <i class="bi bi-person"></i>
+            </div>
+            <h4>Informações Pessoais</h4>
           </div>
-        </div>
-        <div class="col-md-4">
-          <div class="alert alert-warning">
-            <strong>Saldo Devedor:</strong><br>
-            <h4>{{ saldoDevedor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</h4>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="alert alert-info">
-            <strong>Pagamentos Realizados:</strong><br>
-            <h4>{{ parcelasPagas }}</h4>
+          <div class="info-card-body">
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-person-badge"></i>
+                Nome Completo
+              </div>
+              <div class="info-value">{{ cliente.nome }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-card-text"></i>
+                CPF
+              </div>
+              <div class="info-value">{{ cliente.cpf }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-telephone"></i>
+                Telefone
+              </div>
+              <div class="info-value">{{ cliente.telefone }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-envelope"></i>
+                E-mail
+              </div>
+              <div class="info-value">{{ cliente.email }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-geo-alt"></i>
+                Endereço
+              </div>
+              <div class="info-value">{{ cliente.endereco }}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Mensagem -->
-      <div class="alert alert-secondary mt-3">
-        <p class="mb-0">
-          <i class="bi bi-info-circle"></i> 
-          Clique em "Gerenciar Pagamentos" para ver todas as parcelas e registrar pagamentos.
-        </p>
+      <!-- Purchase Information -->
+      <div class="col-lg-6">
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="info-icon purchase">
+              <i class="bi bi-cart-check"></i>
+            </div>
+            <h4>Informações da Compra</h4>
+          </div>
+          <div class="info-card-body">
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-file-text"></i>
+                Número do Contrato
+              </div>
+              <div class="info-value">{{ cliente.compra.numeroContrato }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-cash-coin"></i>
+                Valor da Entrada
+              </div>
+              <div class="info-value">{{ cliente.compra.valorEntrada | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-currency-dollar"></i>
+                Valor Total
+              </div>
+              <div class="info-value highlight">{{ cliente.compra.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-list-ol"></i>
+                Parcelas
+              </div>
+              <div class="info-value">{{ cliente.compra.numeroParcelas }}x de {{ cliente.compra.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-calendar-event"></i>
+                Vencimento
+              </div>
+              <div class="info-value">Todo dia {{ cliente.compra.diaVencimento }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-calendar3"></i>
+                Data da Compra
+              </div>
+              <div class="info-value">{{ cliente.compra.dataCompra | date:'dd/MM/yyyy' }}</div>
+            </div>
+            <div class="info-item" *ngIf="cliente.compra.estimativaValorPrevisto">
+              <div class="info-label">
+                <i class="bi bi-graph-up"></i>
+                Estimativa Mensal
+              </div>
+              <div class="info-value">{{ cliente.compra.estimativaValorPrevisto | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Management Section -->
+    <div class="payment-management-section mt-5">
+      <div class="payment-card">
+        <div class="payment-card-header">
+          <div class="payment-header-content">
+            <div class="payment-icon">
+              <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="payment-title">
+              <h4>Gerenciamento de Pagamentos</h4>
+              <p>Controle completo das parcelas e pagamentos</p>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg" (click)="verPagamentos()">
+            <i class="bi bi-gear me-2"></i>
+            Gerenciar Pagamentos
+          </button>
+        </div>
+        
+        <div class="payment-card-body">
+          <div class="progress-section">
+            <div class="progress-info">
+              <span>Progresso dos Pagamentos</span>
+              <span>{{ parcelasPagas }}/{{ cliente.compra.numeroParcelas }} parcelas</span>
+            </div>
+            <div class="progress">
+              <div class="progress-bar" 
+                   [style.width.%]="(parcelasPagas / cliente.compra.numeroParcelas) * 100">
+              </div>
+            </div>
+            <div class="progress-percentage">
+              {{ ((parcelasPagas / cliente.compra.numeroParcelas) * 100) | number:'1.0-0' }}% concluído
+            </div>
+          </div>
+
+          <div class="payment-info-grid">
+            <div class="payment-info-item">
+              <i class="bi bi-calendar-check text-success"></i>
+              <div>
+                <strong>Próximo Vencimento</strong>
+                <p>Dia {{ cliente.compra.diaVencimento }} do mês</p>
+              </div>
+            </div>
+            <div class="payment-info-item">
+              <i class="bi bi-cash text-primary"></i>
+              <div>
+                <strong>Valor da Parcela</strong>
+                <p>{{ cliente.compra.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
+              </div>
+            </div>
+            <div class="payment-info-item">
+              <i class="bi bi-graph-up text-info"></i>
+              <div>
+                <strong>Status do Contrato</strong>
+                <p>{{ parcelasPagas === cliente.compra.numeroParcelas ? 'Quitado' : 'Em andamento' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Notes -->
+    <div class="notes-section mt-4" *ngIf="cliente.compra.relatorioContratosPendentes">
+      <div class="notes-card">
+        <div class="notes-header">
+          <i class="bi bi-file-text me-2"></i>
+          Observações do Contrato
+        </div>
+        <div class="notes-content">
+          {{ cliente.compra.relatorioContratosPendentes }}
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="container mt-4" *ngIf="!cliente">
-  <div class="alert alert-danger">
-    Cliente não encontrado.
+<div class="client-details-container" *ngIf="!cliente">
+  <div class="container">
+    <div class="empty-state">
+      <div class="empty-state-content">
+        <div class="empty-state-icon error">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h3>Cliente não encontrado</h3>
+        <p>O cliente solicitado não existe ou foi removido do sistema</p>
+        <button class="btn btn-primary btn-lg" (click)="voltar()">
+          <i class="bi bi-arrow-left me-2"></i>
+          Voltar para Lista
+        </button>
+      </div>
+    </div>
   </div>
-  <button class="btn btn-secondary" (click)="voltar()">
-    <i class="bi bi-arrow-left"></i> Voltar
-  </button>
 </div>

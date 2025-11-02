@@ -131,6 +131,14 @@ export class PagamentoListaComponent implements OnInit {
     }
   }
 
+  getStatusIcon(status: string): string {
+    switch (status) {
+      case 'pago': return 'bi-check-circle-fill';
+      case 'atrasado': return 'bi-exclamation-triangle-fill';
+      default: return 'bi-clock-fill';
+    }
+  }
+
   calcularTotalPago(): number {
     return this.parcelas
       .filter(p => p.status === 'pago')

@@ -1,100 +1,140 @@
-<div class="container mt-4">
+<div class="users-container">
+  <!-- Header Section -->
   <div class="header-section">
-    <h2>Gerenciamento de Usuários</h2>
-    <button class="btn btn-primary" (click)="toggleAddForm()">
-      <span *ngIf="!showAddForm">+ Adicionar Usuário</span>
-      <span *ngIf="showAddForm">✕ Cancelar</span>
-    </button>
-  </div>
-
-  <div class="alert alert-success" *ngIf="successMessage" role="alert">
-    {{ successMessage }}
-  </div>
-
-  <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
-    {{ errorMessage }}
-  </div>
-
-  <!-- Formulário de Adicionar Usuário -->
-  <div class="add-user-form" *ngIf="showAddForm">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Novo Usuário</h5>
-        <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="displayName">Nome Completo *</label>
-                <input
-                  type="text"
-                  id="displayName"
-                  class="form-control"
-                  formControlName="displayName"
-                  placeholder="Nome do usuário"
-                  [class.is-invalid]="displayName?.invalid && displayName?.touched"
-                />
-                <div class="invalid-feedback" *ngIf="displayName?.invalid && displayName?.touched">
-                  Nome é obrigatório
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="email">Email *</label>
-                <input
-                  type="email"
-                  id="email"
-                  class="form-control"
-                  formControlName="email"
-                  placeholder="email@exemplo.com"
-                  [class.is-invalid]="email?.invalid && email?.touched"
-                />
-                <div class="invalid-feedback" *ngIf="email?.invalid && email?.touched">
-                  <span *ngIf="email?.errors?.['required']">Email é obrigatório</span>
-                  <span *ngIf="email?.errors?.['email']">Email inválido</span>
-                </div>
-              </div>
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <div class="page-header-info">
+            
+            <div class="page-title-info">
+              <h1 class="page-title">
+                <i class="bi bi-person-gear me-3"></i>
+                Gerenciamento de Usuários
+              </h1>
+              <p class="page-subtitle">Gerencie usuários e permissões do sistema</p>
             </div>
           </div>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <div class="header-actions">
+            <button class="btn btn-outline-light btn-lg" (click)="toggleAddForm()">
+              <i class="bi" [class]="showAddForm ? 'bi-x-lg' : 'bi-plus-circle'" class="me-2"></i>
+              {{ showAddForm ? 'Cancelar' : 'Novo Usuário' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="password">Senha *</label>
-                <input
-                  type="password"
-                  id="password"
-                  class="form-control"
-                  formControlName="password"
-                  placeholder="Mínimo 6 caracteres"
-                  [class.is-invalid]="password?.invalid && password?.touched"
-                />
-                <div class="invalid-feedback" *ngIf="password?.invalid && password?.touched">
-                  <span *ngIf="password?.errors?.['required']">Senha é obrigatória</span>
-                  <span *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</span>
-                </div>
+  <div class="container mt-4">
+    <!-- Success/Error Messages -->
+    <div class="alert alert-success alert-modern" *ngIf="successMessage" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      {{ successMessage }}
+    </div>
+
+    <div class="alert alert-danger alert-modern" *ngIf="errorMessage" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Add User Form -->
+    <div class="add-user-section" *ngIf="showAddForm">
+      <div class="form-card">
+        <div class="form-header">
+          <div class="form-icon">
+            <i class="bi bi-person-plus"></i>
+          </div>
+          <div class="form-title">
+            <h4>Novo Usuário</h4>
+            <p>Preencha os dados para criar um novo usuário</p>
+          </div>
+        </div>
+
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="modern-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="displayName" class="form-label">
+                <i class="bi bi-person-badge me-2"></i>
+                Nome Completo *
+              </label>
+              <input
+                type="text"
+                id="displayName"
+                class="form-control"
+                formControlName="displayName"
+                placeholder="Digite o nome completo"
+                [class.is-invalid]="displayName?.invalid && displayName?.touched"
+              />
+              <div class="invalid-feedback" *ngIf="displayName?.invalid && displayName?.touched">
+                <i class="bi bi-exclamation-circle me-1"></i>
+                Nome é obrigatório
               </div>
             </div>
 
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="role">Tipo de Usuário *</label>
-                <select
-                  id="role"
-                  class="form-control"
-                  formControlName="role"
-                >
-                  <option [value]="UserRole.COMUM">Comum</option>
-                  <option [value]="UserRole.ADMIN">Administrador</option>
-                </select>
+            <div class="form-group">
+              <label for="email" class="form-label">
+                <i class="bi bi-envelope me-2"></i>
+                Email *
+              </label>
+              <input
+                type="email"
+                id="email"
+                class="form-control"
+                formControlName="email"
+                placeholder="usuario@exemplo.com"
+                [class.is-invalid]="email?.invalid && email?.touched"
+              />
+              <div class="invalid-feedback" *ngIf="email?.invalid && email?.touched">
+                <i class="bi bi-exclamation-circle me-1"></i>
+                <span *ngIf="email?.errors?.['required']">Email é obrigatório</span>
+                <span *ngIf="email?.errors?.['email']">Email inválido</span>
               </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password" class="form-label">
+                <i class="bi bi-lock me-2"></i>
+                Senha *
+              </label>
+              <input
+                type="password"
+                id="password"
+                class="form-control"
+                formControlName="password"
+                placeholder="Mínimo 6 caracteres"
+                [class.is-invalid]="password?.invalid && password?.touched"
+              />
+              <div class="invalid-feedback" *ngIf="password?.invalid && password?.touched">
+                <i class="bi bi-exclamation-circle me-1"></i>
+                <span *ngIf="password?.errors?.['required']">Senha é obrigatória</span>
+                <span *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="role" class="form-label">
+                <i class="bi bi-shield-check me-2"></i>
+                Tipo de Usuário *
+              </label>
+              <select id="role" class="form-control" formControlName="role">
+                <option [value]="UserRole.COMUM">Usuário Comum</option>
+                <option [value]="UserRole.ADMIN">Administrador</option>
+              </select>
             </div>
           </div>
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-success" [disabled]="loading">
-              <span *ngIf="!loading">Criar Usuário</span>
+            <button type="button" class="btn btn-secondary" (click)="toggleAddForm()">
+              <i class="bi bi-x-circle me-2"></i>
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-success" [disabled]="loading || userForm.invalid">
+              <span *ngIf="!loading">
+                <i class="bi bi-check-circle me-2"></i>
+                Criar Usuário
+              </span>
               <span *ngIf="loading">
                 <span class="spinner-border spinner-border-sm me-2"></span>
                 Criando...
@@ -104,70 +144,106 @@
         </form>
       </div>
     </div>
-  </div>
 
-  <!-- Lista de Usuários -->
-  <div class="users-list mt-4">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Usuários Cadastrados</h5>
-        
-        <div *ngIf="loading && users.length === 0" class="text-center py-4">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Carregando...</span>
+    <!-- Users List -->
+    <div class="users-list-section">
+      <div class="list-header">
+        <h4>
+          <i class="bi bi-people me-2"></i>
+          Usuários Cadastrados
+        </h4>
+        <div class="users-count" *ngIf="users.length > 0">
+          {{ users.length }} usuário(s) cadastrado(s)
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading && users.length === 0" class="loading-state">
+        <div class="loading-content">
+          <div class="loading-spinner">
+            <div class="spinner-border text-primary"></div>
           </div>
+          <p>Carregando usuários...</p>
         </div>
+      </div>
 
-        <div *ngIf="!loading && users.length === 0" class="text-center py-4 text-muted">
-          Nenhum usuário cadastrado
+      <!-- Empty State -->
+      <div *ngIf="!loading && users.length === 0" class="empty-state">
+        <div class="empty-state-content">
+          <div class="empty-state-icon">
+            <i class="bi bi-people"></i>
+          </div>
+          <h3>Nenhum usuário cadastrado</h3>
+          <p>Comece adicionando o primeiro usuário ao sistema</p>
+          <button class="btn btn-primary btn-lg" (click)="toggleAddForm()">
+            <i class="bi bi-plus-circle me-2"></i>
+            Adicionar Primeiro Usuário
+          </button>
         </div>
+      </div>
 
-        <div class="table-responsive" *ngIf="users.length > 0">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Tipo</th>
-                <th>Status</th>
-                <th class="text-center">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let user of users" [class.inactive-row]="!user.active">
-                <td>{{ user.displayName }}</td>
-                <td>{{ user.email }}</td>
-                <td>
-                  <span class="badge" [ngClass]="getRoleBadgeClass(user.role)">
-                    {{ getRoleLabel(user.role) }}
-                  </span>
-                </td>
-                <td>
-                  <span class="badge" [ngClass]="user.active ? 'bg-success' : 'bg-secondary'">
-                    {{ user.active ? 'Ativo' : 'Inativo' }}
-                  </span>
-                </td>
-                <td class="text-center">
-                  <div class="btn-group btn-group-sm" role="group">
-                    <button
-                      class="btn btn-outline-warning"
-                      (click)="toggleUserStatus(user)"
-                      [title]="user.active ? 'Desativar' : 'Ativar'"
-                    >
-                      {{ user.active ? '🔒' : '🔓' }}
-                    </button>
-                    <button
-                      class="btn btn-outline-danger"
-                      (click)="deleteUser(user)"
-                      title="Deletar"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- Users Table -->
+      <div class="users-table" *ngIf="users.length > 0">
+        <div class="table-container">
+          <div class="user-row header-row">
+            <div class="col-user">Usuário</div>
+            <div class="col-email">Email</div>
+            <div class="col-role">Tipo</div>
+            <div class="col-status">Status</div>
+            <div class="col-actions">Ações</div>
+          </div>
+
+          <div class="user-row data-row" *ngFor="let user of users" [class]="'status-' + (user.active ? 'active' : 'inactive')">
+            <div class="col-user">
+              <div class="user-info">
+                <div class="user-avatar">
+                  <i class="bi bi-person-circle"></i>
+                </div>
+                <div class="user-details">
+                  <span class="user-name">{{ user.displayName }}</span>
+                  <span class="user-id" *ngIf="user.uid">ID: {{ user.uid.substring(0, 8) }}...</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-email">
+              <div class="cell-content">
+                <i class="bi bi-envelope"></i>
+                <span>{{ user.email }}</span>
+              </div>
+            </div>
+            
+            <div class="col-role">
+              <span class="role-badge" [class]="'role-' + user.role.toLowerCase()">
+                <i class="bi" [class]="user.role === UserRole.ADMIN ? 'bi-shield-fill' : 'bi-person-fill'"></i>
+                {{ getRoleLabel(user.role) }}
+              </span>
+            </div>
+            
+            <div class="col-status">
+              <span class="status-badge" [class]="'status-' + (user.active ? 'active' : 'inactive')">
+                <i class="bi" [class]="user.active ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                {{ user.active ? 'Ativo' : 'Inativo' }}
+              </span>
+            </div>
+            
+            <div class="col-actions">
+              <div class="action-buttons">
+                <button 
+                  class="action-btn toggle" 
+                  (click)="toggleUserStatus(user)"
+                  [title]="user.active ? 'Desativar usuário' : 'Ativar usuário'">
+                  <i class="bi" [class]="user.active ? 'bi-lock' : 'bi-unlock'"></i>
+                </button>
+                <button 
+                  class="action-btn delete" 
+                  (click)="deleteUser(user)"
+                  title="Excluir usuário">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

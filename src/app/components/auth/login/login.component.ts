@@ -21,6 +21,7 @@ export class LoginComponent {
   loading = false;
   errorMessage = '';
   returnUrl = '/home';
+  showPassword = false;
 
   constructor() {
     // Se já estiver autenticado, redireciona
@@ -70,5 +71,9 @@ export class LoginComponent {
 
   get password() {
     return this.loginForm.get('password');
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 }

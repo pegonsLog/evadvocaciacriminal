@@ -20,6 +20,7 @@ export class ClienteFormComponent implements OnInit {
   clienteForm!: FormGroup;
   isEditMode = false;
   clienteId?: string;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -109,7 +110,12 @@ export class ClienteFormComponent implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
+    if (this.isSubmitting) {
+      return; // Evita múltiplos submits
+    }
+    
     if (this.clienteForm.valid) {
+      this.isSubmitting = true;
       const formValue = this.clienteForm.value;
       
       // Remove formatação dos valores
@@ -175,6 +181,8 @@ export class ClienteFormComponent implements OnInit {
       } catch (error) {
         console.error('Erro ao salvar cliente:', error);
         this.modalService.showError('Erro ao salvar cliente. Verifique o console para mais detalhes.');
+      } finally {
+        this.isSubmitting = false;
       }
     } else {
       this.marcarCamposComoTocados();

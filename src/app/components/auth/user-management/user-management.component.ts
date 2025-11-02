@@ -92,6 +92,11 @@ export class UserManagementComponent implements OnInit {
   }
 
   async toggleUserStatus(user: User): Promise<void> {
+    if (!user.uid) {
+      this.errorMessage = 'Erro: ID do usuário não encontrado.';
+      return;
+    }
+
     const currentUser = this.authService.getCurrentUser();
     
     if (currentUser?.uid === user.uid) {
@@ -116,6 +121,11 @@ export class UserManagementComponent implements OnInit {
   }
 
   async deleteUser(user: User): Promise<void> {
+    if (!user.uid) {
+      this.errorMessage = 'Erro: ID do usuário não encontrado.';
+      return;
+    }
+
     const currentUser = this.authService.getCurrentUser();
     
     if (currentUser?.uid === user.uid) {

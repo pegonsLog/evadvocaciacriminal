@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ClienteService } from '../../../services/cliente.service';
 import { Cliente } from '../../../models/cliente.model';
@@ -9,12 +10,14 @@ import { ModalService } from '../../../services/modal.service';
 @Component({
   selector: 'app-cliente-lista',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './cliente-lista.component.html',
   styleUrl: './cliente-lista.component.scss'
 })
 export class ClienteListaComponent implements OnInit {
   clientes: Cliente[] = [];
+  filteredClients: Cliente[] = [];
+  searchTerm: string = '';
   private authService = inject(AuthService);
 
   constructor(
@@ -26,7 +29,32 @@ export class ClienteListaComponent implements OnInit {
   ngOnInit(): void {
     this.clienteService.getClientes().subscribe(clientes => {
       this.clientes = clientes;
+      this.filteredClients = clientes;
     });
+  }
+
+  filterClients(): void {
+    if (!this.searchTerm.trim()) {
+      this.filteredClients = this.clientes;
+      return;
+    }
+
+    const term = this.searchTerm.toLowerCase().trim();
+    this.filteredClients = this.clientes.filter(cliente =>
+      cliente.nome.toLowerCase().includes(term) ||
+      cliente.cpf.toLowerCase().includes(term) ||
+      cliente.telefone.toLowerCase().includes(term) ||
+      cliente.email.toLowerCase().includes(term)
+    );
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.filteredClients = this.clientes;
+  }
+
+  trackByClienteId(index: number, cliente: Cliente): string {
+    return cliente.id;
   }
 
   verDetalhes(id: string): void {
@@ -37,16 +65,32 @@ export class ClienteListaComponent implements OnInit {
     this.router.navigate(['/clientes/editar', id]);
   }
 
-  excluirCliente(id: string): void {
+  async excluirCliente(id: string): Promise<void> {
     // Apenas administradores podem deletar
     if (!this.authService.isAdmin()) {
       this.modalService.showWarning('Apenas administradores podem excluir clientes.');
       return;
     }
 
-    if (confirm('Tem certeza que deseja excluir este cliente?')) {
-      this.clienteService.deleteCliente(id);
+    const cliente = this.clienteService.getClienteById(id);
+    if (!cliente) {
+      this.modalService.showError('Cliente não encontrado.');
+      return;
     }
+
+    this.modalService.showConfirm(
+      `Tem certeza que deseja excluir o cliente "${cliente.nome}"?\n\nEsta ação também removerá:\n• Todas as parcelas do cliente\n• Todos os pagamentos registrados\n\nEsta ação não pode ser desfeita.`,
+      async () => {
+        try {
+          await this.clienteService.deleteCliente(id);
+          this.modalService.showSuccess('Cliente e todos os dados relacionados foram excluídos com sucesso!');
+        } catch (error) {
+          console.error('Erro ao excluir cliente:', error);
+          this.modalService.showError('Erro ao excluir cliente. Verifique o console para mais detalhes.');
+        }
+      },
+      'Confirmar Exclusão'
+    );
   }
 
   novoCliente(): void {

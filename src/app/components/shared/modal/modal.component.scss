@@ -1,4 +1,447 @@
-/* Estilos específicos do modal se necessário */
+// Elegant Modal Design System
+$emerald-primary: #10b981;
+$emerald-secondary: #059669;
+$emerald-light: #34d399;
+$emerald-extra-light: #a7f3d0;
+
+$red-primary: #ef4444;
+$red-secondary: #dc2626;
+$red-light: #f87171;
+
+$blue-primary: #3b82f6;
+$blue-secondary: #2563eb;
+$blue-light: #60a5fa;
+
+$orange-primary: #f59e0b;
+$orange-secondary: #d97706;
+$orange-light: #fbbf24;
+
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+$shadow-elegant: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+$shadow-soft: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+$shadow-button: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
+$radius-lg: 20px;
+$radius-xl: 24px;
+$transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+.elegant-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1055;
+  animation: elegantFadeIn 0.4s ease-out;
+  padding: 1.5rem;
+}
+
+.elegant-modal-container {
+  width: 100%;
+  max-width: 420px;
+  animation: elegantSlideUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.elegant-modal-card {
+  background: white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-elegant;
+  position: relative;
+  overflow: hidden;
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+
+  // Close button
+  .elegant-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: $gray-100;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $gray-500;
+    cursor: pointer;
+    transition: $transition-smooth;
+    z-index: 10;
+
+    &:hover {
+      background: $gray-200;
+      color: $gray-700;
+      transform: scale(1.1);
+    }
+
+    i {
+      font-size: 1.1rem;
+    }
+  }
+
+  // Icon container with different themes
+  .modal-icon-container {
+    margin-bottom: 1.5rem;
+    position: relative;
+
+    .icon-background {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+      position: relative;
+
+      .icon-circle {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+
+        .modal-icon {
+          font-size: 2rem;
+          font-weight: 600;
+        }
+      }
+
+      // Animated background rings
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      &::before {
+        width: 100%;
+        height: 100%;
+        opacity: 0.2;
+        animation-delay: 0s;
+      }
+
+      &::after {
+        width: 120%;
+        height: 120%;
+        opacity: 0.1;
+        animation-delay: 0.5s;
+      }
+    }
+
+    // Success theme
+    &.icon-success {
+      .icon-circle {
+        background: linear-gradient(135deg, $emerald-primary 0%, $emerald-secondary 100%);
+        color: white;
+      }
+
+      .icon-background::before,
+      .icon-background::after {
+        background: $emerald-primary;
+      }
+    }
+
+    // Error theme
+    &.icon-error {
+      .icon-circle {
+        background: linear-gradient(135deg, $red-primary 0%, $red-secondary 100%);
+        color: white;
+      }
+
+      .icon-background::before,
+      .icon-background::after {
+        background: $red-primary;
+      }
+    }
+
+    // Warning theme
+    &.icon-warning {
+      .icon-circle {
+        background: linear-gradient(135deg, $orange-primary 0%, $orange-secondary 100%);
+        color: white;
+      }
+
+      .icon-background::before,
+      .icon-background::after {
+        background: $orange-primary;
+      }
+    }
+
+    // Info theme
+    &.icon-info {
+      .icon-circle {
+        background: linear-gradient(135deg, $blue-primary 0%, $blue-secondary 100%);
+        color: white;
+      }
+
+      .icon-background::before,
+      .icon-background::after {
+        background: $blue-primary;
+      }
+    }
+
+    // Confirm theme
+    &.icon-confirm {
+      .icon-circle {
+        background: linear-gradient(135deg, $gray-600 0%, $gray-700 100%);
+        color: white;
+      }
+
+      .icon-background::before,
+      .icon-background::after {
+        background: $gray-600;
+      }
+    }
+  }
+
+  // Content section
+  .modal-content-section {
+    margin-bottom: 2rem;
+
+    .modal-title {
+      color: $gray-800;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+
+    .modal-message {
+      color: $gray-600;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin: 0;
+
+      p {
+        margin-bottom: 0.75rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      strong {
+        color: $gray-700;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Actions section
+  .modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+
+    .elegant-btn {
+      padding: 0.875rem 2rem;
+      border: none;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: $transition-smooth;
+      position: relative;
+      overflow: hidden;
+      min-width: 120px;
+
+      .btn-text {
+        position: relative;
+        z-index: 2;
+      }
+
+      // Ripple effect
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transition: width 0.6s, height 0.6s;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+      }
+
+      &:active::before {
+        width: 300px;
+        height: 300px;
+      }
+
+      // Cancel button
+      &.cancel-btn {
+        background: $gray-100;
+        color: $gray-600;
+        border: 2px solid $gray-200;
+
+        &:hover {
+          background: $gray-200;
+          color: $gray-700;
+          transform: translateY(-2px);
+          box-shadow: $shadow-button;
+        }
+      }
+
+      // Confirm button
+      &.confirm-btn {
+        background: linear-gradient(135deg, $emerald-primary 0%, $emerald-secondary 100%);
+        color: white;
+        box-shadow: 0 4px 14px 0 rgba($emerald-primary, 0.3);
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px 0 rgba($emerald-primary, 0.4);
+        }
+      }
+
+      // Primary button
+      &.primary-btn {
+        background: linear-gradient(135deg, $blue-primary 0%, $blue-secondary 100%);
+        color: white;
+        box-shadow: 0 4px 14px 0 rgba($blue-primary, 0.3);
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px 0 rgba($blue-primary, 0.4);
+        }
+      }
+    }
+  }
+
+  // Modal theme variations
+  &.modal-success {
+    border-top: 4px solid $emerald-primary;
+  }
+
+  &.modal-error {
+    border-top: 4px solid $red-primary;
+  }
+
+  &.modal-warning {
+    border-top: 4px solid $orange-primary;
+  }
+
+  &.modal-info {
+    border-top: 4px solid $blue-primary;
+  }
+
+  &.modal-confirm {
+    border-top: 4px solid $gray-600;
+  }
+}
+
+// Animations
+@keyframes elegantFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+@keyframes elegantSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0;
+  }
+}
+
+// Mobile Responsiveness
+@media (max-width: 768px) {
+  .elegant-modal-overlay {
+    padding: 1rem;
+  }
+
+  .elegant-modal-container {
+    max-width: 100%;
+  }
+
+  .elegant-modal-card {
+    padding: 2rem 1.5rem 1.5rem;
+
+    .modal-icon-container {
+      margin-bottom: 1.25rem;
+
+      .icon-background {
+        width: 70px;
+        height: 70px;
+
+        .icon-circle .modal-icon {
+          font-size: 1.75rem;
+        }
+      }
+    }
+
+    .modal-content-section {
+      margin-bottom: 1.5rem;
+
+      .modal-title {
+        font-size: 1.25rem;
+      }
+
+      .modal-message {
+        font-size: 0.95rem;
+      }
+    }
+
+    .modal-actions {
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .elegant-btn {
+        width: 100%;
+        padding: 1rem 2rem;
+      }
+    }
+  }
+}
+
+// Compatibility
 .modal {
   z-index: 1055;
 }
