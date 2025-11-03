@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private modalService = inject(ModalService);
 
   loginForm: FormGroup;
   loading = false;
@@ -75,5 +77,46 @@ export class LoginComponent {
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  async onForgotPassword(): Promise<void> {
+    const email = this.loginForm.get('email')?.value;
+
+    if (!email) {
+      this.errorMessage = 'Digite seu email primeiro para recuperar a senha';
+      return;
+    }
+
+    if (this.loginForm.get('email')?.invalid) {
+      this.errorMessage = 'Digite um email válido para recuperar a senha';
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    try {
+      await this.authService.resetPassword(email);
+
+      // Modal personalizado com instruções detalhadas
+      this.modalService.showInfo(
+        `Email de recuperação enviado para: ${email}
+
+📧 VERIFIQUE TAMBÉM A PASTA SPAM/LIXO ELETRÔNICO
+
+⏰ O link de recuperação expira em 1 hora
+🔒 Se você não solicitou esta recuperação, ignore este email
+
+💡 Dica: Adicione noreply@firebase.com à sua lista de contatos confiáveis para evitar que futuros emails vão para o spam.
+
+Não recebeu o email? Aguarde alguns minutos e verifique todas as pastas.`,
+        '📧 Email de Recuperação Enviado'
+      );
+    } catch (error: any) {
+      this.errorMessage = error.message || 'Erro ao enviar email de recuperação';
+      console.error('Erro no reset de senha:', error);
+    } finally {
+      this.loading = false;
+    }
   }
 }

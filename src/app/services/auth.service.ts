@@ -1,18 +1,19 @@
 import { Injectable, inject } from '@angular/core';
-import { 
-  Auth, 
-  signInWithEmailAndPassword, 
+import {
+  Auth,
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
   user,
   User as FirebaseUser,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from '@angular/fire/auth';
-import { 
-  Firestore, 
-  doc, 
-  setDoc, 
-  getDoc, 
+import {
+  Firestore,
+  doc,
+  setDoc,
+  getDoc,
   collection,
   query,
   getDocs,
@@ -29,10 +30,10 @@ import { User, UserRole, UserCredentials, UserRegistration } from '../models/use
 export class AuthService {
   private auth = inject(Auth);
   private firestore = inject(Firestore);
-  
+
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
-  
+
   user$ = user(this.auth);
 
   constructor() {
@@ -40,7 +41,15 @@ export class AuthService {
     this.user$.pipe(
       switchMap(firebaseUser => {
         if (firebaseUser) {
-          return this.getUserData(firebaseUser.uid);
+          return this.getUserData(firebaseUser.uid).pipe(
+            switchMap(userData => {
+              // Se o usuário não tem documento no Firestore, cria um
+              if (!userData) {
+                return this.createUserDocument(firebaseUser);
+              }
+              return of(userData);
+            })
+          );
         } else {
           return of(null);
         }
@@ -60,18 +69,18 @@ export class AuthService {
         credentials.email,
         credentials.password
       );
-      
+
       const userData = await this.getUserData(userCredential.user.uid).toPromise();
-      
+
       if (!userData) {
         throw new Error('Dados do usuário não encontrados');
       }
-      
+
       if (!userData.active) {
         await this.logout();
         throw new Error('Usuário inativo. Entre em contato com o administrador.');
       }
-      
+
       return userData;
     } catch (error: any) {
       console.error('Erro no login:', error);
@@ -129,6 +138,18 @@ export class AuthService {
   }
 
   /**
+   * Envia email de reset de senha
+   */
+  async resetPassword(email: string): Promise<void> {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+    } catch (error: any) {
+      console.error('Erro ao enviar email de reset:', error);
+      throw this.handleAuthError(error);
+    }
+  }
+
+  /**
    * Obtém dados do usuário do Firestore
    */
   getUserData(uid: string): Observable<User | null> {
@@ -139,6 +160,25 @@ export class AuthService {
         }
         return null;
       })
+    );
+  }
+
+  /**
+   * Cria documento do usuário no Firestore se não existir
+   */
+  private createUserDocument(firebaseUser: any): Observable<User> {
+    const userData: User = {
+      uid: firebaseUser.uid,
+      email: firebaseUser.email,
+      displayName: firebaseUser.displayName || firebaseUser.email,
+      role: firebaseUser.email === 'evadvocaciacriminal@gmail.com' ? UserRole.ADMIN : UserRole.COMUM,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      active: true
+    };
+
+    return from(setDoc(doc(this.firestore, 'users', userData.uid), userData)).pipe(
+      map(() => userData)
     );
   }
 
@@ -180,7 +220,7 @@ export class AuthService {
       const usersRef = collection(this.firestore, 'users');
       const q = query(usersRef);
       const querySnapshot = await getDocs(q);
-      
+
       return querySnapshot.docs.map(doc => doc.data() as User);
     } catch (error) {
       console.error('Erro ao buscar usuários:', error);
@@ -234,7 +274,7 @@ export class AuthService {
    */
   private handleAuthError(error: any): Error {
     let message = 'Erro ao processar solicitação';
-    
+
     switch (error.code) {
       case 'auth/user-not-found':
         message = 'Usuário não encontrado';
@@ -263,7 +303,7 @@ export class AuthService {
       default:
         message = error.message || message;
     }
-    
+
     return new Error(message);
   }
 }

@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // REGRAS TEMPORÁRIAS PARA RESOLVER BOOTSTRAP
+    // ==========================================
+
+    // Verifica se o usuário está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Verifica se o usuário é administrador (email específico)
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.email == 'evadvocaciacriminal@gmail.com';
+    }
+
+    // ==========================================
+    // REGRAS PARA USUÁRIOS - TEMPORARIAMENTE PERMISSIVAS
+    // ==========================================
+
+    match /users/{userId} {
+      // Leitura: Qualquer usuário autenticado pode ler (TEMPORÁRIO)
+      allow read: if isAuthenticated();
+
+      // Criação: Qualquer usuário autenticado pode criar (TEMPORÁRIO)
+      allow create: if isAuthenticated() &&
+                       request.resource.data.uid is string &&
+                       request.resource.data.email is string &&
+                       request.resource.data.displayName is string &&
+                       request.resource.data.role in ['ADMIN', 'COMUM'] &&
+                       request.resource.data.active is bool;
+
+      // Atualização: Qualquer usuário autenticado pode atualizar (TEMPORÁRIO)
+      allow update: if isAuthenticated();
+
+      // Deleção: Apenas admin pode deletar
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // REGRAS PARA CLIENTES
+    // ==========================================
+
+    match /clientes/{clienteId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // ==========================================
+    // REGRAS PARA PARCELAS
+    // ==========================================
+
+    match /parcelas/{parcelaId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // ==========================================
+    // REGRAS PARA PAGAMENTOS
+    // ==========================================
+
+    match /pagamentos/{pagamentoId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // ==========================================
+    // REGRA PADRÃO
+    // ==========================================
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

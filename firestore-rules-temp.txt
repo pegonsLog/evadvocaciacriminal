@@ -11,7 +11,7 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Verifica se o usuário é administrador
+    // Verifica se o usuário é administrador (email específico OU role ADMIN)
     function isAdmin() {
       return isAuthenticated() && 
              (request.auth.token.email == 'evadvocaciacriminal@gmail.com' ||
@@ -19,12 +19,7 @@ service cloud.firestore {
                get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN'));
     }
 
-    // Verifica se é o primeiro usuário sendo criado (para bootstrap inicial)
-    function isFirstUser() {
-      return !exists(/databases/$(database)/documents/users/$(request.auth.uid));
-    }
-
-    // Verifica se o usuário está ativo (simplificado para evitar loops de permissão)
+    // Verifica se o usuário está ativo (simplificado)
     function isActiveUser() {
       return isAuthenticated();
     }
@@ -42,8 +37,9 @@ service cloud.firestore {
       // Leitura: Admin pode ler todos, usuário pode ler apenas seus próprios dados
       allow read: if isAdmin() || isOwner(userId);
 
-      // Criação: Admins podem criar usuários OU é o primeiro usuário (bootstrap)
-      allow create: if (isAdmin() || (isFirstUser() && request.resource.data.email == 'evadvocaciacriminal@gmail.com')) &&
+      // Criação: TEMPORÁRIO - Qualquer usuário autenticado pode criar (para resolver o bootstrap)
+      // IMPORTANTE: Mude isso depois que o admin principal for criado!
+      allow create: if isAuthenticated() &&
                        request.resource.data.keys().hasAll(['uid', 'email', 'displayName', 'role', 'active', 'createdAt', 'updatedAt']) &&
                        request.resource.data.uid is string &&
                        request.resource.data.email is string &&
@@ -65,11 +61,11 @@ service cloud.firestore {
     // ==========================================
 
     match /clientes/{clienteId} {
-      // Leitura: Qualquer usuário autenticado e ativo pode ler
-      allow read: if isActiveUser();
+      // Leitura: Qualquer usuário autenticado pode ler
+      allow read: if isAuthenticated();
 
-      // Criação e Atualização: Qualquer usuário autenticado e ativo pode criar e atualizar
-      allow create, update: if isActiveUser() &&
+      // Criação e Atualização: Qualquer usuário autenticado pode criar e atualizar
+      allow create, update: if isAuthenticated() &&
                                request.resource.data.keys().hasAll(['nome', 'cpf', 'telefone', 'compra']) &&
                                request.resource.data.nome is string &&
                                request.resource.data.cpf is string &&
@@ -77,7 +73,7 @@ service cloud.firestore {
                                request.resource.data.compra is map;
 
       // Deleção: Apenas administradores podem deletar clientes
-      allow delete: if isAdmin() && isActiveUser();
+      allow delete: if isAdmin();
     }
 
     // ==========================================
@@ -85,22 +81,22 @@ service cloud.firestore {
     // ==========================================
 
     match /parcelas/{parcelaId} {
-      // Leitura: Qualquer usuário autenticado e ativo pode ler
-      allow read: if isActiveUser();
+      // Leitura: Qualquer usuário autenticado pode ler
+      allow read: if isAuthenticated();
 
-      // Criação: Qualquer usuário autenticado e ativo pode criar com todos os campos obrigatórios
-      allow create: if isActiveUser() &&
+      // Criação: Qualquer usuário autenticado pode criar
+      allow create: if isAuthenticated() &&
                        request.resource.data.keys().hasAll(['clienteId', 'numeroParcela', 'valorParcela', 'dataVencimento', 'status']) &&
                        request.resource.data.clienteId is string &&
                        request.resource.data.numeroParcela is number &&
                        request.resource.data.valorParcela is number &&
                        request.resource.data.status in ['pendente', 'pago', 'atrasado'];
 
-      // Atualização: Qualquer usuário autenticado e ativo pode atualizar (permite atualizações parciais)
-      allow update: if isActiveUser();
+      // Atualização: Qualquer usuário autenticado pode atualizar
+      allow update: if isAuthenticated();
 
       // Deleção: Apenas administradores podem deletar parcelas
-      allow delete: if isAdmin() && isActiveUser();
+      allow delete: if isAdmin();
     }
 
     // ==========================================
@@ -108,17 +104,17 @@ service cloud.firestore {
     // ==========================================
 
     match /pagamentos/{pagamentoId} {
-      // Leitura: Qualquer usuário autenticado e ativo pode ler
-      allow read: if isActiveUser();
+      // Leitura: Qualquer usuário autenticado pode ler
+      allow read: if isAuthenticated();
 
-      // Criação e Atualização: Qualquer usuário autenticado e ativo pode criar e atualizar
-      allow create, update: if isActiveUser() &&
+      // Criação e Atualização: Qualquer usuário autenticado pode criar e atualizar
+      allow create, update: if isAuthenticated() &&
                                request.resource.data.keys().hasAll(['clienteId', 'valor', 'dataPagamento']) &&
                                request.resource.data.clienteId is string &&
                                request.resource.data.valor is number;
 
       // Deleção: Apenas administradores podem deletar pagamentos
-      allow delete: if isAdmin() && isActiveUser();
+      allow delete: if isAdmin();
     }
 
     // ==========================================

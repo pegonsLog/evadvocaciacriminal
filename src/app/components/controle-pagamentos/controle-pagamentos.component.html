@@ -10,14 +10,14 @@
           </h1>
           <p class="page-subtitle">Acompanhe o status financeiro de todos os clientes</p>
         </div>
-        <div class="col-lg-4 text-lg-end">
+        <!-- <div class="col-lg-4 text-lg-end">
           <div class="header-stats">
             <div class="stat-item">
               <span class="stat-value">{{ resumos.length }}</span>
               <span class="stat-label">Clientes</span>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -85,7 +85,7 @@
           Resumo por Cliente
         </h4>
       </div>
-      
+
       <div class="modern-table-wrapper">
         <div class="table-responsive">
           <table class="modern-table">
@@ -146,7 +146,8 @@
                   </div>
                 </td>
                 <td>
-                  <span class="amount total-amount">{{ resumo.valorCompra | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+                  <span class="amount total-amount">{{ resumo.valorCompra | currency:'BRL':'symbol':'1.2-2':'pt-BR'
+                    }}</span>
                 </td>
                 <td>
                   <span class="installments-badge">{{ resumo.numeroParcelas }}x</span>
@@ -155,10 +156,12 @@
                   <span class="amount">{{ resumo.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
                 </td>
                 <td>
-                  <span class="amount paid-amount">{{ resumo.totalPago | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+                  <span class="amount paid-amount">{{ resumo.totalPago | currency:'BRL':'symbol':'1.2-2':'pt-BR'
+                    }}</span>
                 </td>
                 <td>
-                  <span class="amount pending-amount">{{ resumo.saldoDevedor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+                  <span class="amount pending-amount">{{ resumo.saldoDevedor | currency:'BRL':'symbol':'1.2-2':'pt-BR'
+                    }}</span>
                 </td>
                 <td>
                   <div class="action-buttons">

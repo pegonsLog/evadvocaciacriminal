@@ -49,14 +49,8 @@
             Email
           </label>
           <div class="input-wrapper">
-            <input
-              type="email"
-              id="email"
-              class="modern-input"
-              formControlName="email"
-              placeholder="Digite seu email"
-              [class.error]="email?.invalid && email?.touched"
-            />
+            <input type="email" id="email" class="modern-input" formControlName="email" placeholder="Digite seu email"
+              [class.error]="email?.invalid && email?.touched" />
             <div class="input-icon">
               <i class="bi bi-person"></i>
             </div>
@@ -75,19 +69,10 @@
             Senha
           </label>
           <div class="input-wrapper">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              id="password"
-              class="modern-input"
-              formControlName="password"
-              placeholder="Digite sua senha"
-              [class.error]="password?.invalid && password?.touched"
-            />
-            <button 
-              type="button" 
-              class="password-toggle"
-              (click)="togglePassword()"
-              tabindex="-1">
+            <input [type]="showPassword ? 'text' : 'password'" id="password" class="modern-input"
+              formControlName="password" placeholder="Digite sua senha"
+              [class.error]="password?.invalid && password?.touched" />
+            <button type="button" class="password-toggle" (click)="togglePassword()" tabindex="-1">
               <i class="bi" [class]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
             </button>
           </div>
@@ -99,12 +84,8 @@
         </div>
 
         <!-- Login Button -->
-        <button
-          type="submit"
-          class="modern-login-btn"
-          [disabled]="loading || loginForm.invalid"
-          [class.loading]="loading"
-        >
+        <button type="submit" class="modern-login-btn" [disabled]="loading || loginForm.invalid"
+          [class.loading]="loading">
           <span class="btn-content" *ngIf="!loading">
             <i class="bi bi-box-arrow-in-right me-2"></i>
             Entrar no Sistema
@@ -121,25 +102,12 @@
         <div class="divider">
           <span>ou</span>
         </div>
-        <button type="button" class="forgot-password-btn" disabled>
-          <i class="bi bi-question-circle me-2"></i>
-          Esqueceu sua senha?
+        <button type="button" class="forgot-password-btn" (click)="onForgotPassword()" [disabled]="loading"
+          [class.loading]="loading">
+          <i class="bi bi-question-circle me-2" *ngIf="!loading"></i>
+          <div class="modern-spinner me-2" *ngIf="loading"></div>
+          {{ loading ? 'Enviando...' : 'Esqueceu sua senha?' }}
         </button>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="modern-footer">
-      <div class="footer-content">
-        <p class="copyright">© 2025 EV Advocacia Criminal</p>
-        <div class="footer-links">
-          <span class="version">v1.0.0</span>
-          <span class="separator">•</span>
-          <span class="secure">
-            <i class="bi bi-shield-lock me-1"></i>
-            Conexão Segura
-          </span>
-        </div>
       </div>
     </div>
   </div>

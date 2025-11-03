@@ -10,14 +10,14 @@
           </h1>
           <p class="page-subtitle">Gerencie todos os clientes cadastrados no sistema</p>
         </div>
-        <div class="col-lg-4 text-lg-end">
+        <!-- <div class="col-lg-4 text-lg-end">
           <div class="header-stats">
             <div class="stat-item">
               <span class="stat-value">{{ clientes.length }}</span>
               <span class="stat-label">Total de Clientes</span>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -29,23 +29,15 @@
         <div class="search-wrapper">
           <div class="search-input-group">
             <i class="bi bi-search search-icon"></i>
-            <input 
-              type="text" 
-              class="search-input" 
-              placeholder="Buscar cliente por nome, CPF ou telefone..."
-              [(ngModel)]="searchTerm"
-              (ngModelChange)="filterClients()">
-            <button 
-              class="search-clear" 
-              type="button"
-              *ngIf="searchTerm"
-              (click)="clearSearch()">
+            <input type="text" class="search-input" placeholder="Buscar cliente por nome, CPF ou telefone..."
+              [(ngModel)]="searchTerm" (ngModelChange)="filterClients()">
+            <button class="search-clear" type="button" *ngIf="searchTerm" (click)="clearSearch()">
               <i class="bi bi-x-lg"></i>
             </button>
           </div>
         </div>
       </div>
-      
+
       <div class="action-buttons">
         <button class="btn btn-primary btn-lg" (click)="novoCliente()">
           <i class="bi bi-plus-circle me-2"></i>
@@ -135,11 +127,13 @@
               </div>
               <div class="contract-item">
                 <span class="contract-label">Valor Total</span>
-                <span class="contract-value total">{{ cliente.compra.valorTotal | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+                <span class="contract-value total">{{ cliente.compra.valorTotal |
+                  currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
               </div>
               <div class="contract-item">
                 <span class="contract-label">Parcelas</span>
-                <span class="contract-value">{{ cliente.compra.numeroParcelas }}x de {{ cliente.compra.valorParcela | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+                <span class="contract-value">{{ cliente.compra.numeroParcelas }}x de {{ cliente.compra.valorParcela |
+                  currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
               </div>
               <div class="contract-item">
                 <span class="contract-label">Vencimento</span>
