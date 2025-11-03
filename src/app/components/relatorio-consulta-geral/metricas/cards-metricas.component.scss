@@ -1,0 +1,347 @@
+.cards-metricas {
+  .card-metrica {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent !important;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    &.border-success {
+      border-left-color: var(--bs-success) !important;
+    }
+
+    &.border-warning {
+      border-left-color: var(--bs-warning) !important;
+    }
+
+    &.border-danger {
+      border-left-color: var(--bs-danger) !important;
+    }
+
+    &.border-info {
+      border-left-color: var(--bs-info) !important;
+    }
+
+    &.border-primary {
+      border-left-color: var(--bs-primary) !important;
+    }
+
+    &.border-secondary {
+      border-left-color: var(--bs-secondary) !important;
+    }
+  }
+
+  .icon-container {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 1.25rem;
+    }
+  }
+
+  .valor-principal {
+    h3 {
+      font-size: 2rem;
+      line-height: 1.2;
+
+      @media (max-width: 576px) {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .variacao-container {
+    min-height: 40px;
+
+    small {
+      font-size: 0.875rem;
+    }
+  }
+
+  // Animações para os valores
+  .valor-principal h3 {
+    animation: fadeInUp 0.6s ease-out;
+    transition: all 0.3s ease;
+
+    &.valor-animando {
+      color: var(--bs-primary) !important;
+      text-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+    }
+  }
+
+  .variacao-container {
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  // Estados de animação
+  .card-metrica {
+    &.animando {
+      .valor-principal h3 {
+        animation: pulseGlow 1.2s ease-in-out;
+      }
+    }
+
+    &.entrada-animada {
+      opacity: 0;
+      transform: translateY(30px) scale(0.9);
+    }
+  }
+
+  // Estados de loading
+  .spinner-border {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  // Responsividade para o resumo geral
+  .card.bg-light {
+    .border-end {
+      @media (max-width: 768px) {
+        border-right: none !important;
+        border-bottom: 1px solid var(--bs-border-color);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+
+        &:last-child {
+          border-bottom: none;
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+      }
+    }
+  }
+
+  // Cores personalizadas para backgrounds sutis
+  .bg-success-subtle {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+  }
+
+  .bg-warning-subtle {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+  }
+
+  .bg-danger-subtle {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+  }
+
+  .bg-info-subtle {
+    background-color: rgba(13, 202, 240, 0.1) !important;
+  }
+
+  .bg-primary-subtle {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+  }
+
+  .bg-secondary-subtle {
+    background-color: rgba(108, 117, 125, 0.1) !important;
+  }
+}
+
+// Animações
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes countUp {
+  from {
+    transform: scale(0.8);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+// Animação de contagem para valores numéricos
+.valor-principal h3 {
+  animation: countUp 0.6s ease-out;
+}
+
+// Animação de pulsação com brilho
+@keyframes pulseGlow {
+  0%,
+  100% {
+    transform: scale(1);
+    text-shadow: 0 0 5px rgba(13, 110, 253, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    text-shadow: 0 0 20px rgba(13, 110, 253, 0.6);
+  }
+}
+
+// Animação de entrada suave
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Animação de destaque para mudanças
+@keyframes highlightChange {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(13, 110, 253, 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+// Estados de hover para melhor interatividade
+.card-metrica {
+  cursor: default;
+
+  .icon-container {
+    transition: transform 0.2s ease;
+  }
+
+  &:hover .icon-container {
+    transform: scale(1.1);
+  }
+}
+
+// Indicadores de tendência
+.text-success {
+  color: var(--bs-success) !important;
+}
+
+.text-danger {
+  color: var(--bs-danger) !important;
+}
+
+.text-muted {
+  color: var(--bs-secondary) !important;
+}
+
+// Progress bar customizada
+.progress {
+  background-color: rgba(0, 0, 0, 0.1);
+
+  .progress-bar {
+    transition: width 1s ease-in-out;
+  }
+}
+
+// Melhorias para dispositivos móveis
+@media (max-width: 576px) {
+  .cards-metricas {
+    .icon-container {
+      width: 40px;
+      height: 40px;
+
+      i {
+        font-size: 1rem;
+      }
+    }
+
+    .card-title {
+      font-size: 0.875rem;
+    }
+
+    .variacao-container small {
+      font-size: 0.75rem;
+    }
+  }
+}
+// Transições suaves para mudanças de estado
+.card-metrica {
+  .valor-principal,
+  .variacao-container {
+    transition: all 0.3s ease;
+  }
+
+  // Efeito de destaque para cards com mudanças
+  &.mudanca-significativa {
+    animation: highlightChange 2s ease-in-out;
+  }
+
+  // Animação de entrada personalizada
+  &.entrada-personalizada {
+    animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  // Melhorias na interatividade
+  .icon-container {
+    transition: all 0.3s ease;
+  }
+
+  &:hover .icon-container {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  // Efeito de loading suave
+  &.carregando {
+    .valor-principal h3 {
+      animation: skeleton 1.5s ease-in-out infinite;
+    }
+  }
+}
+
+// Animação de skeleton loading
+@keyframes skeleton {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+// Animação para barras de progresso
+.progress-bar {
+  transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.animando {
+    animation: progressGrow 1.5s ease-out;
+  }
+}
+
+@keyframes progressGrow {
+  from {
+    width: 0%;
+  }
+}
+
+// Responsividade aprimorada para animações
+@media (prefers-reduced-motion: reduce) {
+  .cards-metricas {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+// Melhorias para dispositivos com toque
+@media (hover: none) and (pointer: coarse) {
+  .card-metrica:hover {
+    transform: none;
+
+    .icon-container {
+      transform: none;
+    }
+  }
+}

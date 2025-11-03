@@ -13,7 +13,7 @@
                 <i class="bi bi-credit-card me-3"></i>
                 Gerenciamento de Pagamentos
               </h1>
-              <p class="page-subtitle">{{ cliente.nome }} - Contrato {{ cliente.compra.numeroContrato }}</p>
+              <p class="page-subtitle">{{ cliente.nome }} - Contrato {{ cliente.contrato.numeroContrato }}</p>
             </div>
           </div>
         </div>
@@ -38,7 +38,7 @@
             <i class="bi bi-currency-dollar"></i>
           </div>
           <div class="summary-content">
-            <h4>{{ cliente.compra.valorTotal | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</h4>
+            <h4>{{ cliente.contrato.valorTotal | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</h4>
             <p>Valor Total</p>
           </div>
         </div>
@@ -47,7 +47,7 @@
             <i class="bi bi-list-ol"></i>
           </div>
           <div class="summary-content">
-            <h4>{{ cliente.compra.numeroParcelas }}x</h4>
+            <h4>{{ cliente.contrato.numeroParcelas }}x</h4>
             <p>Parcelas</p>
           </div>
         </div>
@@ -56,7 +56,7 @@
             <i class="bi bi-cash"></i>
           </div>
           <div class="summary-content">
-            <h4>{{ cliente.compra.valorParcela | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</h4>
+            <h4>{{ cliente.contrato.valorParcela | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</h4>
             <p>Valor/Parcela</p>
           </div>
         </div>
@@ -65,7 +65,7 @@
             <i class="bi bi-calendar-event"></i>
           </div>
           <div class="summary-content">
-            <h4>Dia {{ cliente.compra.diaVencimento }}</h4>
+            <h4>Dia {{ getDiaVencimento() }}</h4>
             <p>Vencimento</p>
           </div>
         </div>
@@ -109,30 +109,30 @@
 
           <div class="payment-row data-row" *ngFor="let parcela of parcelas" [class]="'status-' + parcela.status">
             <div class="col-parcela">
-              <span class="installment-badge">{{ parcela.numeroParcela }}/{{ cliente.compra.numeroParcelas }}</span>
+              <span class="installment-badge">{{ parcela.numeroParcela }}/{{ cliente.contrato.numeroParcelas }}</span>
             </div>
-            
+
             <div class="col-vencimento">
               <div class="cell-content">
                 <i class="bi bi-calendar3"></i>
                 <span>{{ parcela.dataVencimento | date:'dd/MM/yyyy' }}</span>
               </div>
             </div>
-            
+
             <div class="col-valor">
               <div class="cell-content">
                 <i class="bi bi-currency-dollar"></i>
                 <span class="amount">{{ parcela.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
               </div>
             </div>
-            
+
             <div class="col-status">
               <span class="status-badge" [class]="'status-' + parcela.status">
                 <i class="bi" [class]="getStatusIcon(parcela.status)"></i>
                 {{ getStatusText(parcela.status) }}
               </span>
             </div>
-            
+
             <div class="col-pagamento">
               <div class="cell-content" *ngIf="parcela.dataPagamento">
                 <i class="bi bi-check-circle"></i>
@@ -140,7 +140,7 @@
               </div>
               <span class="no-data" *ngIf="!parcela.dataPagamento">-</span>
             </div>
-            
+
             <div class="col-atraso">
               <span class="delay-badge" *ngIf="parcela.diasAtraso > 0">
                 <i class="bi bi-exclamation-triangle"></i>
@@ -151,11 +151,11 @@
                 Em dia
               </span>
             </div>
-            
+
             <div class="col-acoes">
               <div class="action-buttons">
-                <button class="action-btn pay" (click)="abrirModalPagamento(parcela)"
-                  title="Registrar Pagamento" *ngIf="parcela.status !== 'pago'">
+                <button class="action-btn pay" (click)="abrirModalPagamento(parcela)" title="Registrar Pagamento"
+                  *ngIf="parcela.status !== 'pago'">
                   <i class="bi bi-check-circle"></i>
                 </button>
                 <div class="paid-indicator" *ngIf="parcela.status === 'pago'">
@@ -179,7 +179,7 @@
           Resumo dos Pagamentos
         </h4>
       </div>
-      
+
       <div class="summary-stats">
         <div class="stat-card paid">
           <div class="stat-icon">
@@ -191,7 +191,7 @@
             <span class="stat-amount">{{ calcularTotalPago() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
           </div>
         </div>
-        
+
         <div class="stat-card pending">
           <div class="stat-icon">
             <i class="bi bi-clock"></i>
@@ -199,10 +199,11 @@
           <div class="stat-content">
             <h3>{{ contarPorStatus('pendente') }}</h3>
             <p>Em Aberto</p>
-            <span class="stat-amount">{{ (contarPorStatus('pendente') * cliente.compra.valorParcela) | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+            <span class="stat-amount">{{ (contarPorStatus('pendente') * cliente.contrato.valorParcela) |
+              currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
           </div>
         </div>
-        
+
         <div class="stat-card overdue">
           <div class="stat-icon">
             <i class="bi bi-exclamation-triangle"></i>
@@ -210,10 +211,11 @@
           <div class="stat-content">
             <h3>{{ contarPorStatus('atrasado') }}</h3>
             <p>Atrasadas</p>
-            <span class="stat-amount">{{ (contarPorStatus('atrasado') * cliente.compra.valorParcela) | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+            <span class="stat-amount">{{ (contarPorStatus('atrasado') * cliente.contrato.valorParcela) |
+              currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
           </div>
         </div>
-        
+
         <div class="stat-card progress">
           <div class="stat-icon">
             <i class="bi bi-graph-up-arrow"></i>
@@ -243,9 +245,10 @@
       <div class="modal-body">
         <div class="mb-3">
           <p><strong>Cliente:</strong> {{ parcelaEditando.clienteNome }}</p>
-          <p><strong>Parcela:</strong> {{ parcelaEditando.numeroParcela }}/{{ cliente?.compra?.numeroParcelas }}</p>
+          <p><strong>Parcela:</strong> {{ parcelaEditando.numeroParcela }}/{{ cliente?.contrato?.numeroParcelas }}</p>
           <p><strong>Vencimento:</strong> {{ parcelaEditando.dataVencimento | date:'dd/MM/yyyy' }}</p>
-          <p><strong>Valor da Parcela:</strong> {{ parcelaEditando.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
+          <p><strong>Valor da Parcela:</strong> {{ parcelaEditando.valorParcela |
+            currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
         </div>
 
         <hr>
@@ -261,7 +264,8 @@
             <span class="input-group-text">R$</span>
             <input type="number" class="form-control" id="valorPago" [(ngModel)]="valorPagoInput" step="0.01" required>
           </div>
-          <small class="text-muted">Valor padrão: {{ parcelaEditando.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</small>
+          <small class="text-muted">Valor padrão: {{ parcelaEditando.valorParcela |
+            currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</small>
         </div>
 
         <div class="mb-3">
@@ -292,16 +296,20 @@
       <div class="modal-body">
         <div class="mb-3">
           <p><strong>Cliente:</strong> {{ parcelaEditando.clienteNome }}</p>
-          <p><strong>Parcela:</strong> {{ parcelaEditando.numeroParcela }}/{{ cliente?.compra?.numeroParcelas }}</p>
+          <p><strong>Parcela:</strong> {{ parcelaEditando.numeroParcela }}/{{ cliente?.contrato?.numeroParcelas }}</p>
           <p><strong>Vencimento:</strong> {{ parcelaEditando.dataVencimento | date:'dd/MM/yyyy' }}</p>
-          <p><strong>Valor da Parcela:</strong> {{ parcelaEditando.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
-          <p *ngIf="parcelaEditando.valorPago"><strong>Valor Pago:</strong> {{ parcelaEditando.valorPago | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
-          <p *ngIf="parcelaEditando.dataPagamento"><strong>Data de Pagamento:</strong> {{ parcelaEditando.dataPagamento | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Valor da Parcela:</strong> {{ parcelaEditando.valorParcela |
+            currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
+          <p *ngIf="parcelaEditando.valorPago"><strong>Valor Pago:</strong> {{ parcelaEditando.valorPago |
+            currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
+          <p *ngIf="parcelaEditando.dataPagamento"><strong>Data de Pagamento:</strong> {{ parcelaEditando.dataPagamento
+            | date:'dd/MM/yyyy' }}</p>
         </div>
 
         <div class="alert alert-warning">
           <i class="bi bi-exclamation-triangle"></i>
-          <strong>Atenção:</strong> Esta ação irá remover completamente o pagamento registrado e voltar a parcela para o status "Em Aberto".
+          <strong>Atenção:</strong> Esta ação irá remover completamente o pagamento registrado e voltar a parcela para o
+          status "Em Aberto".
         </div>
       </div>
       <div class="modal-footer">

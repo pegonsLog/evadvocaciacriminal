@@ -50,16 +50,73 @@ export class ParcelaService {
   }
 
   async gerarParcelas(cliente: Cliente): Promise<void> {
+    // Verificar se deve usar o novo método com data base ou o método legado
+    if (cliente.contrato.dataPrimeiroVencimento) {
+      return this.gerarParcelasComDataBase(cliente);
+    } else {
+      return this.gerarParcelasLegado(cliente);
+    }
+  }
+
+  /**
+   * Novo método que gera parcelas baseado na data do primeiro vencimento
+   */
+  async gerarParcelasComDataBase(cliente: Cliente): Promise<void> {
+    // Validações de negócio
+    this.validarDadosCliente(cliente);
+
     // Primeiro, limpar parcelas existentes para evitar duplicatas
     await this.deleteParcelasByCliente(cliente.id);
-    
-    const dataInicio = new Date(cliente.compra.dataCompra);
-    const diaVencimento = cliente.compra.diaVencimento;
 
-    for (let i = 1; i <= cliente.compra.numeroParcelas; i++) {
+    const dataPrimeiroVencimento = this.criarDataSegura(cliente.contrato.dataPrimeiroVencimento);
+    const diaVencimento = dataPrimeiroVencimento.getDate();
+
+    // Calcular valor parcelado (total - entrada)
+    const valorParcelado = cliente.contrato.valorTotal - cliente.contrato.valorEntrada;
+    const valorParcela = valorParcelado / cliente.contrato.numeroParcelas;
+
+    for (let i = 0; i < cliente.contrato.numeroParcelas; i++) {
+      // Calcular data de vencimento para cada parcela
+      const dataVencimento = new Date(dataPrimeiroVencimento);
+      dataVencimento.setMonth(dataVencimento.getMonth() + i);
+
+      // Ajustar para o último dia do mês se o dia não existir
+      const ultimoDiaDoMes = new Date(dataVencimento.getFullYear(), dataVencimento.getMonth() + 1, 0).getDate();
+      if (diaVencimento > ultimoDiaDoMes) {
+        dataVencimento.setDate(ultimoDiaDoMes);
+      } else {
+        dataVencimento.setDate(diaVencimento);
+      }
+
+      const parcela: Omit<Parcela, 'id'> = {
+        clienteId: cliente.id,
+        clienteNome: cliente.nome,
+        numeroContrato: cliente.contrato.numeroContrato,
+        numeroParcela: i + 1,
+        valorParcela: valorParcela,
+        dataVencimento: dataVencimento,
+        diasAtraso: 0,
+        status: 'pendente'
+      };
+
+      await addDoc(this.parcelasCollection, parcela);
+    }
+  }
+
+  /**
+   * Método legado para compatibilidade com dados antigos
+   */
+  private async gerarParcelasLegado(cliente: Cliente): Promise<void> {
+    // Primeiro, limpar parcelas existentes para evitar duplicatas
+    await this.deleteParcelasByCliente(cliente.id);
+
+    const dataInicio = new Date(cliente.contrato.dataContrato);
+    const diaVencimento = (cliente.contrato as any).diaVencimento || 10; // Fallback para dia 10
+
+    for (let i = 1; i <= cliente.contrato.numeroParcelas; i++) {
       // Criar data base para o mês correto
       const dataVencimento = new Date(dataInicio.getFullYear(), dataInicio.getMonth() + i, 1);
-      
+
       // Definir o dia de vencimento, ajustando para o último dia do mês se necessário
       const ultimoDiaDoMes = new Date(dataVencimento.getFullYear(), dataVencimento.getMonth() + 1, 0).getDate();
       const diaFinal = Math.min(diaVencimento, ultimoDiaDoMes);
@@ -68,15 +125,68 @@ export class ParcelaService {
       const parcela: Omit<Parcela, 'id'> = {
         clienteId: cliente.id,
         clienteNome: cliente.nome,
-        numeroContrato: cliente.compra.numeroContrato,
+        numeroContrato: cliente.contrato.numeroContrato,
         numeroParcela: i,
-        valorParcela: cliente.compra.valorParcela,
+        valorParcela: cliente.contrato.valorParcela,
         dataVencimento: dataVencimento,
         diasAtraso: 0,
         status: 'pendente'
       };
 
       await addDoc(this.parcelasCollection, parcela);
+    }
+  }
+
+  /**
+   * Cria uma data de forma segura, evitando problemas de fuso horário
+   */
+  private criarDataSegura(data: Date | string): Date {
+    if (data instanceof Date) {
+      return new Date(data);
+    }
+
+    // Se for string, adicionar horário para evitar problemas de fuso horário
+    if (typeof data === 'string') {
+      // Se já tem horário, usar como está
+      if (data.includes('T')) {
+        return new Date(data);
+      }
+      // Se não tem horário, adicionar meio-dia para evitar problemas de fuso horário
+      return new Date(data + 'T12:00:00');
+    }
+
+    return new Date(data);
+  }
+
+  /**
+   * Validações de negócio para os dados do cliente
+   */
+  private validarDadosCliente(cliente: Cliente): void {
+    // Validar que valor de entrada não seja maior que valor total
+    if (cliente.contrato.valorEntrada > cliente.contrato.valorTotal) {
+      throw new Error('O valor de entrada não pode ser maior que o valor total do contrato');
+    }
+
+    // Validar que data do primeiro vencimento não seja anterior à data atual
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const dataPrimeiroVencimento = this.criarDataSegura(cliente.contrato.dataPrimeiroVencimento);
+    dataPrimeiroVencimento.setHours(0, 0, 0, 0);
+
+    if (dataPrimeiroVencimento < hoje) {
+      throw new Error('A data do primeiro vencimento não pode ser anterior à data atual');
+    }
+
+    // Validar que o número de parcelas seja válido
+    if (cliente.contrato.numeroParcelas <= 0) {
+      throw new Error('O número de parcelas deve ser maior que zero');
+    }
+
+    // Validar que há valor a ser parcelado
+    const valorParcelado = cliente.contrato.valorTotal - cliente.contrato.valorEntrada;
+    if (valorParcelado <= 0) {
+      throw new Error('Não há valor a ser parcelado (valor total deve ser maior que a entrada)');
     }
   }
 
@@ -101,7 +211,7 @@ export class ParcelaService {
 
       if (parcela) {
         const diasAtraso = this.calcularDiasAtraso(parcela.dataVencimento, dataPagamento);
-        
+
         const dadosPagamento = {
           dataPagamento: dataPagamento,
           valorPago: valorPago,
@@ -114,7 +224,7 @@ export class ParcelaService {
         console.log('🔗 [SERVIÇO] Referência do documento:', parcelaDoc.path);
 
         await updateDoc(parcelaDoc, dadosPagamento);
-        
+
         console.log('✅ [SERVIÇO] Pagamento registrado com sucesso no Firestore');
 
         // Verificar se foi salvo
@@ -159,10 +269,10 @@ export class ParcelaService {
         status: 'pendente',
         observacao: ''
       });
-      
+
       // Marcar como recentemente limpa para evitar que atualizarStatusParcelas interfira
       this.parcelasRecentementeLimpas.add(parcelaId);
-      
+
       // Remover da lista após 5 segundos
       setTimeout(() => {
         this.parcelasRecentementeLimpas.delete(parcelaId);
@@ -221,5 +331,92 @@ export class ParcelaService {
     snapshot.forEach(async (docSnapshot) => {
       await deleteDoc(docSnapshot.ref);
     });
+  }
+
+  /**
+   * Recalcula parcelas preservando histórico de pagamentos já realizados
+   */
+  async recalcularParcelas(cliente: Cliente): Promise<void> {
+    console.log('🔄 Recalculando parcelas para cliente:', cliente.nome);
+
+    // Obter parcelas existentes
+    const parcelasExistentes = this.getParcelasByCliente(cliente.id);
+
+    // Separar parcelas pagas das pendentes
+    const parcelasPagas = parcelasExistentes.filter(p => p.status === 'pago');
+    const parcelasPendentes = parcelasExistentes.filter(p => p.status !== 'pago');
+
+    console.log(`📊 Encontradas ${parcelasPagas.length} parcelas pagas e ${parcelasPendentes.length} pendentes`);
+
+    // Deletar apenas parcelas pendentes
+    for (const parcela of parcelasPendentes) {
+      await this.deleteParcela(parcela.id);
+    }
+
+    // Calcular quantas parcelas ainda precisam ser geradas
+    const parcelasRestantes = cliente.contrato.numeroParcelas - parcelasPagas.length;
+
+    if (parcelasRestantes > 0) {
+      // Determinar a data de início para as novas parcelas
+      let dataInicio: Date;
+
+      if (parcelasPagas.length > 0) {
+        // Se há parcelas pagas, começar após a última parcela paga
+        const ultimaParcelaPaga = parcelasPagas.sort((a, b) => a.numeroParcela - b.numeroParcela).pop();
+        dataInicio = this.criarDataSegura(cliente.contrato.dataPrimeiroVencimento);
+        dataInicio.setMonth(dataInicio.getMonth() + ultimaParcelaPaga!.numeroParcela);
+      } else {
+        // Se não há parcelas pagas, usar a data do primeiro vencimento
+        dataInicio = this.criarDataSegura(cliente.contrato.dataPrimeiroVencimento);
+      }
+
+      // Gerar novas parcelas
+      await this.gerarParcelasRestantes(cliente, parcelasPagas.length, parcelasRestantes, dataInicio);
+    }
+
+    console.log('✅ Recálculo de parcelas concluído');
+  }
+
+  /**
+   * Gera parcelas restantes após recálculo
+   */
+  private async gerarParcelasRestantes(
+    cliente: Cliente,
+    parcelasJaPagas: number,
+    parcelasRestantes: number,
+    dataInicio: Date
+  ): Promise<void> {
+    const diaVencimento = dataInicio.getDate();
+
+    // Calcular valor parcelado (total - entrada)
+    const valorParcelado = cliente.contrato.valorTotal - cliente.contrato.valorEntrada;
+    const valorParcela = valorParcelado / cliente.contrato.numeroParcelas;
+
+    for (let i = 0; i < parcelasRestantes; i++) {
+      // Calcular data de vencimento para cada parcela restante
+      const dataVencimento = new Date(dataInicio);
+      dataVencimento.setMonth(dataVencimento.getMonth() + i);
+
+      // Ajustar para o último dia do mês se o dia não existir
+      const ultimoDiaDoMes = new Date(dataVencimento.getFullYear(), dataVencimento.getMonth() + 1, 0).getDate();
+      if (diaVencimento > ultimoDiaDoMes) {
+        dataVencimento.setDate(ultimoDiaDoMes);
+      } else {
+        dataVencimento.setDate(diaVencimento);
+      }
+
+      const parcela: Omit<Parcela, 'id'> = {
+        clienteId: cliente.id,
+        clienteNome: cliente.nome,
+        numeroContrato: cliente.contrato.numeroContrato,
+        numeroParcela: parcelasJaPagas + i + 1,
+        valorParcela: valorParcela,
+        dataVencimento: dataVencimento,
+        diasAtraso: 0,
+        status: 'pendente'
+      };
+
+      await addDoc(this.parcelasCollection, parcela);
+    }
   }
 }

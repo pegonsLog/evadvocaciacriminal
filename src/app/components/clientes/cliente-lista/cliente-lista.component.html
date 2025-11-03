@@ -123,21 +123,22 @@
             <div class="contract-summary">
               <div class="contract-item">
                 <span class="contract-label">Contrato</span>
-                <span class="contract-value">{{ cliente.compra.numeroContrato }}</span>
+                <span class="contract-value">{{ cliente.contrato.numeroContrato }}</span>
               </div>
               <div class="contract-item">
                 <span class="contract-label">Valor Total</span>
-                <span class="contract-value total">{{ cliente.compra.valorTotal |
+                <span class="contract-value total">{{ cliente.contrato.valorTotal |
                   currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
               </div>
               <div class="contract-item">
                 <span class="contract-label">Parcelas</span>
-                <span class="contract-value">{{ cliente.compra.numeroParcelas }}x de {{ cliente.compra.valorParcela |
+                <span class="contract-value">{{ cliente.contrato.numeroParcelas }}x de {{ cliente.contrato.valorParcela
+                  |
                   currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
               </div>
               <div class="contract-item">
                 <span class="contract-label">Vencimento</span>
-                <span class="contract-value">Dia {{ cliente.compra.diaVencimento }}</span>
+                <span class="contract-value">Dia {{ getDiaVencimento(cliente) }}</span>
               </div>
             </div>
           </div>

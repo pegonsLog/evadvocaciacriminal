@@ -12,10 +12,10 @@ export class ClienteService {
   private parcelaService = inject(ParcelaService);
   private clientesCollection = collection(this.firestore, 'clientes');
   private pagamentosCollection = collection(this.firestore, 'pagamentos');
-  
+
   private clientes: Cliente[] = [];
   private pagamentos: Pagamento[] = [];
-  
+
   private clientesSubject = new BehaviorSubject<Cliente[]>([]);
   private pagamentosSubject = new BehaviorSubject<Pagamento[]>([]);
 
@@ -33,39 +33,68 @@ export class ClienteService {
   }
 
   async addCliente(cliente: Cliente): Promise<string> {
+    // Preparar dados para Firestore mantendo compatibilidade com regras existentes
     const clienteData = {
       ...cliente,
       dataCadastro: new Date(),
+      // Enviar como 'compra' para compatibilidade com regras do Firestore
       compra: {
-        ...cliente.compra,
-        dataCompra: new Date()
+        ...cliente.contrato,
+        dataCompra: new Date() // Manter nome antigo para compatibilidade
       }
     };
     delete (clienteData as any).id;
+    delete (clienteData as any).contrato; // Remover o campo novo para evitar conflitos
+
     const docRef = await addDoc(this.clientesCollection, clienteData);
+
+    // Gerar parcelas automaticamente usando a nova lógica
+    const clienteComId = { ...cliente, id: docRef.id };
+    await this.parcelaService.gerarParcelas(clienteComId);
+
     return docRef.id;
   }
 
   async updateCliente(cliente: Cliente): Promise<void> {
     const clienteDoc = doc(this.firestore, `clientes/${cliente.id}`);
-    const clienteData = { ...cliente };
+
+    // Preparar dados para Firestore mantendo compatibilidade com regras existentes
+    const clienteData = {
+      ...cliente,
+      // Enviar como 'compra' para compatibilidade com regras do Firestore
+      compra: {
+        ...cliente.contrato,
+        dataCompra: cliente.contrato.dataContrato // Manter nome antigo para compatibilidade
+      }
+    };
     delete (clienteData as any).id;
+    delete (clienteData as any).contrato; // Remover o campo novo para evitar conflitos
+
+    // Verificar se houve mudanças que requerem recálculo das parcelas
+    const clienteAnterior = this.getClienteById(cliente.id);
+    const precisaRecalcularParcelas = this.verificarSeNecessarioRecalcularParcelas(clienteAnterior, cliente);
+
     await updateDoc(clienteDoc, clienteData);
+
+    // Recalcular parcelas se necessário, preservando histórico de pagamentos
+    if (precisaRecalcularParcelas) {
+      await this.parcelaService.recalcularParcelas(cliente);
+    }
   }
 
   async deleteCliente(id: string): Promise<void> {
     const clienteDoc = doc(this.firestore, `clientes/${id}`);
-    
+
     // Deletar parcelas relacionadas
     await this.parcelaService.deleteParcelasByCliente(id);
-    
+
     // Deletar pagamentos relacionados
     const pagamentosQuery = query(this.pagamentosCollection, where('clienteId', '==', id));
     const snapshot = await getDocs(pagamentosQuery);
     snapshot.forEach(async (docSnapshot) => {
       await deleteDoc(docSnapshot.ref);
     });
-    
+
     // Deletar o cliente
     await deleteDoc(clienteDoc);
   }
@@ -103,19 +132,37 @@ export class ClienteService {
   // Resumo de Pagamentos
   getResumoPagamentos(): ResumoPagamento[] {
     return this.clientes.map(cliente => {
-      const pagamentosCliente = this.getPagamentosByCliente(cliente.id);
-      const totalPago = pagamentosCliente.reduce((sum, p) => sum + p.valorPago, 0);
-      const saldoDevedor = cliente.compra.valorTotal - totalPago;
+      // Buscar parcelas pagas para este cliente
+      const parcelasPagas = this.parcelaService.getParcelasByCliente(cliente.id)
+        .filter(p => p.status === 'pago');
+
+      const totalPago = parcelasPagas.reduce((sum, p) => sum + (p.valorPago || 0), 0);
+
+      // Saldo devedor = (Valor total - Entrada) - Total pago
+      const valorParcelado = cliente.contrato.valorTotal - cliente.contrato.valorEntrada;
+      const saldoDevedor = valorParcelado - totalPago;
+
+      // Converter parcelas pagas para formato de pagamento para compatibilidade
+      const pagamentos: Pagamento[] = parcelasPagas.map(parcela => ({
+        id: parcela.id,
+        clienteId: parcela.clienteId,
+        clienteNome: parcela.clienteNome,
+        valorPago: parcela.valorPago || 0,
+        dataPagamento: parcela.dataPagamento || new Date(),
+        dataVencimento: parcela.dataVencimento,
+        diasAtraso: parcela.diasAtraso,
+        observacao: parcela.observacao
+      }));
 
       return {
         clienteId: cliente.id,
         clienteNome: cliente.nome,
-        valorCompra: cliente.compra.valorTotal,
-        numeroParcelas: cliente.compra.numeroParcelas,
-        valorParcela: cliente.compra.valorParcela,
+        valorCompra: cliente.contrato.valorTotal,
+        numeroParcelas: cliente.contrato.numeroParcelas,
+        valorParcela: cliente.contrato.valorParcela,
         totalPago: totalPago,
         saldoDevedor: saldoDevedor,
-        pagamentos: pagamentosCliente
+        pagamentos: pagamentos
       };
     });
   }
@@ -124,19 +171,37 @@ export class ClienteService {
     const cliente = this.getClienteById(clienteId);
     if (!cliente) return undefined;
 
-    const pagamentosCliente = this.getPagamentosByCliente(clienteId);
-    const totalPago = pagamentosCliente.reduce((sum, p) => sum + p.valorPago, 0);
-    const saldoDevedor = cliente.compra.valorTotal - totalPago;
+    // Buscar parcelas pagas para este cliente
+    const parcelasPagas = this.parcelaService.getParcelasByCliente(clienteId)
+      .filter(p => p.status === 'pago');
+
+    const totalPago = parcelasPagas.reduce((sum, p) => sum + (p.valorPago || 0), 0);
+
+    // Saldo devedor = (Valor total - Entrada) - Total pago
+    const valorParcelado = cliente.contrato.valorTotal - cliente.contrato.valorEntrada;
+    const saldoDevedor = valorParcelado - totalPago;
+
+    // Converter parcelas pagas para formato de pagamento para compatibilidade
+    const pagamentos: Pagamento[] = parcelasPagas.map(parcela => ({
+      id: parcela.id,
+      clienteId: parcela.clienteId,
+      clienteNome: parcela.clienteNome,
+      valorPago: parcela.valorPago || 0,
+      dataPagamento: parcela.dataPagamento || new Date(),
+      dataVencimento: parcela.dataVencimento,
+      diasAtraso: parcela.diasAtraso,
+      observacao: parcela.observacao
+    }));
 
     return {
       clienteId: cliente.id,
       clienteNome: cliente.nome,
-      valorCompra: cliente.compra.valorTotal,
-      numeroParcelas: cliente.compra.numeroParcelas,
-      valorParcela: cliente.compra.valorParcela,
+      valorCompra: cliente.contrato.valorTotal,
+      numeroParcelas: cliente.contrato.numeroParcelas,
+      valorParcela: cliente.contrato.valorParcela,
       totalPago: totalPago,
       saldoDevedor: saldoDevedor,
-      pagamentos: pagamentosCliente
+      pagamentos: pagamentos
     };
   }
 
@@ -145,20 +210,57 @@ export class ClienteService {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
+  /**
+   * Verifica se é necessário recalcular as parcelas baseado nas mudanças do cliente
+   */
+  private verificarSeNecessarioRecalcularParcelas(clienteAnterior: Cliente | undefined, clienteNovo: Cliente): boolean {
+    if (!clienteAnterior) {
+      return false; // Cliente novo, parcelas já serão geradas
+    }
+
+    const contratoAnterior = clienteAnterior.contrato;
+    const contratoNovo = clienteNovo.contrato;
+
+    // Verificar mudanças que afetam o cálculo das parcelas
+    return (
+      contratoAnterior.valorTotal !== contratoNovo.valorTotal ||
+      contratoAnterior.valorEntrada !== contratoNovo.valorEntrada ||
+      contratoAnterior.numeroParcelas !== contratoNovo.numeroParcelas ||
+      contratoAnterior.dataPrimeiroVencimento?.getTime() !== contratoNovo.dataPrimeiroVencimento?.getTime()
+    );
+  }
+
 
   private carregarDados(): void {
     // Carregar clientes do Firestore usando onSnapshot
-    onSnapshot(this.clientesCollection, 
+    onSnapshot(this.clientesCollection,
       (snapshot) => {
         this.clientes = snapshot.docs.map(doc => {
           const data = doc.data() as any;
+
+          // Verificar se os dados estão no formato antigo (compra) ou novo (contrato)
+          const contratoData = data.contrato || data.compra;
+
           return {
             id: doc.id,
             ...data,
             dataCadastro: data.dataCadastro?.toDate ? data.dataCadastro.toDate() : new Date(data.dataCadastro),
-            compra: {
-              ...data.compra,
-              dataCompra: data.compra?.dataCompra?.toDate ? data.compra.dataCompra.toDate() : new Date(data.compra?.dataCompra || new Date())
+            contrato: {
+              numeroContrato: contratoData?.numeroContrato || '',
+              valorEntrada: contratoData?.valorEntrada || 0,
+              valorTotal: contratoData?.valorTotal || 0,
+              numeroParcelas: contratoData?.numeroParcelas || 0,
+              valorParcela: contratoData?.valorParcela || 0,
+              dataContrato: contratoData?.dataContrato?.toDate ?
+                contratoData.dataContrato.toDate() :
+                (contratoData?.dataCompra?.toDate ?
+                  contratoData.dataCompra.toDate() :
+                  new Date(contratoData?.dataContrato || contratoData?.dataCompra || new Date())),
+              dataPrimeiroVencimento: contratoData?.dataPrimeiroVencimento?.toDate ?
+                contratoData.dataPrimeiroVencimento.toDate() :
+                (contratoData?.dataPrimeiroVencimento ? new Date(contratoData.dataPrimeiroVencimento) : undefined),
+              estimativaValorPrevisto: contratoData?.estimativaValorPrevisto,
+              relatorioContratosPendentes: contratoData?.relatorioContratosPendentes
             }
           } as Cliente;
         });

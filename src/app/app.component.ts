@@ -16,11 +16,11 @@ import { ModalService } from './services/modal.service';
 export class AppComponent implements OnInit, OnDestroy {
   title = 'EV Advocacia Criminal';
   isMobileMenuOpen = false;
-  
+
   authService = inject(AuthService);
   private router = inject(Router);
   private modalService = inject(ModalService);
-  
+
   currentUser$ = this.authService.currentUser$;
   UserRole = UserRole;
 
@@ -76,20 +76,21 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   async logout(): Promise<void> {
-    this.modalService.showConfirm(
+    const confirmar = await this.modalService.showConfirm(
       'Deseja realmente sair?',
-      async () => {
-        try {
-          await this.authService.logout();
-          this.router.navigate(['/login']);
-          this.closeMobileMenu();
-        } catch (error) {
-          console.error('Erro ao fazer logout:', error);
-          this.modalService.showError('Erro ao fazer logout.');
-        }
-      },
       'Confirmar Logout'
     );
+
+    if (confirmar) {
+      try {
+        await this.authService.logout();
+        this.router.navigate(['/login']);
+        this.closeMobileMenu();
+      } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+        this.modalService.showError('Erro ao fazer logout.');
+      }
+    }
   }
 
   isAdmin(): boolean {

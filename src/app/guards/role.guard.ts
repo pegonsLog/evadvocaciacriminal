@@ -12,8 +12,8 @@ export const roleGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   if (!authService.isAuthenticated()) {
-    router.navigate(['/login'], { 
-      queryParams: { returnUrl: state.url } 
+    router.navigate(['/login'], {
+      queryParams: { returnUrl: state.url }
     });
     return false;
   }
@@ -26,7 +26,6 @@ export const roleGuard: CanActivateFn = (route, state) => {
   }
 
   // Usuário autenticado mas sem a role necessária
-  router.navigate(['/home']);
-  alert('Acesso negado. Você não tem permissão para acessar esta área.');
+  router.navigate(['/acesso-negado']);
   return false;
 };

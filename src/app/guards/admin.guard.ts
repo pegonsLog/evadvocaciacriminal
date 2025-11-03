@@ -10,8 +10,8 @@ export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   if (!authService.isAuthenticated()) {
-    router.navigate(['/login'], { 
-      queryParams: { returnUrl: state.url } 
+    router.navigate(['/login'], {
+      queryParams: { returnUrl: state.url }
     });
     return false;
   }
@@ -21,7 +21,6 @@ export const adminGuard: CanActivateFn = (route, state) => {
   }
 
   // Usuário autenticado mas sem permissão
-  router.navigate(['/home']);
-  alert('Acesso negado. Apenas administradores podem acessar esta área.');
+  router.navigate(['/acesso-negado']);
   return false;
 };

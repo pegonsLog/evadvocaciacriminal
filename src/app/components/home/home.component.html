@@ -100,20 +100,14 @@
           Ações Rápidas
         </h4>
       </div>
-      
+
       <div class="actions-content">
         <div class="quick-search">
           <div class="search-box">
             <i class="bi bi-search"></i>
-            <input 
-              type="text" 
-              placeholder="Buscar cliente rapidamente..."
-              [(ngModel)]="filtroNome"
+            <input type="text" placeholder="Buscar cliente rapidamente..." [(ngModel)]="filtroNome"
               (ngModelChange)="aplicarFiltro()">
-            <button 
-              class="clear-btn" 
-              *ngIf="filtroNome"
-              (click)="filtroNome = ''; aplicarFiltro()">
+            <button class="clear-btn" *ngIf="filtroNome" (click)="filtroNome = ''; aplicarFiltro()">
               <i class="bi bi-x"></i>
             </button>
           </div>
@@ -203,7 +197,7 @@
                 </div>
                 <div class="client-basic-info">
                   <h6 class="client-name">{{ cliente.nome }}</h6>
-                  <span class="client-contract">Contrato {{ cliente.compra.numeroContrato }}</span>
+                  <span class="client-contract">Contrato {{ cliente.contrato.numeroContrato }}</span>
                 </div>
                 <div class="client-status-indicator" [class]="getStatusClass(cliente.id)">
                   <i class="bi" [class]="getStatusIcon(cliente.id)"></i>
@@ -214,21 +208,24 @@
                 <div class="client-metrics">
                   <div class="metric">
                     <span class="metric-label">Total</span>
-                    <span class="metric-value">{{ cliente.compra.valorTotal | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+                    <span class="metric-value">{{ cliente.contrato.valorTotal | currency:'BRL':'symbol':'1.0-0':'pt-BR'
+                      }}</span>
                   </div>
                   <div class="metric" *ngIf="getResumo(cliente.id) as resumo">
                     <span class="metric-label">Pago</span>
-                    <span class="metric-value paid">{{ resumo.totalPago | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+                    <span class="metric-value paid">{{ resumo.totalPago | currency:'BRL':'symbol':'1.0-0':'pt-BR'
+                      }}</span>
                   </div>
                   <div class="metric" *ngIf="getResumo(cliente.id) as resumo">
                     <span class="metric-label">Pendente</span>
-                    <span class="metric-value pending">{{ resumo.saldoDevedor | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+                    <span class="metric-value pending">{{ resumo.saldoDevedor | currency:'BRL':'symbol':'1.0-0':'pt-BR'
+                      }}</span>
                   </div>
                 </div>
 
                 <div class="progress-mini" *ngIf="getResumo(cliente.id) as resumo">
-                  <div class="progress-bar-mini" 
-                       [style.width.%]="(resumo.parcelasPagas / cliente.compra.numeroParcelas) * 100">
+                  <div class="progress-bar-mini"
+                    [style.width.%]="(resumo.parcelasPagas / cliente.contrato.numeroParcelas) * 100">
                   </div>
                 </div>
               </div>

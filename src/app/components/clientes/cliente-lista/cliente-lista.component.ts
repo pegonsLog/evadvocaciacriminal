@@ -24,7 +24,7 @@ export class ClienteListaComponent implements OnInit {
     private clienteService: ClienteService,
     private router: Router,
     private modalService: ModalService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.clienteService.getClientes().subscribe(clientes => {
@@ -68,7 +68,7 @@ export class ClienteListaComponent implements OnInit {
   async excluirCliente(id: string): Promise<void> {
     console.log('Método excluirCliente chamado com ID:', id);
     console.log('Usuário é admin?', this.authService.isAdmin());
-    
+
     // Apenas administradores podem deletar
     if (!this.authService.isAdmin()) {
       console.log('Usuário não é admin, mostrando aviso');
@@ -78,7 +78,7 @@ export class ClienteListaComponent implements OnInit {
 
     const cliente = this.clienteService.getClienteById(id);
     console.log('Cliente encontrado:', cliente);
-    
+
     if (!cliente) {
       console.log('Cliente não encontrado');
       this.modalService.showError('Cliente não encontrado.');
@@ -86,24 +86,25 @@ export class ClienteListaComponent implements OnInit {
     }
 
     console.log('Mostrando modal de confirmação');
-    this.modalService.showConfirm(
+    const confirmado = await this.modalService.showConfirm(
       `Tem certeza que deseja excluir o cliente "${cliente.nome}"?\n\nEsta ação também removerá:\n• Todas as parcelas do cliente\n• Todos os pagamentos registrados\n\nEsta ação não pode ser desfeita.`,
-      async () => {
-        console.log('Usuário confirmou exclusão, iniciando processo...');
-        try {
-          await this.clienteService.deleteCliente(id);
-          console.log('Cliente excluído com sucesso');
-          this.modalService.showSuccess('Cliente e todos os dados relacionados foram excluídos com sucesso!');
-          
-          // Atualizar a lista de clientes
-          this.ngOnInit();
-        } catch (error) {
-          console.error('Erro ao excluir cliente:', error);
-          this.modalService.showError('Erro ao excluir cliente. Verifique o console para mais detalhes.');
-        }
-      },
       'Confirmar Exclusão'
     );
+
+    if (confirmado) {
+      console.log('Usuário confirmou exclusão, iniciando processo...');
+      try {
+        await this.clienteService.deleteCliente(id);
+        console.log('Cliente excluído com sucesso');
+        this.modalService.showSuccess('Cliente e todos os dados relacionados foram excluídos com sucesso!');
+
+        // Atualizar a lista de clientes
+        this.ngOnInit();
+      } catch (error) {
+        console.error('Erro ao excluir cliente:', error);
+        this.modalService.showError('Erro ao excluir cliente. Verifique o console para mais detalhes.');
+      }
+    }
   }
 
   novoCliente(): void {
@@ -116,5 +117,27 @@ export class ClienteListaComponent implements OnInit {
 
   isAdmin(): boolean {
     return this.authService.isAdmin();
+  }
+
+  getDiaVencimento(cliente: Cliente): number {
+    if (cliente.contrato.dataPrimeiroVencimento) {
+      return this.criarDataSegura(cliente.contrato.dataPrimeiroVencimento).getDate();
+    }
+    return 10; // Valor padrão para compatibilidade
+  }
+
+  private criarDataSegura(data: Date | string): Date {
+    if (data instanceof Date) {
+      return new Date(data);
+    }
+
+    if (typeof data === 'string') {
+      if (data.includes('T')) {
+        return new Date(data);
+      }
+      return new Date(data + 'T12:00:00');
+    }
+
+    return new Date(data);
   }
 }

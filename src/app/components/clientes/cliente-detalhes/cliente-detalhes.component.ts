@@ -24,13 +24,18 @@ export class ClienteDetalhesComponent implements OnInit {
     private parcelaService: ParcelaService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.cliente = this.clienteService.getClienteById(id);
-      this.carregarResumo(id);
+      // Aguardar os dados serem carregados do Firestore
+      this.clienteService.getClientes().subscribe(clientes => {
+        this.cliente = clientes.find(c => c.id === id);
+        if (this.cliente) {
+          this.carregarResumo(id);
+        }
+      });
     }
   }
 
@@ -42,14 +47,16 @@ export class ClienteDetalhesComponent implements OnInit {
   }
 
   calcularResumo(): void {
-    this.totalPago = this.parcelas
-      .filter(p => p.status === 'pago')
-      .reduce((total, p) => total + (p.valorPago || 0), 0);
-    
-    this.parcelasPagas = this.parcelas.filter(p => p.status === 'pago').length;
-    
+    // Filtrar apenas parcelas pagas
+    const parcelasPagas = this.parcelas.filter(p => p.status === 'pago');
+
+    this.totalPago = parcelasPagas.reduce((total, p) => total + (p.valorPago || 0), 0);
+    this.parcelasPagas = parcelasPagas.length;
+
     if (this.cliente) {
-      this.saldoDevedor = this.cliente.compra.valorTotal - this.totalPago;
+      // Saldo devedor = (Valor total - Entrada) - Total pago
+      const valorParcelado = this.cliente.contrato.valorTotal - this.cliente.contrato.valorEntrada;
+      this.saldoDevedor = valorParcelado - this.totalPago;
     }
   }
 
@@ -67,5 +74,44 @@ export class ClienteDetalhesComponent implements OnInit {
     if (this.cliente) {
       this.router.navigate(['/pagamentos', this.cliente.id]);
     }
+  }
+
+  getDiaVencimento(): number {
+    if (this.cliente?.contrato.dataPrimeiroVencimento) {
+      return this.criarDataSegura(this.cliente.contrato.dataPrimeiroVencimento).getDate();
+    }
+    // Para clientes antigos, usar dia 10 como padrão
+    return 10;
+  }
+
+  formatarDataPrimeiroVencimento(): string {
+    if (this.cliente?.contrato.dataPrimeiroVencimento) {
+      const data = this.criarDataSegura(this.cliente.contrato.dataPrimeiroVencimento);
+      return data.toLocaleDateString('pt-BR');
+    }
+    return '';
+  }
+
+  formatarDataContrato(): string {
+    if (this.cliente?.contrato.dataContrato) {
+      const data = this.criarDataSegura(this.cliente.contrato.dataContrato);
+      return data.toLocaleDateString('pt-BR');
+    }
+    return new Date().toLocaleDateString('pt-BR');
+  }
+
+  private criarDataSegura(data: Date | string): Date {
+    if (data instanceof Date) {
+      return new Date(data);
+    }
+
+    if (typeof data === 'string') {
+      if (data.includes('T')) {
+        return new Date(data);
+      }
+      return new Date(data + 'T12:00:00');
+    }
+
+    return new Date(data);
   }
 }

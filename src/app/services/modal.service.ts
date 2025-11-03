@@ -56,8 +56,34 @@ export class ModalService {
   }
 
   showConfirm(
-    message: string, 
-    onConfirm: () => void | Promise<void>, 
+    message: string,
+    title: string = 'Confirmação',
+    confirmText: string = 'Confirmar',
+    cancelText: string = 'Cancelar'
+  ): Promise<boolean> {
+    return new Promise((resolve) => {
+      this.modalSubject.next({
+        title,
+        message,
+        type: 'confirm',
+        confirmText,
+        cancelText,
+        onConfirm: () => {
+          this.close();
+          resolve(true);
+        },
+        onCancel: () => {
+          this.close();
+          resolve(false);
+        }
+      });
+    });
+  }
+
+  // Método legado para compatibilidade
+  showConfirmWithCallback(
+    message: string,
+    onConfirm: () => void | Promise<void>,
     title: string = 'Confirmação',
     confirmText: string = 'Confirmar',
     cancelText: string = 'Cancelar'

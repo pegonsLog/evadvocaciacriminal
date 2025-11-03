@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit {
     private clienteService: ClienteService,
     private parcelaService: ParcelaService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.clienteService.getClientes().subscribe(clientes => {
@@ -58,13 +58,15 @@ export class HomeComponent implements OnInit {
   calcularResumos(): void {
     this.clientes.forEach(cliente => {
       const parcelasCliente = this.parcelas.filter(p => p.clienteId === cliente.id);
-      
+
       const totalPago = parcelasCliente
         .filter(p => p.status === 'pago')
         .reduce((total, p) => total + (p.valorPago || 0), 0);
-      
+
       const parcelasPagas = parcelasCliente.filter(p => p.status === 'pago').length;
-      const saldoDevedor = cliente.compra.valorTotal - totalPago;
+      // Saldo devedor = (Valor total - Entrada) - Total pago
+      const valorParcelado = cliente.contrato.valorTotal - cliente.contrato.valorEntrada;
+      const saldoDevedor = valorParcelado - totalPago;
 
       this.resumos.set(cliente.id, {
         totalPago,
@@ -98,9 +100,9 @@ export class HomeComponent implements OnInit {
     const resumo = this.getResumo(clienteId);
     const cliente = this.clientes.find(c => c.id === clienteId);
     if (!cliente) return 'status-neutral';
-    
-    const percentualPago = (resumo.parcelasPagas / cliente.compra.numeroParcelas) * 100;
-    
+
+    const percentualPago = (resumo.parcelasPagas / cliente.contrato.numeroParcelas) * 100;
+
     if (percentualPago === 100) return 'status-success';
     if (percentualPago >= 50) return 'status-warning';
     return 'status-danger';
@@ -110,9 +112,9 @@ export class HomeComponent implements OnInit {
     const resumo = this.getResumo(clienteId);
     const cliente = this.clientes.find(c => c.id === clienteId);
     if (!cliente) return 'bi-circle';
-    
-    const percentualPago = (resumo.parcelasPagas / cliente.compra.numeroParcelas) * 100;
-    
+
+    const percentualPago = (resumo.parcelasPagas / cliente.contrato.numeroParcelas) * 100;
+
     if (percentualPago === 100) return 'bi-check-circle-fill';
     if (percentualPago >= 50) return 'bi-clock-fill';
     return 'bi-exclamation-circle-fill';

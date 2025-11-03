@@ -25,7 +25,7 @@ export class ParcelaListaComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private modalService: ModalService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.clienteId = this.route.snapshot.paramMap.get('clienteId') || '';
@@ -41,7 +41,7 @@ export class ParcelaListaComponent implements OnInit {
         .filter(p => p.clienteId === this.clienteId)
         .sort((a, b) => a.numeroParcela - b.numeroParcela);
     });
-    
+
     // Atualizar status das parcelas após carregar (com delay para não interferir em operações recentes)
     setTimeout(() => {
       this.parcelaService.atualizarStatusParcelas();
@@ -145,5 +145,27 @@ export class ParcelaListaComponent implements OnInit {
   editarDataPagamento(parcela: Parcela): void {
     // Redirecionar para a página de pagamentos onde há mais opções de edição
     this.router.navigate(['/pagamentos', this.clienteId]);
+  }
+
+  getDiaVencimento(): number {
+    if (this.cliente?.contrato.dataPrimeiroVencimento) {
+      return this.criarDataSegura(this.cliente.contrato.dataPrimeiroVencimento).getDate();
+    }
+    return 10; // Valor padrão para compatibilidade
+  }
+
+  private criarDataSegura(data: Date | string): Date {
+    if (data instanceof Date) {
+      return new Date(data);
+    }
+
+    if (typeof data === 'string') {
+      if (data.includes('T')) {
+        return new Date(data);
+      }
+      return new Date(data + 'T12:00:00');
+    }
+
+    return new Date(data);
   }
 }

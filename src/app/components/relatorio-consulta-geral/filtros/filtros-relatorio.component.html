@@ -1,0 +1,159 @@
+<div class="filtros-relatorio">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-filter me-2"></i>
+                Filtros do Relatório
+            </h5>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="limparFiltros()"
+                    [disabled]="!temFiltrosAtivos()" title="Limpar todos os filtros">
+                    <i class="fas fa-eraser me-1"></i>
+                    Limpar
+                </button>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <form [formGroup]="filtrosForm" novalidate>
+
+                <!-- Períodos Pré-definidos -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Períodos Rápidos:</label>
+                        <div class="btn-group-sm d-flex flex-wrap gap-1" role="group">
+                            <button *ngFor="let periodo of periodosPredefinidos" type="button"
+                                class="btn btn-outline-primary btn-sm" (click)="aplicarPeriodoPredefinido(periodo.dias)"
+                                title="Aplicar período: {{ periodo.label }}">
+                                {{ periodo.label }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Filtros de Data -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="dataInicio" class="form-label">Data de Início</label>
+                        <input type="date" id="dataInicio" class="form-control" formControlName="dataInicio"
+                            [class.is-invalid]="!validarDatas()">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="dataFim" class="form-label">Data de Fim</label>
+                        <input type="date" id="dataFim" class="form-control" formControlName="dataFim"
+                            [class.is-invalid]="!validarDatas()">
+                    </div>
+                </div>
+
+                <!-- Filtro de Status -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="statusPagamento" class="form-label">Status de Pagamento</label>
+                        <select id="statusPagamento" class="form-select" formControlName="statusPagamento" multiple>
+                            <option *ngFor="let status of statusOptions" [value]="status.value">
+                                {{ status.label }}
+                            </option>
+                        </select>
+                        <div class="form-text">
+                            Mantenha Ctrl pressionado para selecionar múltiplos status
+                        </div>
+                    </div>
+
+                    <!-- Filtro de Cliente (apenas para admin) -->
+                    <div class="col-md-6" *ngIf="isAdmin">
+                        <label for="clienteId" class="form-label">Cliente</label>
+                        <select id="clienteId" class="form-select" formControlName="clienteId">
+                            <option value="">Todos os clientes</option>
+                            <option *ngFor="let cliente of clientes" [value]="cliente.id">
+                                {{ cliente.nome }}
+                            </option>
+                        </select>
+                        <div *ngIf="carregandoClientes" class="form-text">
+                            <i class="fas fa-spinner fa-spin me-1"></i>
+                            Carregando clientes...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros de Valor -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="valorMinimo" class="form-label">Valor Mínimo (R$)</label>
+                        <input type="number" id="valorMinimo" class="form-control" formControlName="valorMinimo" min="0"
+                            step="0.01" placeholder="0,00"
+                            [class.is-invalid]="filtrosForm.get('valorMinimo')?.invalid || !validarValores()">
+                        <div class="invalid-feedback" *ngIf="filtrosForm.get('valorMinimo')?.hasError('min')">
+                            O valor deve ser maior ou igual a zero.
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="valorMaximo" class="form-label">Valor Máximo (R$)</label>
+                        <input type="number" id="valorMaximo" class="form-control" formControlName="valorMaximo" min="0"
+                            step="0.01" placeholder="0,00"
+                            [class.is-invalid]="filtrosForm.get('valorMaximo')?.invalid || !validarValores()">
+                        <div class="invalid-feedback" *ngIf="filtrosForm.get('valorMaximo')?.hasError('min')">
+                            O valor deve ser maior ou igual a zero.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensagens de Erro -->
+                <div class="alert alert-danger" *ngIf="temErrosValidacao()">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    {{ obterMensagemErro() }}
+                </div>
+
+                <!-- Resumo dos Filtros Ativos -->
+                <div class="alert alert-info" *ngIf="temFiltrosAtivos() && !temErrosValidacao()">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span class="fw-bold">Filtros ativos:</span>
+                    </div>
+                    <div class="mt-2">
+                        <div class="d-flex flex-wrap gap-1">
+
+                            <!-- Filtro de Data -->
+                            <span *ngIf="filtrosForm.get('dataInicio')?.value || filtrosForm.get('dataFim')?.value"
+                                class="badge bg-primary">
+                                <i class="fas fa-calendar me-1"></i>
+                                Período:
+                                {{ filtrosForm.get('dataInicio')?.value || '...' }}
+                                até
+                                {{ filtrosForm.get('dataFim')?.value || '...' }}
+                            </span>
+
+                            <!-- Filtro de Status -->
+                            <span *ngIf="filtrosForm.get('statusPagamento')?.value?.length > 0"
+                                class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Status: {{ filtrosForm.get('statusPagamento')?.value?.length }} selecionado(s)
+                            </span>
+
+                            <!-- Filtro de Cliente -->
+                            <span *ngIf="filtrosForm.get('clienteId')?.value && isAdmin"
+                                class="badge bg-warning text-dark">
+                                <i class="fas fa-user me-1"></i>
+                                Cliente: {{ obterNomeCliente(filtrosForm.get('clienteId')?.value) }}
+                            </span>
+
+                            <!-- Filtro de Valor -->
+                            <span
+                                *ngIf="filtrosForm.get('valorMinimo')?.value !== null || filtrosForm.get('valorMaximo')?.value !== null"
+                                class="badge bg-info">
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                Valor:
+                                R$ {{ filtrosForm.get('valorMinimo')?.value || '0' }}
+                                -
+                                R$ {{ filtrosForm.get('valorMaximo')?.value || '∞' }}
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

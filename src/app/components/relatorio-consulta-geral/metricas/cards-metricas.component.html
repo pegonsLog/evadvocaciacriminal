@@ -1,0 +1,125 @@
+<div class="cards-metricas">
+    <div class="row g-3">
+        <div class="col-12 col-sm-6 col-lg-4" *ngFor="let metrica of metricasFormatadas; trackBy: trackByMetrica">
+            <div #cardMetrica class="card h-100 shadow-sm border-0 card-metrica" [class]="'border-' + metrica.cor"
+                [attr.data-metrica]="metrica.nome" [class.animando]="estaAnimandoValor(metrica.nome)"
+                [class.entrada-animada]="animandoEntrada">
+
+                <!-- Loading State -->
+                <div *ngIf="carregando" class="card-body d-flex align-items-center justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </div>
+
+                <!-- Content State -->
+                <div *ngIf="!carregando" class="card-body">
+                    <!-- Header com ícone e nome -->
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-container me-3" [class]="'bg-' + metrica.cor + '-subtle'">
+                            <i [class]="metrica.icone + ' text-' + metrica.cor"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-0 text-muted">{{ metrica.nome }}</h6>
+                        </div>
+                    </div>
+
+                    <!-- Valor principal -->
+                    <div class="valor-principal mb-2">
+                        <h3 class="mb-0 fw-bold" [class]="'text-' + metrica.cor"
+                            [class.valor-animando]="estaAnimandoValor(metrica.nome)">
+                            {{ obterValorExibicao(metrica) }}
+                        </h3>
+                    </div>
+
+                    <!-- Indicadores de variação -->
+                    <div *ngIf="metrica.valorAnterior !== undefined && metrica.variacao !== 0"
+                        class="variacao-container">
+
+                        <!-- Variação absoluta -->
+                        <div class="d-flex align-items-center mb-1">
+                            <i [class]="obterIconeTendencia(metrica.tendencia)"
+                                [class]="obterClasseTendencia(metrica.tendencia) + ' me-1'"></i>
+                            <small [class]="obterClasseTendencia(metrica.tendencia) + ' fw-medium'">
+                                {{ formatarVariacao(metrica) }}
+                            </small>
+                        </div>
+
+                        <!-- Variação percentual -->
+                        <div *ngIf="metrica.percentualVariacao !== 0" class="d-flex align-items-center">
+                            <small [class]="obterClasseTendencia(metrica.tendencia)">
+                                {{ formatarPercentualVariacao(metrica) }} vs período anterior
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Estado estável -->
+                    <div *ngIf="metrica.valorAnterior !== undefined && metrica.variacao === 0"
+                        class="variacao-container">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-minus text-muted me-1"></i>
+                            <small class="text-muted">Sem alteração</small>
+                        </div>
+                    </div>
+
+                    <!-- Primeira medição -->
+                    <div *ngIf="metrica.valorAnterior === undefined" class="variacao-container">
+                        <small class="text-muted">Primeira medição</small>
+                    </div>
+                </div>
+
+                <!-- Barra de progresso para métricas percentuais -->
+                <div *ngIf="!carregando && metrica.formato === 'percentual'"
+                    class="card-footer bg-transparent border-0 pt-0">
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar" [class]="'bg-' + metrica.cor"
+                            [style.width.%]="obterPorcentagemProgresso(metrica.valor)" role="progressbar">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumo geral (opcional) -->
+    <div *ngIf="!carregando && metricasFormatadas.length > 0" class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 col-md-3">
+                            <div class="border-end">
+                                <h6 class="text-muted mb-1">Receita Total</h6>
+                                <h5 class="mb-0 text-success">
+                                    {{ formatarValor(metricasFormatadas[0]) }}
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border-end">
+                                <h6 class="text-muted mb-1">Pendente</h6>
+                                <h5 class="mb-0 text-warning">
+                                    {{ formatarValor(metricasFormatadas[1]) }}
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border-end">
+                                <h6 class="text-muted mb-1">Em Atraso</h6>
+                                <h5 class="mb-0 text-danger">
+                                    {{ formatarValor(metricasFormatadas[2]) }}
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <h6 class="text-muted mb-1">Inadimplência</h6>
+                            <h5 class="mb-0 text-info">
+                                {{ formatarValor(metricasFormatadas[3]) }}
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

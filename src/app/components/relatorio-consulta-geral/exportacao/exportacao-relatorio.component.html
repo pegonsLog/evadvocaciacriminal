@@ -1,0 +1,183 @@
+<!-- Botão para abrir modal de exportação -->
+<button type="button" class="btn btn-outline-primary" (click)="abrirModalExportacao(modalExportacao)"
+    [disabled]="!dadosRelatorio" title="Exportar relatório">
+    <i class="fas fa-download me-2"></i>
+    Exportar Relatório
+</button>
+
+<!-- Modal de configuração de exportação -->
+<ng-template #modalExportacao let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">
+            <i class="fas fa-download me-2"></i>
+            Exportar Relatório
+        </h4>
+        <button type="button" class="btn-close" aria-label="Fechar" (click)="fecharModal()" [disabled]="exportando">
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <!-- Seleção de formato -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <label class="form-label fw-bold">Formato de Exportação</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="formato" id="formatoPdf" value="pdf"
+                            [(ngModel)]="configuracao.formato" (change)="onFormatoChange()" [disabled]="exportando">
+                        <label class="form-check-label" for="formatoPdf">
+                            <i class="fas fa-file-pdf text-danger me-2"></i>
+                            PDF
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="formato" id="formatoExcel" value="excel"
+                            [(ngModel)]="configuracao.formato" (change)="onFormatoChange()" [disabled]="exportando">
+                        <label class="form-check-label" for="formatoExcel">
+                            <i class="fas fa-file-excel text-success me-2"></i>
+                            Excel
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nome do arquivo -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <label for="nomeArquivo" class="form-label fw-bold">Nome do Arquivo</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="nomeArquivo" [(ngModel)]="configuracao.nomeArquivo"
+                        [disabled]="exportando" placeholder="Digite o nome do arquivo">
+                    <span class="input-group-text">
+                        .{{ configuracao.formato }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configurações de conteúdo -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <label class="form-label fw-bold">Conteúdo a Incluir</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="incluirMetricas"
+                                [(ngModel)]="configuracao.incluirMetricas" [disabled]="exportando">
+                            <label class="form-check-label" for="incluirMetricas">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Métricas Gerais
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="incluirGraficos"
+                                [(ngModel)]="configuracao.incluirGraficos" [disabled]="exportando">
+                            <label class="form-check-label" for="incluirGraficos">
+                                <i class="fas fa-chart-pie me-2"></i>
+                                Gráficos
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="incluirContratos"
+                                [(ngModel)]="configuracao.incluirListaContratos" [disabled]="exportando">
+                            <label class="form-check-label" for="incluirContratos">
+                                <i class="fas fa-file-contract me-2"></i>
+                                Lista de Contratos
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="incluirAlertas"
+                                [(ngModel)]="configuracao.incluirAlertas" [disabled]="exportando">
+                            <label class="form-check-label" for="incluirAlertas">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Alertas de Inadimplência
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview dos dados -->
+        <div class="row mb-3" *ngIf="getPreviewDados() as preview">
+            <div class="col-12">
+                <label class="form-label fw-bold">Preview dos Dados</label>
+                <div class="card bg-light">
+                    <div class="card-body p-3">
+                        <div class="row g-2">
+                            <!-- Métricas -->
+                            <div class="col-md-6" *ngIf="configuracao.incluirMetricas && preview.metricas">
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-chart-bar me-1"></i>
+                                    Métricas:
+                                </small>
+                                <small>
+                                    Total Recebido: {{ formatarMoeda(preview.metricas.totalRecebido) }}<br>
+                                    Contratos Ativos: {{ preview.metricas.numeroContratos }}
+                                </small>
+                            </div>
+
+                            <!-- Contratos -->
+                            <div class="col-md-6" *ngIf="configuracao.incluirListaContratos && preview.contratos">
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-file-contract me-1"></i>
+                                    Contratos:
+                                </small>
+                                <small>{{ preview.contratos.total }} contratos encontrados</small>
+                            </div>
+
+                            <!-- Alertas -->
+                            <div class="col-md-6" *ngIf="configuracao.incluirAlertas && preview.alertas">
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Alertas:
+                                </small>
+                                <small>{{ preview.alertas.total }} alertas de inadimplência</small>
+                            </div>
+
+                            <!-- Gráficos -->
+                            <div class="col-md-6" *ngIf="configuracao.incluirGraficos && preview.graficos">
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-chart-pie me-1"></i>
+                                    Gráficos:
+                                </small>
+                                <small>
+                                    Receita, Status e Inadimplência
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensagem de erro -->
+        <div class="alert alert-danger" *ngIf="erro">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            {{ erro }}
+        </div>
+
+        <!-- Indicador de progresso -->
+        <div class="text-center" *ngIf="exportando">
+            <div class="spinner-border text-primary me-2" role="status">
+                <span class="visually-hidden">Exportando...</span>
+            </div>
+            <span>Gerando arquivo {{ configuracao.formato.toUpperCase() }}...</span>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="fecharModal()" [disabled]="exportando">
+            Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" (click)="executarExportacao()"
+            [disabled]="!isConfiguracaoValida() || exportando" [class]="getClasseFormato()">
+            <i [class]="getIconeFormato() + ' me-2'"></i>
+            <span *ngIf="!exportando">Exportar {{ configuracao.formato.toUpperCase() }}</span>
+            <span *ngIf="exportando">Exportando...</span>
+        </button>
+    </div>
+</ng-template>

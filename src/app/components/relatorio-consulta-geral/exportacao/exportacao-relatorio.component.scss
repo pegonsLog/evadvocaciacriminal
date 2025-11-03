@@ -1,0 +1,203 @@
+// Estilos para o componente de exportação de relatório
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+
+  .modal-title {
+    color: #495057;
+    font-weight: 600;
+  }
+}
+
+.modal-body {
+  padding: 1.5rem;
+
+  .form-label {
+    color: #495057;
+    margin-bottom: 0.75rem;
+
+    &.fw-bold {
+      font-weight: 600;
+    }
+  }
+
+  .form-check {
+    padding-left: 1.5rem;
+
+    .form-check-input {
+      margin-top: 0.25rem;
+    }
+
+    .form-check-label {
+      color: #6c757d;
+      cursor: pointer;
+
+      i {
+        width: 1.2rem;
+      }
+    }
+  }
+
+  .input-group {
+    .input-group-text {
+      background-color: #e9ecef;
+      border-color: #ced4da;
+      color: #6c757d;
+      font-weight: 500;
+    }
+  }
+
+  .card {
+    border: 1px solid #e9ecef;
+
+    &.bg-light {
+      background-color: #f8f9fa !important;
+    }
+
+    .card-body {
+      font-size: 0.875rem;
+
+      small {
+        line-height: 1.4;
+
+        &.text-muted {
+          font-weight: 500;
+          margin-bottom: 0.25rem;
+        }
+      }
+    }
+  }
+
+  .alert {
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .spinner-border {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+.modal-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+
+  .btn {
+    min-width: 100px;
+    font-weight: 500;
+
+    &:disabled {
+      opacity: 0.6;
+    }
+
+    i {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Estilos para o botão de exportação principal
+.btn-outline-primary {
+  border-width: 1px;
+  font-weight: 500;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  i {
+    font-size: 0.875rem;
+  }
+}
+
+// Animações
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-body > * {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+
+    .row .col-md-6 {
+      margin-bottom: 1rem;
+    }
+  }
+
+  .modal-footer {
+    padding: 0.75rem 1rem;
+
+    .btn {
+      min-width: 80px;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Estados de hover para checkboxes
+.form-check:hover .form-check-label {
+  color: #495057;
+}
+
+.form-check-input:checked + .form-check-label {
+  color: #495057;
+  font-weight: 500;
+}
+
+// Estilo para preview
+.card.bg-light {
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Indicador de loading
+.text-center {
+  padding: 1rem 0;
+
+  .spinner-border {
+    animation-duration: 0.8s;
+  }
+}
+
+// Cores específicas para formatos
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.text-success {
+  color: #198754 !important;
+}
+
+// Ajustes para ícones
+.fas {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}

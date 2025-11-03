@@ -115,7 +115,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &.active {
       background: rgba(255, 255, 255, 0.2);
-      
+
       .toggle-line:nth-child(1) {
         transform: rotate(45deg) translate(6px, 6px);
       }
@@ -176,6 +176,38 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 0.95rem;
           }
 
+          .nav-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 0.5rem;
+
+            &.new {
+              background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+              color: white;
+              animation: pulse 2s infinite;
+              box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            }
+          }
+
+          @keyframes pulse {
+            0% {
+              transform: scale(1);
+              box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            }
+            50% {
+              transform: scale(1.05);
+              box-shadow: 0 4px 12px rgba(255, 107, 107, 0.5);
+            }
+            100% {
+              transform: scale(1);
+              box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            }
+          }
+
           &:hover {
             background: rgba(255, 255, 255, 0.1);
             color: white;
@@ -195,7 +227,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
             &::after {
-              content: '';
+              content: "";
               position: absolute;
               bottom: -2px;
               left: 50%;
@@ -343,7 +375,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   .modern-footer {
     padding: 0.75rem 0;
-    
+
     .footer-content {
       .footer-copyright {
         p {
@@ -458,6 +490,23 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
             .nav-text {
               font-size: 1.1rem !important;
+            }
+
+            .nav-badge {
+              font-size: 0.7rem !important;
+              padding: 0.2rem 0.5rem !important;
+              border-radius: 8px !important;
+              margin-left: 0.75rem !important;
+
+              &.new {
+                background: linear-gradient(
+                  135deg,
+                  #ff6b6b,
+                  #ee5a24
+                ) !important;
+                color: white !important;
+                animation: pulse 2s infinite !important;
+              }
             }
           }
         }

@@ -176,15 +176,37 @@ $shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
       .input-prefix {
         position: absolute;
         left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
         color: #718096;
         font-weight: 600;
         z-index: 3;
-        background: #fafafa;
-        padding: 0 0.5rem;
+        background: transparent;
+        padding: 0 0.25rem;
+        pointer-events: none;
+        font-size: 1rem;
+        user-select: none;
+        white-space: nowrap;
       }
 
       .modern-input {
-        padding-left: 3rem;
+        padding-left: 3.5rem;
+        width: 100%;
+
+        &:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          background: white;
+
+          + .input-prefix {
+            color: #667eea;
+          }
+        }
+
+        &:not(:placeholder-shown) + .input-prefix {
+          color: #4a5568;
+        }
       }
     }
 
@@ -209,7 +231,7 @@ $shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
       margin-top: 0.5rem;
 
       &::before {
-        content: '⚠';
+        content: "⚠";
         font-size: 1rem;
       }
     }
@@ -317,6 +339,22 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+// Correção específica para evitar sobreposição do prefixo R$
+.modern-input-group {
+  .input-prefix {
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .modern-input {
+    text-align: left;
+
+    &::placeholder {
+      padding-left: 0;
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .page-title {
     font-size: 1.75rem !important;
@@ -351,8 +389,16 @@ input[type="number"] {
     }
   }
 
-  .modern-input-group .input-prefix {
-    background: white !important;
+  .modern-input-group {
+    .input-prefix {
+      background: transparent !important;
+      left: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .modern-input {
+      padding-left: 3rem !important;
+    }
   }
 }
 
@@ -360,7 +406,7 @@ input[type="number"] {
 @media (max-width: 480px) {
   .page-title {
     font-size: 1.5rem !important;
-    
+
     i {
       font-size: 1.25rem !important;
       margin-right: 0.5rem !important;
@@ -373,10 +419,10 @@ input[type="number"] {
 
   .form-card {
     margin: 0.5rem !important;
-    
+
     .form-header {
       padding: 1.25rem !important;
-      
+
       h4 {
         font-size: 1.1rem !important;
       }

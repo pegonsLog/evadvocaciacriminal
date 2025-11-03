@@ -13,7 +13,7 @@
                 <i class="bi bi-credit-card-2-front me-3"></i>
                 {{ isEditMode ? 'Editar Pagamento' : 'Novo Pagamento' }}
               </h1>
-              <p class="page-subtitle">{{ cliente.nome }} - Contrato {{ cliente.compra.numeroContrato }}</p>
+              <p class="page-subtitle">{{ cliente.nome }} - Contrato {{ cliente.contrato.numeroContrato }}</p>
             </div>
           </div>
         </div>
@@ -40,7 +40,7 @@
       </div>
 
       <form [formGroup]="pagamentoForm" (ngSubmit)="onSubmit()" class="modern-form">
-        
+
         <div class="form-section">
           <div class="row g-4">
             <div class="col-md-4">
@@ -51,16 +51,9 @@
                 </label>
                 <div class="input-group modern-input-group">
                   <span class="input-group-text">R$</span>
-                  <input 
-                    type="text" 
-                    class="form-control modern-input no-spinners" 
-                    id="valorPago" 
-                    formControlName="valorPago"
-                    mask="separator.2"
-                    thousandSeparator="."
-                    separatorLimit="9999999"
-                    placeholder="0,00"
-                    [class.is-invalid]="f['valorPago'].invalid && f['valorPago'].touched">
+                  <input type="text" class="form-control modern-input no-spinners" id="valorPago"
+                    formControlName="valorPago" mask="separator.2" thousandSeparator="." separatorLimit="9999999"
+                    placeholder="0,00" [class.is-invalid]="f['valorPago'].invalid && f['valorPago'].touched">
                 </div>
                 <div class="invalid-feedback" *ngIf="f['valorPago'].invalid && f['valorPago'].touched">
                   <div *ngIf="f['valorPago'].errors?.['required']">Valor é obrigatório</div>
@@ -75,10 +68,7 @@
                   <i class="bi bi-calendar-event me-2"></i>
                   Data de Vencimento *
                 </label>
-                <input 
-                  type="date" 
-                  class="form-control modern-input" 
-                  id="dataVencimento" 
+                <input type="date" class="form-control modern-input" id="dataVencimento"
                   formControlName="dataVencimento"
                   [class.is-invalid]="f['dataVencimento'].invalid && f['dataVencimento'].touched">
                 <div class="invalid-feedback" *ngIf="f['dataVencimento'].invalid && f['dataVencimento'].touched">
@@ -93,11 +83,7 @@
                   <i class="bi bi-calendar-check me-2"></i>
                   Data do Pagamento *
                 </label>
-                <input 
-                  type="date" 
-                  class="form-control modern-input" 
-                  id="dataPagamento" 
-                  formControlName="dataPagamento"
+                <input type="date" class="form-control modern-input" id="dataPagamento" formControlName="dataPagamento"
                   [class.is-invalid]="f['dataPagamento'].invalid && f['dataPagamento'].touched">
                 <div class="invalid-feedback" *ngIf="f['dataPagamento'].invalid && f['dataPagamento'].touched">
                   Data do pagamento é obrigatória
@@ -124,11 +110,7 @@
               <i class="bi bi-chat-text me-2"></i>
               Observação
             </label>
-            <textarea 
-              class="form-control modern-textarea" 
-              id="observacao" 
-              formControlName="observacao"
-              rows="4"
+            <textarea class="form-control modern-textarea" id="observacao" formControlName="observacao" rows="4"
               placeholder="Adicione uma observação sobre este pagamento (opcional)"></textarea>
           </div>
         </div>

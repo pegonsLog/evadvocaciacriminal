@@ -8,7 +8,8 @@
             <i class="bi bi-person-plus me-3"></i>
             {{ isEditMode ? 'Editar Cliente' : 'Novo Cliente' }}
           </h1>
-          <p class="page-subtitle">{{ isEditMode ? 'Atualize as informações do cliente' : 'Cadastre um novo cliente no sistema' }}</p>
+          <p class="page-subtitle">{{ isEditMode ? 'Atualize as informações do cliente' : 'Cadastre um novo cliente no
+            sistema' }}</p>
         </div>
         <div class="col-lg-4 text-lg-end">
           <div class="form-progress">
@@ -48,8 +49,7 @@
                   Nome Completo *
                 </label>
                 <input type="text" class="form-control modern-input" id="nome" formControlName="nome"
-                  placeholder="Digite o nome completo"
-                  [class.is-invalid]="f['nome'].invalid && f['nome'].touched">
+                  placeholder="Digite o nome completo" [class.is-invalid]="f['nome'].invalid && f['nome'].touched">
                 <div class="invalid-feedback" *ngIf="f['nome'].invalid && f['nome'].touched">
                   <div *ngIf="f['nome'].errors?.['required']">Nome é obrigatório</div>
                   <div *ngIf="f['nome'].errors?.['minlength']">Nome deve ter no mínimo 3 caracteres</div>
@@ -63,8 +63,8 @@
                   <i class="bi bi-card-text me-2"></i>
                   CPF *
                 </label>
-                <input type="text" class="form-control modern-input" id="cpf" formControlName="cpf" 
-                  mask="000.000.000-00" placeholder="000.000.000-00" 
+                <input type="text" class="form-control modern-input" id="cpf" formControlName="cpf"
+                  mask="000.000.000-00" placeholder="000.000.000-00"
                   [class.is-invalid]="f['cpf'].invalid && f['cpf'].touched">
                 <div class="invalid-feedback" *ngIf="f['cpf'].invalid && f['cpf'].touched">
                   CPF é obrigatório
@@ -94,8 +94,7 @@
                   E-mail *
                 </label>
                 <input type="email" class="form-control modern-input" id="email" formControlName="email"
-                  placeholder="exemplo@email.com"
-                  [class.is-invalid]="f['email'].invalid && f['email'].touched">
+                  placeholder="exemplo@email.com" [class.is-invalid]="f['email'].invalid && f['email'].touched">
                 <div class="invalid-feedback" *ngIf="f['email'].invalid && f['email'].touched">
                   <div *ngIf="f['email'].errors?.['required']">E-mail é obrigatório</div>
                   <div *ngIf="f['email'].errors?.['email']">E-mail inválido</div>
@@ -141,8 +140,8 @@
                   <i class="bi bi-file-earmark-text me-2"></i>
                   Número do Contrato *
                 </label>
-                <input type="text" class="form-control modern-input" id="numeroContrato" formControlName="numeroContrato"
-                  placeholder="Digite o número do contrato"
+                <input type="text" class="form-control modern-input" id="numeroContrato"
+                  formControlName="numeroContrato" placeholder="Digite o número do contrato"
                   [class.is-invalid]="f['numeroContrato'].invalid && f['numeroContrato'].touched">
                 <div class="invalid-feedback" *ngIf="f['numeroContrato'].invalid && f['numeroContrato'].touched">
                   Número do contrato é obrigatório
@@ -157,14 +156,15 @@
                   Valor da Entrada *
                 </label>
                 <div class="modern-input-group">
+                  <input type="text" class="form-control modern-input no-spinners" id="valorEntrada"
+                    formControlName="valorEntrada" mask="separator.2" thousandSeparator="." separatorLimit="999999999"
+                    placeholder="0,00" [class.is-invalid]="f['valorEntrada'].invalid && f['valorEntrada'].touched">
                   <span class="input-prefix">R$</span>
-                  <input type="text" class="form-control modern-input no-spinners" id="valorEntrada" 
-                    formControlName="valorEntrada" mask="separator.2" thousandSeparator="." 
-                    separatorLimit="999999999" placeholder="0,00"
-                    [class.is-invalid]="f['valorEntrada'].invalid && f['valorEntrada'].touched">
                 </div>
                 <div class="invalid-feedback" *ngIf="f['valorEntrada'].invalid && f['valorEntrada'].touched">
-                  Valor da entrada é obrigatório
+                  <div *ngIf="f['valorEntrada'].errors?.['required']">Valor da entrada é obrigatório</div>
+                  <div *ngIf="f['valorEntrada'].errors?.['entradaMaiorQueTotal']">Valor da entrada não pode ser maior
+                    que o valor total</div>
                 </div>
               </div>
             </div>
@@ -179,11 +179,10 @@
                     Valor Total *
                   </label>
                   <div class="modern-input-group">
+                    <input type="text" class="form-control modern-input no-spinners" id="valorTotal"
+                      formControlName="valorTotal" mask="separator.2" thousandSeparator="." separatorLimit="999999999"
+                      placeholder="0,00" [class.is-invalid]="f['valorTotal'].invalid && f['valorTotal'].touched">
                     <span class="input-prefix">R$</span>
-                    <input type="text" class="form-control modern-input no-spinners" id="valorTotal" 
-                      formControlName="valorTotal" mask="separator.2" thousandSeparator="." 
-                      separatorLimit="999999999" placeholder="0,00"
-                      [class.is-invalid]="f['valorTotal'].invalid && f['valorTotal'].touched">
                   </div>
                   <div class="invalid-feedback" *ngIf="f['valorTotal'].invalid && f['valorTotal'].touched">
                     <div *ngIf="f['valorTotal'].errors?.['required']">Valor é obrigatório</div>
@@ -198,7 +197,7 @@
                     <i class="bi bi-list-ol me-2"></i>
                     Número de Parcelas *
                   </label>
-                  <input type="text" class="form-control modern-input no-spinners" id="numeroParcelas" 
+                  <input type="text" class="form-control modern-input no-spinners" id="numeroParcelas"
                     formControlName="numeroParcelas" mask="0*" placeholder="Ex: 12"
                     [class.is-invalid]="f['numeroParcelas'].invalid && f['numeroParcelas'].touched">
                   <div class="invalid-feedback" *ngIf="f['numeroParcelas'].invalid && f['numeroParcelas'].touched">
@@ -215,11 +214,10 @@
                     Valor da Parcela
                   </label>
                   <div class="modern-input-group">
-                    <span class="input-prefix">R$</span>
-                    <input type="text" class="form-control modern-input no-spinners calculated-field" 
-                      id="valorParcela" formControlName="valorParcela" readonly 
-                      placeholder="Calculado automaticamente"
+                    <input type="text" class="form-control modern-input no-spinners calculated-field" id="valorParcela"
+                      formControlName="valorParcela" readonly placeholder="Calculado automaticamente"
                       [class.is-invalid]="f['valorParcela'].invalid && f['valorParcela'].touched">
+                    <span class="input-prefix">R$</span>
                   </div>
                   <small class="form-hint">
                     <i class="bi bi-info-circle me-1"></i>
@@ -233,22 +231,23 @@
           <div class="row g-4">
             <div class="col-md-6">
               <div class="form-group">
-                <label for="diaVencimento" class="form-label">
+                <label for="dataPrimeiroVencimento" class="form-label">
                   <i class="bi bi-calendar-event me-2"></i>
-                  Dia do Vencimento *
+                  Data do Primeiro Vencimento *
                 </label>
-                <input type="number" class="form-control modern-input" id="diaVencimento" 
-                  formControlName="diaVencimento" min="1" max="31" placeholder="Ex: 10"
-                  [class.is-invalid]="f['diaVencimento'].invalid && f['diaVencimento'].touched">
-                <div class="invalid-feedback" *ngIf="f['diaVencimento'].invalid && f['diaVencimento'].touched">
-                  <div *ngIf="f['diaVencimento'].errors?.['required']">Dia de vencimento é obrigatório</div>
-                  <div *ngIf="f['diaVencimento'].errors?.['min'] || f['diaVencimento'].errors?.['max']">
-                    Dia deve estar entre 1 e 31
-                  </div>
+                <input type="date" class="form-control modern-input" id="dataPrimeiroVencimento"
+                  formControlName="dataPrimeiroVencimento"
+                  [class.is-invalid]="f['dataPrimeiroVencimento'].invalid && f['dataPrimeiroVencimento'].touched">
+                <div class="invalid-feedback"
+                  *ngIf="f['dataPrimeiroVencimento'].invalid && f['dataPrimeiroVencimento'].touched">
+                  <div *ngIf="f['dataPrimeiroVencimento'].errors?.['required']">Data do primeiro vencimento é
+                    obrigatória</div>
+                  <div *ngIf="f['dataPrimeiroVencimento'].errors?.['dateInPast']">Data não pode ser anterior à data
+                    atual</div>
                 </div>
                 <small class="form-hint">
                   <i class="bi bi-info-circle me-1"></i>
-                  Dia do mês em que as parcelas vencem
+                  Data específica para o vencimento da primeira parcela
                 </small>
               </div>
             </div>
@@ -260,10 +259,10 @@
                   Estimativa Valor Previsto/Mês
                 </label>
                 <div class="modern-input-group">
-                  <span class="input-prefix">R$</span>
                   <input type="text" class="form-control modern-input no-spinners" id="estimativaValorPrevisto"
                     formControlName="estimativaValorPrevisto" mask="separator.2" thousandSeparator="."
                     separatorLimit="999999999" placeholder="0,00">
+                  <span class="input-prefix">R$</span>
                 </div>
                 <small class="form-hint">
                   <i class="bi bi-info-circle me-1"></i>
@@ -278,8 +277,8 @@
                   <i class="bi bi-file-text me-2"></i>
                   Observações do Contrato
                 </label>
-                <textarea class="form-control modern-input" id="relatorioContratosPendentes" 
-                  formControlName="relatorioContratosPendentes" rows="4" 
+                <textarea class="form-control modern-input" id="relatorioContratosPendentes"
+                  formControlName="relatorioContratosPendentes" rows="4"
                   placeholder="Adicione observações importantes sobre o contrato, valores pendentes ou outras informações relevantes..."></textarea>
                 <small class="form-hint">
                   <i class="bi bi-info-circle me-1"></i>
@@ -302,7 +301,7 @@
               <strong>Atenção!</strong> Verifique os campos obrigatórios antes de continuar.
             </div>
           </div>
-          
+
           <div class="action-buttons">
             <button type="button" class="btn btn-outline-secondary btn-lg" (click)="cancelar()">
               <i class="bi bi-x-circle me-2"></i>

@@ -1,3 +1,18 @@
+<!-- Loading State -->
+<div class="client-details-container" *ngIf="!cliente">
+  <div class="container">
+    <div class="empty-state">
+      <div class="empty-state-content">
+        <div class="empty-state-icon">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+        <h3>Carregando dados do cliente...</h3>
+        <p>Aguarde enquanto buscamos as informações</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="client-details-container" *ngIf="cliente">
   <!-- Header Section -->
   <div class="header-section">
@@ -63,7 +78,7 @@
               <i class="bi bi-list-check"></i>
             </div>
             <div class="stat-content">
-              <h3>{{ parcelasPagas }}/{{ cliente.compra.numeroParcelas }}</h3>
+              <h3>{{ parcelasPagas }}/{{ cliente.contrato.numeroParcelas }}</h3>
               <p>Parcelas Pagas</p>
             </div>
           </div>
@@ -126,9 +141,9 @@
         <div class="info-card">
           <div class="info-card-header">
             <div class="info-icon purchase">
-              <i class="bi bi-cart-check"></i>
+              <i class="bi bi-file-earmark-text"></i>
             </div>
-            <h4>Informações da Compra</h4>
+            <h4>Informações do Contrato</h4>
           </div>
           <div class="info-card-body">
             <div class="info-item">
@@ -136,49 +151,63 @@
                 <i class="bi bi-file-text"></i>
                 Número do Contrato
               </div>
-              <div class="info-value">{{ cliente.compra.numeroContrato }}</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">
-                <i class="bi bi-cash-coin"></i>
-                Valor da Entrada
-              </div>
-              <div class="info-value">{{ cliente.compra.valorEntrada | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
+              <div class="info-value">{{ cliente.contrato.numeroContrato || 'Não informado' }}</div>
             </div>
             <div class="info-item">
               <div class="info-label">
                 <i class="bi bi-currency-dollar"></i>
                 Valor Total
               </div>
-              <div class="info-value highlight">{{ cliente.compra.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
+              <div class="info-value highlight">{{ (cliente.contrato.valorTotal || 0) |
+                currency:'BRL':'symbol':'1.2-2':'pt-BR'
+                }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-cash-coin"></i>
+                Valor da Entrada
+              </div>
+              <div class="info-value">{{ (cliente.contrato.valorEntrada || 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR'
+                }}
+              </div>
             </div>
             <div class="info-item">
               <div class="info-label">
                 <i class="bi bi-list-ol"></i>
                 Parcelas
               </div>
-              <div class="info-value">{{ cliente.compra.numeroParcelas }}x de {{ cliente.compra.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
+              <div class="info-value">{{ cliente.contrato.numeroParcelas || 0 }}x de {{ (cliente.contrato.valorParcela
+                || 0) |
+                currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
             </div>
             <div class="info-item">
               <div class="info-label">
                 <i class="bi bi-calendar-event"></i>
                 Vencimento
               </div>
-              <div class="info-value">Todo dia {{ cliente.compra.diaVencimento }}</div>
+              <div class="info-value">Todo dia {{ getDiaVencimento() }}</div>
             </div>
             <div class="info-item">
               <div class="info-label">
                 <i class="bi bi-calendar3"></i>
-                Data da Compra
+                Data do Contrato
               </div>
-              <div class="info-value">{{ cliente.compra.dataCompra | date:'dd/MM/yyyy' }}</div>
+              <div class="info-value">{{ formatarDataContrato() }}</div>
             </div>
-            <div class="info-item" *ngIf="cliente.compra.estimativaValorPrevisto">
+            <div class="info-item" *ngIf="cliente.contrato.dataPrimeiroVencimento">
+              <div class="info-label">
+                <i class="bi bi-calendar-date"></i>
+                Primeiro Vencimento
+              </div>
+              <div class="info-value">{{ formatarDataPrimeiroVencimento() }}</div>
+            </div>
+            <div class="info-item" *ngIf="cliente.contrato.estimativaValorPrevisto">
               <div class="info-label">
                 <i class="bi bi-graph-up"></i>
                 Estimativa Mensal
               </div>
-              <div class="info-value">{{ cliente.compra.estimativaValorPrevisto | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
+              <div class="info-value">{{ cliente.contrato.estimativaValorPrevisto |
+                currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
             </div>
           </div>
         </div>
@@ -203,20 +232,19 @@
             Gerenciar Pagamentos
           </button>
         </div>
-        
+
         <div class="payment-card-body">
           <div class="progress-section">
             <div class="progress-info">
               <span>Progresso dos Pagamentos</span>
-              <span>{{ parcelasPagas }}/{{ cliente.compra.numeroParcelas }} parcelas</span>
+              <span>{{ parcelasPagas }}/{{ cliente.contrato.numeroParcelas }} parcelas</span>
             </div>
             <div class="progress">
-              <div class="progress-bar" 
-                   [style.width.%]="(parcelasPagas / cliente.compra.numeroParcelas) * 100">
+              <div class="progress-bar" [style.width.%]="(parcelasPagas / cliente.contrato.numeroParcelas) * 100">
               </div>
             </div>
             <div class="progress-percentage">
-              {{ ((parcelasPagas / cliente.compra.numeroParcelas) * 100) | number:'1.0-0' }}% concluído
+              {{ ((parcelasPagas / cliente.contrato.numeroParcelas) * 100) | number:'1.0-0' }}% concluído
             </div>
           </div>
 
@@ -225,21 +253,21 @@
               <i class="bi bi-calendar-check text-success"></i>
               <div>
                 <strong>Próximo Vencimento</strong>
-                <p>Dia {{ cliente.compra.diaVencimento }} do mês</p>
+                <p>Dia {{ getDiaVencimento() }} do mês</p>
               </div>
             </div>
             <div class="payment-info-item">
               <i class="bi bi-cash text-primary"></i>
               <div>
                 <strong>Valor da Parcela</strong>
-                <p>{{ cliente.compra.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
+                <p>{{ cliente.contrato.valorParcela | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</p>
               </div>
             </div>
             <div class="payment-info-item">
               <i class="bi bi-graph-up text-info"></i>
               <div>
                 <strong>Status do Contrato</strong>
-                <p>{{ parcelasPagas === cliente.compra.numeroParcelas ? 'Quitado' : 'Em andamento' }}</p>
+                <p>{{ parcelasPagas === cliente.contrato.numeroParcelas ? 'Quitado' : 'Em andamento' }}</p>
               </div>
             </div>
           </div>
@@ -248,14 +276,14 @@
     </div>
 
     <!-- Additional Notes -->
-    <div class="notes-section mt-4" *ngIf="cliente.compra.relatorioContratosPendentes">
+    <div class="notes-section mt-4" *ngIf="cliente.contrato.relatorioContratosPendentes">
       <div class="notes-card">
         <div class="notes-header">
           <i class="bi bi-file-text me-2"></i>
           Observações do Contrato
         </div>
         <div class="notes-content">
-          {{ cliente.compra.relatorioContratosPendentes }}
+          {{ cliente.contrato.relatorioContratosPendentes }}
         </div>
       </div>
     </div>

@@ -70,11 +70,11 @@ service cloud.firestore {
 
       // Criação e Atualização: Qualquer usuário autenticado e ativo pode criar e atualizar
       allow create, update: if isActiveUser() &&
-                               request.resource.data.keys().hasAll(['nome', 'cpf', 'telefone', 'compra']) &&
+                               request.resource.data.keys().hasAll(['nome', 'cpf', 'telefone', 'contrato']) &&
                                request.resource.data.nome is string &&
                                request.resource.data.cpf is string &&
                                request.resource.data.telefone is string &&
-                               request.resource.data.compra is map;
+                               request.resource.data.contrato is map;
 
       // Deleção: Apenas administradores podem deletar clientes
       allow delete: if isAdmin() && isActiveUser();

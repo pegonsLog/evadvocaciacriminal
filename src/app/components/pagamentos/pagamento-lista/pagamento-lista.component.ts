@@ -45,7 +45,7 @@ export class PagamentoListaComponent implements OnInit {
         .filter(p => p.clienteId === clienteId)
         .sort((a, b) => a.numeroParcela - b.numeroParcela);
     });
-    
+
     // Atualizar status das parcelas após carregar (com delay para não interferir em operações recentes)
     setTimeout(() => {
       this.parcelaService.atualizarStatusParcelas();
@@ -164,37 +164,60 @@ export class PagamentoListaComponent implements OnInit {
       return;
     }
 
-    this.modalService.showConfirm(
+    const confirmado = await this.modalService.showConfirm(
       `Tem certeza que deseja limpar a data de pagamento da parcela ${this.parcelaEditando.numeroParcela}?<br><br>` +
       'Esta ação irá:<br>' +
       '• Remover a data de pagamento<br>' +
       '• Alterar o status para "Em Aberto"<br>' +
       '• Recalcular os dias de atraso',
-      async () => {
-        console.log('🚀 Callback de confirmação executado');
-        console.log('📝 Parcela sendo editada:', {
-          id: this.parcelaEditando?.id,
-          status: this.parcelaEditando?.status,
-          dataPagamento: this.parcelaEditando?.dataPagamento
-        });
-        
-        try {
-          await this.parcelaService.limparDataPagamento(this.parcelaEditando!.id);
-          console.log('🎉 Serviço executado, mostrando modal de sucesso');
-          this.modalService.showSuccess('Data de pagamento removida com sucesso! A parcela voltou ao status em aberto.', 'Sucesso', () => {
-            console.log('🔄 Callback de sucesso executado, cancelando edição');
-            this.cancelarEdicaoData();
-          });
-        } catch (error) {
-          console.error('❌ Erro ao limpar data de pagamento:', error);
-          this.modalService.showError('Erro ao limpar data de pagamento.');
-        }
-      },
       'Confirmar Limpeza'
     );
+
+    if (confirmado) {
+      console.log('🚀 Callback de confirmação executado');
+      console.log('📝 Parcela sendo editada:', {
+        id: this.parcelaEditando?.id,
+        status: this.parcelaEditando?.status,
+        dataPagamento: this.parcelaEditando?.dataPagamento
+      });
+
+      try {
+        await this.parcelaService.limparDataPagamento(this.parcelaEditando!.id);
+        console.log('🎉 Serviço executado, mostrando modal de sucesso');
+        this.modalService.showSuccess('Data de pagamento removida com sucesso! A parcela voltou ao status em aberto.', 'Sucesso', () => {
+          console.log('🔄 Callback de sucesso executado, cancelando edição');
+          this.cancelarEdicaoData();
+        });
+      } catch (error) {
+        console.error('❌ Erro ao limpar data de pagamento:', error);
+        this.modalService.showError('Erro ao limpar data de pagamento.');
+      }
+    }
   }
 
   voltar(): void {
     this.router.navigate(['/clientes']);
+  }
+
+  getDiaVencimento(): number {
+    if (this.cliente?.contrato.dataPrimeiroVencimento) {
+      return this.criarDataSegura(this.cliente.contrato.dataPrimeiroVencimento).getDate();
+    }
+    return 10; // Valor padrão para compatibilidade
+  }
+
+  private criarDataSegura(data: Date | string): Date {
+    if (data instanceof Date) {
+      return new Date(data);
+    }
+
+    if (typeof data === 'string') {
+      if (data.includes('T')) {
+        return new Date(data);
+      }
+      return new Date(data + 'T12:00:00');
+    }
+
+    return new Date(data);
   }
 }

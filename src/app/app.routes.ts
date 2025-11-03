@@ -7,77 +7,86 @@ import { PagamentoListaComponent } from './components/pagamentos/pagamento-lista
 import { PagamentoFormComponent } from './components/pagamentos/pagamento-form/pagamento-form.component';
 import { ParcelaListaComponent } from './components/parcelas/parcela-lista/parcela-lista.component';
 import { ControlePagamentosComponent } from './components/controle-pagamentos/controle-pagamentos.component';
+import { RelatorioConsultaGeralComponent } from './components/relatorio-consulta-geral/relatorio-consulta-geral.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { UserManagementComponent } from './components/auth/user-management/user-management.component';
+import { AcessoNegadoComponent } from './components/shared/acesso-negado/acesso-negado.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
+import { relatorioGuard } from './guards/relatorio.guard';
 
 export const routes: Routes = [
-  // Rota pública de login
+  // Rotas públicas
   { path: 'login', component: LoginComponent },
-  
+  { path: 'acesso-negado', component: AcessoNegadoComponent },
+
   // Redireciona para home se autenticado, senão para login
   { path: '', redirectTo: '/home', pathMatch: 'full' },
-  
+
   // Rotas protegidas - requerem autenticação
-  { 
-    path: 'home', 
+  {
+    path: 'home',
     component: HomeComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'clientes', 
+  {
+    path: 'clientes',
     component: ClienteListaComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'clientes/novo', 
+  {
+    path: 'clientes/novo',
     component: ClienteFormComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'clientes/editar/:id', 
+  {
+    path: 'clientes/editar/:id',
     component: ClienteFormComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'clientes/:id', 
+  {
+    path: 'clientes/:id',
     component: ClienteDetalhesComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'parcelas/:clienteId', 
+  {
+    path: 'parcelas/:clienteId',
     component: ParcelaListaComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'pagamentos/:id', 
+  {
+    path: 'pagamentos/:id',
     component: PagamentoListaComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'pagamentos/novo/:clienteId', 
+  {
+    path: 'pagamentos/novo/:clienteId',
     component: PagamentoFormComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'pagamentos/editar/:id', 
+  {
+    path: 'pagamentos/editar/:id',
     component: PagamentoFormComponent,
     canActivate: [authGuard]
   },
-  { 
-    path: 'controle-pagamentos', 
+  {
+    path: 'controle-pagamentos',
     component: ControlePagamentosComponent,
     canActivate: [authGuard]
   },
-  
+  {
+    path: 'relatorio-consulta-geral',
+    component: RelatorioConsultaGeralComponent,
+    canActivate: [relatorioGuard]
+  },
+
   // Rota exclusiva para administradores
-  { 
-    path: 'usuarios', 
+  {
+    path: 'usuarios',
     component: UserManagementComponent,
     canActivate: [adminGuard]
   },
-  
+
   // Rota padrão
   { path: '**', redirectTo: '/home' }
 ];

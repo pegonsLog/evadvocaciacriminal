@@ -6,17 +6,17 @@ export interface Cliente {
   email: string;
   endereco: string;
   dataCadastro: Date;
-  compra: Compra;
+  contrato: Contrato;
 }
 
-export interface Compra {
+export interface Contrato {
   numeroContrato: string;
   valorEntrada: number;
   valorTotal: number;
   numeroParcelas: number;
   valorParcela: number;
-  dataCompra: Date;
-  diaVencimento: number; // Dia do mês para vencimento (ex: 10 = todo dia 10)
+  dataContrato: Date;
+  dataPrimeiroVencimento: Date; // Data específica do primeiro vencimento
   estimativaValorPrevisto?: number;
   relatorioContratosPendentes?: string;
 }
