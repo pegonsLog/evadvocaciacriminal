@@ -33,18 +33,25 @@ export class ClienteService {
   }
 
   async addCliente(cliente: Cliente): Promise<string> {
-    // Preparar dados para Firestore mantendo compatibilidade com regras existentes
+    console.log('🔍 [DEBUG] Cliente recebido:', cliente);
+    
+    // Preparar dados para Firestore usando apenas o formato 'contrato'
     const clienteData = {
       ...cliente,
       dataCadastro: new Date(),
-      // Enviar como 'compra' para compatibilidade com regras do Firestore
-      compra: {
+      contrato: {
         ...cliente.contrato,
-        dataCompra: new Date() // Manter nome antigo para compatibilidade
+        dataContrato: new Date()
       }
     };
     delete (clienteData as any).id;
-    delete (clienteData as any).contrato; // Remover o campo novo para evitar conflitos
+
+    console.log('📤 [DEBUG] Dados para Firestore:', clienteData);
+    console.log('📋 [DEBUG] Campos presentes:', Object.keys(clienteData));
+    console.log('🔐 [DEBUG] Auth state:', {
+      uid: (window as any).firebase?.auth()?.currentUser?.uid,
+      email: (window as any).firebase?.auth()?.currentUser?.email
+    });
 
     const docRef = await addDoc(this.clientesCollection, clienteData);
 
@@ -58,17 +65,15 @@ export class ClienteService {
   async updateCliente(cliente: Cliente): Promise<void> {
     const clienteDoc = doc(this.firestore, `clientes/${cliente.id}`);
 
-    // Preparar dados para Firestore mantendo compatibilidade com regras existentes
+    // Preparar dados para Firestore usando apenas o formato 'contrato'
     const clienteData = {
       ...cliente,
-      // Enviar como 'compra' para compatibilidade com regras do Firestore
-      compra: {
+      contrato: {
         ...cliente.contrato,
-        dataCompra: cliente.contrato.dataContrato // Manter nome antigo para compatibilidade
+        dataContrato: cliente.contrato.dataContrato
       }
     };
     delete (clienteData as any).id;
-    delete (clienteData as any).contrato; // Remover o campo novo para evitar conflitos
 
     // Verificar se houve mudanças que requerem recálculo das parcelas
     const clienteAnterior = this.getClienteById(cliente.id);
@@ -238,8 +243,8 @@ export class ClienteService {
         this.clientes = snapshot.docs.map(doc => {
           const data = doc.data() as any;
 
-          // Verificar se os dados estão no formato antigo (compra) ou novo (contrato)
-          const contratoData = data.contrato || data.compra;
+          // Usar apenas o formato 'contrato'
+          const contratoData = data.contrato;
 
           return {
             id: doc.id,
@@ -253,9 +258,7 @@ export class ClienteService {
               valorParcela: contratoData?.valorParcela || 0,
               dataContrato: contratoData?.dataContrato?.toDate ?
                 contratoData.dataContrato.toDate() :
-                (contratoData?.dataCompra?.toDate ?
-                  contratoData.dataCompra.toDate() :
-                  new Date(contratoData?.dataContrato || contratoData?.dataCompra || new Date())),
+                new Date(contratoData?.dataContrato || new Date()),
               dataPrimeiroVencimento: contratoData?.dataPrimeiroVencimento?.toDate ?
                 contratoData.dataPrimeiroVencimento.toDate() :
                 (contratoData?.dataPrimeiroVencimento ? new Date(contratoData.dataPrimeiroVencimento) : undefined),

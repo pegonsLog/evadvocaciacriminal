@@ -191,23 +191,9 @@ export class ParcelaService {
   }
 
   async registrarPagamento(parcelaId: string, valorPago: number, dataPagamento: Date, observacao?: string): Promise<void> {
-    console.log('💰 [SERVIÇO] Iniciando registro de pagamento');
-    console.log('💰 [SERVIÇO] Parâmetros recebidos:', {
-      parcelaId,
-      valorPago,
-      dataPagamento,
-      observacao
-    });
-
     try {
       const parcelaDoc = doc(this.firestore, `parcelas/${parcelaId}`);
       const parcela = this.getParcelaById(parcelaId);
-
-      console.log('📋 [SERVIÇO] Parcela encontrada:', {
-        id: parcela?.id,
-        status: parcela?.status,
-        valorParcela: parcela?.valorParcela
-      });
 
       if (parcela) {
         const diasAtraso = this.calcularDiasAtraso(parcela.dataVencimento, dataPagamento);
@@ -220,21 +206,9 @@ export class ParcelaService {
           observacao: observacao || ''
         };
 
-        console.log('💾 [SERVIÇO] Dados para salvar:', dadosPagamento);
-        console.log('🔗 [SERVIÇO] Referência do documento:', parcelaDoc.path);
-
         await updateDoc(parcelaDoc, dadosPagamento);
 
-        console.log('✅ [SERVIÇO] Pagamento registrado com sucesso no Firestore');
-
-        // Verificar se foi salvo
-        const docSnapshot = await getDoc(parcelaDoc);
-        if (docSnapshot.exists()) {
-          console.log('📄 [SERVIÇO] Dados salvos no Firestore:', docSnapshot.data());
-        }
-
       } else {
-        console.log('❌ [SERVIÇO] Parcela não encontrada');
         throw new Error('Parcela não encontrada');
       }
     } catch (error) {
@@ -337,16 +311,12 @@ export class ParcelaService {
    * Recalcula parcelas preservando histórico de pagamentos já realizados
    */
   async recalcularParcelas(cliente: Cliente): Promise<void> {
-    console.log('🔄 Recalculando parcelas para cliente:', cliente.nome);
-
     // Obter parcelas existentes
     const parcelasExistentes = this.getParcelasByCliente(cliente.id);
 
     // Separar parcelas pagas das pendentes
     const parcelasPagas = parcelasExistentes.filter(p => p.status === 'pago');
     const parcelasPendentes = parcelasExistentes.filter(p => p.status !== 'pago');
-
-    console.log(`📊 Encontradas ${parcelasPagas.length} parcelas pagas e ${parcelasPendentes.length} pendentes`);
 
     // Deletar apenas parcelas pendentes
     for (const parcela of parcelasPendentes) {
@@ -374,7 +344,7 @@ export class ParcelaService {
       await this.gerarParcelasRestantes(cliente, parcelasPagas.length, parcelasRestantes, dataInicio);
     }
 
-    console.log('✅ Recálculo de parcelas concluído');
+
   }
 
   /**

@@ -40,11 +40,16 @@ export class AuthService {
     // Observa mudanças no estado de autenticação do Firebase
     this.user$.pipe(
       switchMap(firebaseUser => {
+        console.log('🔍 [AUTH] Estado de autenticação mudou:', firebaseUser?.email || 'não autenticado');
+        
         if (firebaseUser) {
           return this.getUserData(firebaseUser.uid).pipe(
             switchMap(userData => {
+              console.log('📋 [AUTH] Dados do usuário no Firestore:', userData);
+              
               // Se o usuário não tem documento no Firestore, cria um
               if (!userData) {
+                console.log('⚠️ [AUTH] Usuário sem documento no Firestore, criando...');
                 return this.createUserDocument(firebaseUser);
               }
               return of(userData);
@@ -55,6 +60,7 @@ export class AuthService {
         }
       })
     ).subscribe(userData => {
+      console.log('👤 [AUTH] Usuário atual definido:', userData?.email || 'nenhum');
       this.currentUserSubject.next(userData);
     });
   }
@@ -167,6 +173,8 @@ export class AuthService {
    * Cria documento do usuário no Firestore se não existir
    */
   private createUserDocument(firebaseUser: any): Observable<User> {
+    console.log('🔍 [AUTH] Criando documento do usuário:', firebaseUser.email);
+    
     const userData: User = {
       uid: firebaseUser.uid,
       email: firebaseUser.email,
@@ -177,8 +185,13 @@ export class AuthService {
       active: true
     };
 
+    console.log('📤 [AUTH] Dados do usuário:', userData);
+
     return from(setDoc(doc(this.firestore, 'users', userData.uid), userData)).pipe(
-      map(() => userData)
+      map(() => {
+        console.log('✅ [AUTH] Documento do usuário criado com sucesso');
+        return userData;
+      })
     );
   }
 

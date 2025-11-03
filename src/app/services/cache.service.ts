@@ -51,7 +51,7 @@ export class CacheService {
 
         // Verificar se existe no cache e não expirou
         if (entry && (currentTime - entry.timestamp) < entry.ttl) {
-            console.log(`Cache hit para: ${key}`);
+
             return of(entry.data);
         }
 
@@ -63,7 +63,7 @@ export class CacheService {
         }
 
         // Criar nova requisição
-        console.log(`Cache miss para: ${key}, buscando dados...`);
+
         const subject = new BehaviorSubject<T | null>(null);
         this.cacheSubjects.set(cacheKey, subject);
 
@@ -82,7 +82,7 @@ export class CacheService {
             catchError(error => {
                 // Em caso de erro, tentar usar dados do cache mesmo se expirados (fallback offline)
                 if (entry && this.config.enableOfflineMode) {
-                    console.log(`Erro na requisição, usando cache expirado para: ${key}`);
+
                     subject.next(entry.data);
                     subject.complete();
                     this.cacheSubjects.delete(cacheKey);
@@ -116,7 +116,7 @@ export class CacheService {
         };
 
         this.cache.set(cacheKey, entry);
-        console.log(`Dados armazenados no cache: ${key} (TTL: ${effectiveTtl}ms)`);
+
     }
 
     /**
@@ -127,7 +127,7 @@ export class CacheService {
         const deleted = this.cache.delete(cacheKey);
 
         if (deleted) {
-            console.log(`Cache invalidado para: ${key}`);
+
         }
 
         return deleted;
@@ -157,7 +157,7 @@ export class CacheService {
     clear(): void {
         this.cache.clear();
         this.cacheSubjects.clear();
-        console.log('Cache completamente limpo');
+
     }
 
     /**
@@ -198,7 +198,7 @@ export class CacheService {
         }
 
         if (cleanedCount > 0) {
-            console.log(`${cleanedCount} entradas expiradas removidas do cache`);
+
         }
 
         return cleanedCount;
@@ -264,6 +264,6 @@ export class CacheService {
             this.cache.delete(key);
         }
 
-        console.log(`${entriesToRemove} entradas antigas removidas do cache`);
+
     }
 }
