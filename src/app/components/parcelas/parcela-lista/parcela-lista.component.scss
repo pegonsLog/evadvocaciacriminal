@@ -105,10 +105,18 @@ $shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
         font-size: 1.25rem;
         color: white;
 
-        &.total { background: $emerald; }
-        &.installments { background: $teal; }
-        &.amount { background: $orange; }
-        &.due { background: $rose; }
+        &.total {
+          background: $emerald;
+        }
+        &.installments {
+          background: $teal;
+        }
+        &.amount {
+          background: $orange;
+        }
+        &.due {
+          background: $rose;
+        }
       }
 
       .summary-content {
@@ -578,11 +586,11 @@ $shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
 
   .summary-stats {
     grid-template-columns: 1fr !important;
-    
+
     .stat-card {
       height: 140px !important; // Altura fixa em mobile
       padding: 1.5rem !important;
-      
+
       .stat-content {
         h3 {
           font-size: 1.5rem !important;
@@ -606,7 +614,7 @@ $shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
 @media (max-width: 480px) {
   .page-title {
     font-size: 1.5rem !important;
-    
+
     i {
       font-size: 1.25rem !important;
       margin-right: 0.5rem !important;

@@ -1,356 +1,344 @@
 <div class="relatorio-consulta-geral">
-  <!-- Header do Relatório -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center flex-wrap">
-        <div>
-          <h2 class="mb-1">
-            <i class="fas fa-chart-line me-3"></i>
-            Relatório de Consulta Geral
-          </h2>
-          <p class="text-muted mb-0" style="margin-left: 20px;">
-            {{ podeVerTodosClientes ? 'Visão consolidada de todos os contratos' : 'Seus contratos e pagamentos' }}
-          </p>
-        </div>
-        <div class="d-flex gap-2 flex-wrap">
-          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="recarregarDados()"
-            [disabled]="carregando">
-            <i class="fas fa-sync-alt" [class.fa-spin]="carregando"></i>
-            Atualizar
-          </button>
-          <button type="button" class="btn btn-outline-primary btn-sm" (click)="limparFiltros()"
-            [disabled]="carregando">
-            <i class="fas fa-filter-circle-xmark me-1"></i>
-            Limpar Filtros
-          </button>
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <div class="report-header-info">
+            <div class="report-title-info">
+              <h1 class="page-title">
+                <i class="bi bi-graph-up me-3"></i>
+                Relatório de Consulta Geral
+              </h1>
+              <p class="page-subtitle">
+                {{ podeVerTodosClientes ? 'Visão consolidada de todos os contratos' : 'Seus contratos e pagamentos' }}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Indicador de Carregamento -->
-  <div *ngIf="mostrarCarregamento()" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Carregando...</span>
-    </div>
-    <p class="mt-3 text-muted">{{ getMensagemEstado() }}</p>
-  </div>
+  <div class="container mt-4">
 
-  <!-- Mensagem de Erro -->
-  <div *ngIf="mostrarErro()" class="alert alert-danger" role="alert">
-    <i class="fas fa-exclamation-triangle me-2"></i>
-    {{ getMensagemEstado() }}
-    <button type="button" class="btn btn-sm btn-outline-danger ms-3" (click)="recarregarDados()">
-      <i class="fas fa-redo me-1"></i>
-      Tentar Novamente
-    </button>
-  </div>
-
-  <!-- Mensagem de Dados Vazios -->
-  <div *ngIf="mostrarDadosVazios()" class="text-center py-5">
-    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
-    <h4 class="text-muted">Nenhum dado encontrado</h4>
-    <p class="text-muted">
-      Não há dados disponíveis para os filtros aplicados.
-      <br>
-      Tente ajustar os filtros ou verificar se há contratos cadastrados.
-    </p>
-    <button type="button" class="btn btn-primary" (click)="limparFiltros()">
-      <i class="fas fa-filter-circle-xmark me-1"></i>
-      Limpar Filtros
-    </button>
-  </div>
-
-  <!-- Conteúdo Principal -->
-  <div *ngIf="mostrarConteudo()" class="relatorio-content">
-
-    <!-- Seção de Filtros -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <app-filtros-relatorio [filtrosIniciais]="filtrosAtivos" (filtrosChange)="onFiltrosChange($event)">
-        </app-filtros-relatorio>
+    <!-- Indicador de Carregamento -->
+    <div *ngIf="mostrarCarregamento()" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
       </div>
+      <p class="mt-3 text-muted">{{ getMensagemEstado() }}</p>
     </div>
 
-    <!-- Cards de Métricas -->
-    <div class="row mb-4" *ngIf="metricas && podeVerMetricasConsolidadas">
-      <!-- Total Recebido -->
-      <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
-        <div class="card metric-card bg-success text-white">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="card-subtitle mb-2 text-white-50">Total Recebido</h6>
-                <h4 class="card-title mb-0">
-                  {{ metricas.totalRecebido | currency:'BRL':'symbol':'1.2-2' }}
-                </h4>
-              </div>
-              <div class="metric-icon">
-                <i class="fas fa-money-bill-wave fa-2x"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Mensagem de Erro -->
+    <div *ngIf="mostrarErro()" class="alert alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      {{ getMensagemEstado() }}
 
-      <!-- Total Pendente -->
-      <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
-        <div class="card metric-card bg-warning text-white">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="card-subtitle mb-2 text-white-50">Total Pendente</h6>
-                <h4 class="card-title mb-0">
-                  {{ metricas.totalPendente | currency:'BRL':'symbol':'1.2-2' }}
-                </h4>
-              </div>
-              <div class="metric-icon">
-                <i class="fas fa-clock fa-2x"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Total Atrasado -->
-      <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
-        <div class="card metric-card bg-danger text-white">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="card-subtitle mb-2 text-white-50">Total Atrasado</h6>
-                <h4 class="card-title mb-0">
-                  {{ metricas.totalAtrasado | currency:'BRL':'symbol':'1.2-2' }}
-                </h4>
-              </div>
-              <div class="metric-icon">
-                <i class="fas fa-exclamation-triangle fa-2x"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Taxa de Inadimplência -->
-      <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
-        <div class="card metric-card" [class.bg-success]="metricas.taxaInadimplencia <= 5"
-          [class.bg-warning]="metricas.taxaInadimplencia > 5 && metricas.taxaInadimplencia <= 15"
-          [class.bg-danger]="metricas.taxaInadimplencia > 15" [class.text-white]="true">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="card-subtitle mb-2 text-white-50">Taxa de Inadimplência</h6>
-                <h4 class="card-title mb-0">
-                  {{ metricas.taxaInadimplencia | number:'1.1-1' }}%
-                </h4>
-              </div>
-              <div class="metric-icon">
-                <i class="fas fa-chart-pie fa-2x"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Contratos Ativos -->
-      <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
-        <div class="card metric-card bg-info text-white">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="card-subtitle mb-2 text-white-50">Contratos Ativos</h6>
-                <h4 class="card-title mb-0">
-                  {{ metricas.numeroContratosAtivos }}
-                </h4>
-              </div>
-              <div class="metric-icon">
-                <i class="fas fa-file-contract fa-2x"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ticket Médio -->
-      <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
-        <div class="card metric-card bg-primary text-white">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="card-subtitle mb-2 text-white-50">Ticket Médio</h6>
-                <h4 class="card-title mb-0">
-                  {{ metricas.ticketMedio | currency:'BRL':'symbol':'1.2-2' }}
-                </h4>
-              </div>
-              <div class="metric-icon">
-                <i class="fas fa-calculator fa-2x"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tempo Médio de Pagamento -->
-      <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
-        <div class="card metric-card bg-secondary text-white">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="card-subtitle mb-2 text-white-50">Tempo Médio Pagamento</h6>
-                <h4 class="card-title mb-0">
-                  {{ metricas.tempoMedioPagamento | number:'1.0-0' }} dias
-                </h4>
-              </div>
-              <div class="metric-icon">
-                <i class="fas fa-calendar-alt fa-2x"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Espaço para mais métricas se necessário -->
-      <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
-        <!-- Placeholder para futuras métricas -->
-      </div>
     </div>
 
-    <!-- Seção de Gráficos -->
-    <div class="row mb-4">
-      <!-- Gráfico de Receita -->
-      <div class="col-lg-8 mb-4">
-        <app-grafico-receita [dadosReceita]="dadosReceitaMensal" [carregando]="carregando" appLazyLoad
-          (firstView)="onGraficoVisible('receita')">
-        </app-grafico-receita>
-      </div>
+    <!-- Mensagem de Dados Vazios -->
+    <div *ngIf="mostrarDadosVazios()" class="text-center py-5">
+      <i class="bi bi-graph-up fa-3x text-muted mb-3"></i>
+      <h4 class="text-muted">Nenhum dado encontrado</h4>
+      <p class="text-muted">
+        Não há dados disponíveis para os filtros aplicados.
+        <br>
+        Tente ajustar os filtros ou verificar se há contratos cadastrados.
+      </p>
 
-      <!-- Gráfico de Status -->
-      <div class="col-lg-4 mb-4">
-        <app-grafico-status [distribuicaoStatus]="distribuicaoStatus" [carregando]="carregando" appLazyLoad
-          (firstView)="onGraficoVisible('status')">
-        </app-grafico-status>
-      </div>
     </div>
 
-    <!-- Seção de Gráficos Adicionais -->
-    <div class="row mb-4">
-      <!-- Gráfico de Inadimplência -->
-      <div class="col-lg-6 mb-4">
-        <app-grafico-inadimplencia [dadosInadimplencia]="dadosInadimplencia" [carregando]="carregando" appLazyLoad
-          (firstView)="onGraficoVisible('inadimplencia')">
-        </app-grafico-inadimplencia>
-      </div>
+    <!-- Conteúdo Principal -->
+    <div *ngIf="mostrarConteudo()" class="relatorio-content">
 
-      <!-- Gráfico Específico do Cliente (apenas para usuários comuns) -->
-      <div class="col-lg-6 mb-4" *ngIf="!podeVerTodosClientes && dadosEvolucaoCliente">
-        <app-grafico-evolucao-cliente [dadosEvolucao]="dadosEvolucaoCliente" [carregando]="carregando" appLazyLoad
-          (firstView)="onGraficoVisible('evolucao-cliente')">
-        </app-grafico-evolucao-cliente>
-      </div>
-
-      <!-- Top Clientes (apenas para admin) -->
-      <div class="col-lg-6 mb-4" *ngIf="podeVerTodosClientes && temFuncionalidade('ver_graficos_comparativos')">
-        <div class="card h-100">
-          <div class="card-header">
-            <h5 class="card-title mb-0">
-              <i class="fas fa-trophy me-2"></i>
-              Top Clientes por Receita
-            </h5>
-          </div>
-          <div class="card-body">
-            <div class="chart-placeholder">
-              <div class="text-center py-4">
-                <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
-                <p class="text-muted">Ranking de clientes será implementado na próxima tarefa</p>
-              </div>
-            </div>
-          </div>
+      <!-- Seção de Filtros -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <app-filtros-relatorio [filtrosIniciais]="filtrosAtivos" (filtrosChange)="onFiltrosChange($event)">
+          </app-filtros-relatorio>
         </div>
       </div>
-    </div>
 
-    <!-- Seção de Alertas -->
-    <div class="row mb-4" *ngIf="dadosConsolidados?.alertas && (dadosConsolidados?.alertas?.length || 0) > 0">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="card-title mb-0">
-              <i class="fas fa-bell me-2"></i>
-              Alertas de Cobrança
-              <span class="badge bg-danger ms-2">{{ dadosConsolidados?.alertas?.length }}</span>
-            </h5>
-          </div>
-          <div class="card-body">
-            <div class="alert-list">
-              <div *ngFor="let alerta of dadosConsolidados?.alertas?.slice(0, 5)" class="alert mb-2"
-                [class.alert-danger]="alerta.tipo === 'atraso_critico'"
-                [class.alert-warning]="alerta.tipo === 'atraso_moderado'"
-                [class.alert-info]="alerta.tipo === 'vencimento_proximo'">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <strong>{{ alerta.clienteNome }}</strong> - {{ alerta.numeroContrato }}
-                    <br>
-                    <small>
-                      <span *ngIf="alerta.tipo === 'vencimento_proximo'">
-                        Vencimento próximo: {{ alerta.proximoVencimento | date:'dd/MM/yyyy' }}
-                      </span>
-                      <span *ngIf="alerta.tipo !== 'vencimento_proximo'">
-                        {{ alerta.diasAtraso }} dias em atraso -
-                        {{ alerta.valorEmAtraso | currency:'BRL':'symbol':'1.2-2' }}
-                      </span>
-                    </small>
-                  </div>
-                  <div>
-                    <i class="fas fa-2x" [class.fa-exclamation-triangle]="alerta.tipo === 'atraso_critico'"
-                      [class.fa-exclamation-circle]="alerta.tipo === 'atraso_moderado'"
-                      [class.fa-clock]="alerta.tipo === 'vencimento_proximo'">
-                    </i>
-                  </div>
+      <!-- Cards de Métricas -->
+      <div class="row mb-4" *ngIf="metricas && podeVerMetricasConsolidadas">
+        <!-- Total Recebido -->
+        <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-6 mb-3">
+          <div class="card metric-card bg-success text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="card-subtitle mb-2 text-white-50">Total Recebido</h6>
+                  <h4 class="card-title mb-0">
+                    {{ metricas.totalRecebido | currency:'BRL':'symbol':'1.2-2' }}
+                  </h4>
+                </div>
+                <div class="metric-icon">
+                  <i class="bi bi-cash-stack fa-2x"></i>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <div *ngIf="(dadosConsolidados?.alertas?.length || 0) > 5" class="text-center mt-3">
-                <small class="text-muted">
-                  E mais {{ (dadosConsolidados?.alertas?.length || 0) - 5 }} alertas...
-                </small>
+        <!-- Total Pendente -->
+        <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-6 mb-3">
+          <div class="card metric-card bg-warning text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="card-subtitle mb-2 text-white-50">Total Pendente</h6>
+                  <h4 class="card-title mb-0">
+                    {{ metricas.totalPendente | currency:'BRL':'symbol':'1.2-2' }}
+                  </h4>
+                </div>
+                <div class="metric-icon">
+                  <i class="bi bi-clock fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Atrasado -->
+        <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-6 mb-3">
+          <div class="card metric-card bg-danger text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="card-subtitle mb-2 text-white-50">Total Atrasado</h6>
+                  <h4 class="card-title mb-0">
+                    {{ metricas.totalAtrasado | currency:'BRL':'symbol':'1.2-2' }}
+                  </h4>
+                </div>
+                <div class="metric-icon">
+                  <i class="bi bi-exclamation-triangle fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Taxa de Inadimplência -->
+        <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-6 mb-3">
+          <div class="card metric-card" [class.bg-success]="metricas.taxaInadimplencia <= 5"
+            [class.bg-warning]="metricas.taxaInadimplencia > 5 && metricas.taxaInadimplencia <= 15"
+            [class.bg-danger]="metricas.taxaInadimplencia > 15" [class.text-white]="true">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="card-subtitle mb-2 text-white-50">Taxa de Inadimplência</h6>
+                  <h4 class="card-title mb-0">
+                    {{ metricas.taxaInadimplencia | number:'1.1-1' }}%
+                  </h4>
+                </div>
+                <div class="metric-icon">
+                  <i class="bi bi-pie-chart fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contratos Ativos -->
+        <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-6 mb-3">
+          <div class="card metric-card bg-info text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="card-subtitle mb-2 text-white-50">Contratos Ativos</h6>
+                  <h4 class="card-title mb-0">
+                    {{ metricas.numeroContratosAtivos }}
+                  </h4>
+                </div>
+                <div class="metric-icon">
+                  <i class="bi bi-file-earmark-text fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Valor do Contrato -->
+        <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-6 mb-3">
+          <div class="card metric-card bg-primary text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="card-subtitle mb-2 text-white-50">Valor Médio em Contratos</h6>
+                  <h4 class="card-title mb-0">
+                    {{ metricas.ticketMedio | currency:'BRL':'symbol':'1.2-2' }}
+                  </h4>
+                </div>
+                <div class="metric-icon">
+                  <i class="bi bi-calculator fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tempo Médio de Pagamento -->
+        <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-6 mb-3">
+          <div class="card metric-card bg-secondary text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="card-subtitle mb-2 text-white-50">Tempo Médio Pagamento</h6>
+                  <h4 class="card-title mb-0">
+                    {{ metricas.tempoMedioPagamento | number:'1.0-0' }} dias
+                  </h4>
+                </div>
+                <div class="metric-icon">
+                  <i class="bi bi-calendar-date fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Espaço para mais métricas se necessário -->
+        <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-6 mb-3">
+          <!-- Placeholder para futuras métricas -->
+        </div>
+      </div>
+
+      <!-- Seção de Gráficos -->
+      <div class="row mb-4">
+        <!-- Gráfico de Receita -->
+        <div class="col-xl-8 col-lg-7 mb-4">
+          <app-grafico-receita [dadosReceita]="dadosReceitaMensal" [carregando]="carregando" appLazyLoad
+            (firstView)="onGraficoVisible('receita')">
+          </app-grafico-receita>
+        </div>
+
+        <!-- Gráfico de Status -->
+        <div class="col-xl-4 col-lg-5 mb-4">
+          <app-grafico-status [distribuicaoStatus]="distribuicaoStatus" [carregando]="carregando" appLazyLoad
+            (firstView)="onGraficoVisible('status')">
+          </app-grafico-status>
+        </div>
+      </div>
+
+      <!-- Seção de Gráficos Adicionais -->
+      <div class="row mb-4">
+        <!-- Gráfico de Inadimplência -->
+        <div class="col-lg-6 mb-4">
+          <app-grafico-inadimplencia [dadosInadimplencia]="dadosInadimplencia" [carregando]="carregando" appLazyLoad
+            (firstView)="onGraficoVisible('inadimplencia')">
+          </app-grafico-inadimplencia>
+        </div>
+
+        <!-- Gráfico Específico do Cliente (apenas para usuários comuns) -->
+        <div class="col-lg-6 mb-4" *ngIf="!podeVerTodosClientes && dadosEvolucaoCliente">
+          <app-grafico-evolucao-cliente [dadosEvolucao]="dadosEvolucaoCliente" [carregando]="carregando" appLazyLoad
+            (firstView)="onGraficoVisible('evolucao-cliente')">
+          </app-grafico-evolucao-cliente>
+        </div>
+
+        <!-- Top Clientes (apenas para admin) -->
+        <div class="col-lg-6 mb-4" *ngIf="podeVerTodosClientes && podeVerGraficosComparativos">
+          <div class="card h-100">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-trophy me-2"></i>
+                Top Clientes por Receita
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="chart-placeholder">
+                <div class="text-center py-4">
+                  <i class="bi bi-trophy fa-3x text-muted mb-3"></i>
+                  <p class="text-muted">Ranking de clientes será implementado na próxima tarefa</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Seção de Exportação -->
-    <div class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="card-title mb-0">
-              <i class="fas fa-download me-2"></i>
-              Exportar Relatório
-            </h5>
-          </div>
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <p class="mb-2">
-                  <i class="fas fa-info-circle me-2 text-info"></i>
-                  Exporte os dados do relatório em formato PDF ou Excel com opções personalizáveis.
-                </p>
-                <small class="text-muted">
-                  Inclua métricas, gráficos, lista de contratos e alertas conforme necessário.
-                </small>
-              </div>
-              <div>
-                <app-exportacao-relatorio [dadosRelatorio]="dadosConsolidados" [filtrosAplicados]="filtrosAtivos"
-                  (exportacaoConcluida)="onExportacaoConcluida()">
-                </app-exportacao-relatorio>
+      <!-- Seção de Alertas -->
+      <div class="row mb-4" *ngIf="dadosConsolidados?.alertas && (dadosConsolidados?.alertas?.length || 0) > 0">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-bell me-2"></i>
+                Alertas de Cobrança
+                <span class="badge bg-danger ms-2">{{ dadosConsolidados?.alertas?.length }}</span>
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="alert-list">
+                <div *ngFor="let alerta of dadosConsolidados?.alertas?.slice(0, 5)" class="alert mb-2"
+                  [class.alert-danger]="alerta.tipo === 'atraso_critico'"
+                  [class.alert-warning]="alerta.tipo === 'atraso_moderado'"
+                  [class.alert-info]="alerta.tipo === 'vencimento_proximo'">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <strong>{{ alerta.clienteNome }}</strong> - {{ alerta.numeroContrato }}
+                      <br>
+                      <small>
+                        <span *ngIf="alerta.tipo === 'vencimento_proximo'">
+                          Vencimento próximo: {{ alerta.proximoVencimento | date:'dd/MM/yyyy' }}
+                        </span>
+                        <span *ngIf="alerta.tipo !== 'vencimento_proximo'">
+                          {{ alerta.diasAtraso }} dias em atraso -
+                          {{ alerta.valorEmAtraso | currency:'BRL':'symbol':'1.2-2' }}
+                        </span>
+                      </small>
+                    </div>
+                    <div>
+                      <i class="bi fa-2x" [class.bi-exclamation-triangle]="alerta.tipo === 'atraso_critico'"
+                        [class.bi-exclamation-circle]="alerta.tipo === 'atraso_moderado'"
+                        [class.bi-clock]="alerta.tipo === 'vencimento_proximo'">
+                      </i>
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="(dadosConsolidados?.alertas?.length || 0) > 5" class="text-center mt-3">
+                  <small class="text-muted">
+                    E mais {{ (dadosConsolidados?.alertas?.length || 0) - 5 }} alertas...
+                  </small>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
+      <!-- Seção de Exportação -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-download me-2"></i>
+                Exportar Relatório
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="mb-2">
+                    <i class="bi bi-info-circle me-2 text-info"></i>
+                    Exporte os dados do relatório em formato PDF ou Excel com opções personalizáveis.
+                  </p>
+                  <small class="text-muted">
+                    Inclua métricas, gráficos, lista de contratos e alertas conforme necessário.
+                  </small>
+                </div>
+                <div>
+                  <app-exportacao-relatorio [dadosRelatorio]="dadosConsolidados" [filtrosAplicados]="filtrosAtivos"
+                    (exportacaoConcluida)="onExportacaoConcluida()">
+                  </app-exportacao-relatorio>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
-</div>

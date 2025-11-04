@@ -91,6 +91,68 @@ export interface DadosMensais {
     .text-primary {
       color: #007bff !important;
     }
+
+    /* Responsividade para 1366x768 */
+    @media (max-width: 1400px) and (min-width: 1200px) {
+      .chart-container {
+        height: 260px;
+      }
+
+      .card-header {
+        padding: 0.75rem 1rem;
+      }
+
+      .card-header h5 {
+        font-size: 0.95rem;
+      }
+
+      .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+      }
+
+      .card-body {
+        padding: 1rem;
+      }
+
+      .row.text-center .col-4 {
+        padding: 0.25rem;
+      }
+
+      .row.text-center small {
+        font-size: 0.7rem;
+      }
+
+      .row.text-center .fw-bold {
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Responsividade para tablets */
+    @media (max-width: 1199px) and (min-width: 769px) {
+      .chart-container {
+        height: 280px;
+      }
+    }
+
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+      .chart-container {
+        height: 250px;
+      }
+
+      .card-header {
+        padding: 0.75rem;
+      }
+
+      .card-body {
+        padding: 0.75rem;
+      }
+
+      .row.text-center .col-4 {
+        margin-bottom: 0.5rem;
+      }
+    }
   `]
 })
 export class GraficoReceitaComponent implements OnInit, OnDestroy, OnChanges {

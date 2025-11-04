@@ -315,7 +315,8 @@ $shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
   .modern-table {
     font-size: 0.875rem;
 
-    th, td {
+    th,
+    td {
       padding: 0.75rem 0.5rem !important;
     }
 
@@ -350,7 +351,7 @@ $shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
 @media (max-width: 480px) {
   .page-title {
     font-size: 1.5rem !important;
-    
+
     i {
       font-size: 1.25rem !important;
       margin-right: 0.5rem !important;
@@ -364,7 +365,7 @@ $shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
   .header-stats {
     .stat-item {
       padding: 1rem !important;
-      
+
       .stat-value {
         font-size: 2rem !important;
       }
@@ -373,7 +374,7 @@ $shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
 
   .summary-card {
     padding: 1.25rem !important;
-    
+
     .summary-icon {
       width: 50px !important;
       height: 50px !important;

@@ -1,9 +1,167 @@
 .relatorio-consulta-geral {
-  padding: 1rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.header-section {
+  background: rgb(2, 43, 104);
+  padding: 2.5rem 0 1.5rem;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  color: white;
+
+  .report-header-info {
+    .report-title-info {
+      .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .page-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.1rem;
+        font-weight: 300;
+        margin: 0;
+      }
+    }
+  }
+
+  .header-actions {
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+}
+
+.relatorio-consulta-geral {
+  .container {
+    margin-top: -1.5rem;
+    position: relative;
+    z-index: 2;
+    padding: 1rem;
+  }
+
+  // Responsividade específica para 1366x768 (laptops comuns)
+  @media (max-width: 1366px) and (min-width: 1200px) {
+    // Otimizar uso do espaço vertical
+    .row.mb-4 {
+      margin-bottom: 1.25rem !important;
+    }
+
+    // Reduzir padding dos cards para economizar espaço
+    .card .card-body {
+      padding: 1rem;
+    }
+
+    .metric-card .card-body {
+      padding: 1rem;
+    }
+
+    // Ajustar altura dos gráficos
+    .chart-placeholder {
+      min-height: 260px;
+    }
+
+    // Compactar header
+    h2 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    // Otimizar botões do header
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    // Otimizar alertas
+    .alert-list .alert {
+      padding: 0.75rem;
+      margin-bottom: 0.5rem !important;
+    }
+
+    // Otimizar seção de exportação
+    .card .card-header {
+      padding: 0.75rem 1rem;
+
+      .card-title {
+        font-size: 1rem;
+      }
+    }
+  }
 
   // Responsividade para mobile
   @media (max-width: 767.98px) {
-    padding: 0.5rem;
+    .container {
+      padding: 0.5rem;
+    }
+  }
+
+  // Mobile responsiveness for header
+  @media (max-width: 768px) {
+    .header-section {
+      padding: 2rem 0 1rem !important;
+      height: 160px !important;
+
+      .report-header-info {
+        text-align: center;
+
+        .report-title-info {
+          .page-title {
+            font-size: 1.75rem !important;
+          }
+
+          .page-subtitle {
+            font-size: 1rem !important;
+          }
+        }
+      }
+
+      .header-actions {
+        margin-top: 1.5rem;
+        text-align: center !important;
+
+        .btn {
+          width: auto;
+          margin-bottom: 0.5rem;
+        }
+      }
+    }
+  }
+
+  // Small Mobile Styles
+  @media (max-width: 480px) {
+    .header-section {
+      .report-header-info {
+        .report-title-info {
+          .page-title {
+            font-size: 1.5rem !important;
+          }
+
+          .page-subtitle {
+            font-size: 0.9rem !important;
+          }
+        }
+      }
+
+      .header-actions {
+        .btn {
+          padding: 0.75rem 1rem !important;
+          font-size: 0.9rem !important;
+        }
+      }
+    }
   }
 
   // Header do relatório
@@ -220,6 +378,38 @@
 
     i.fa-spin {
       animation: fa-spin 1s infinite linear;
+    }
+  }
+
+  // Responsividade para telas médias (1366x768 e similares)
+  @media (max-width: 1400px) and (min-width: 992px) {
+    padding: 0.75rem;
+
+    .metric-card {
+      .card-body {
+        padding: 1.25rem;
+      }
+
+      .card-title {
+        font-size: 1.4rem;
+      }
+
+      .card-subtitle {
+        font-size: 0.8rem;
+      }
+    }
+
+    .chart-placeholder {
+      min-height: 280px;
+    }
+
+    .card .card-body {
+      padding: 1.25rem;
+    }
+
+    // Ajustar espaçamento entre seções
+    .row.mb-4 {
+      margin-bottom: 1.5rem !important;
     }
   }
 

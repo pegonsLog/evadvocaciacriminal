@@ -1,0 +1,262 @@
+/*
+ * Otimizações específicas para resolução 1366x768
+ * Este arquivo contém ajustes para melhor aproveitamento do espaço vertical limitado
+ */
+
+@media (max-width: 1400px) and (min-width: 1200px) and (max-height: 800px) {
+  .relatorio-consulta-geral {
+    // Reduzir padding geral
+    padding: 0.5rem;
+
+    // Compactar header principal
+    .row.mb-4:first-child {
+      margin-bottom: 1rem !important;
+
+      h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+      }
+
+      p.text-muted {
+        font-size: 0.85rem;
+        margin-bottom: 0;
+      }
+
+      .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+      }
+    }
+
+    // Otimizar cards de métricas
+    .metric-card {
+      .card-body {
+        padding: 0.75rem;
+      }
+
+      .card-title {
+        font-size: 1.2rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .card-subtitle {
+        font-size: 0.7rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .metric-icon {
+        i {
+          font-size: 1.5rem !important;
+        }
+      }
+    }
+
+    // Compactar seções
+    .row.mb-4 {
+      margin-bottom: 1rem !important;
+    }
+
+    // Otimizar gráficos
+    .chart-placeholder {
+      min-height: 220px;
+    }
+
+    // Compactar alertas
+    .alert-list {
+      .alert {
+        padding: 0.5rem;
+        margin-bottom: 0.25rem !important;
+
+        .d-flex.justify-content-between {
+          align-items: flex-start;
+        }
+
+        strong {
+          font-size: 0.9rem;
+        }
+
+        small {
+          font-size: 0.75rem;
+        }
+
+        i.fa-2x {
+          font-size: 1.5rem !important;
+        }
+      }
+    }
+
+    // Otimizar seção de exportação
+    .card:last-child {
+      .card-header {
+        padding: 0.75rem 1rem;
+
+        h5 {
+          font-size: 0.95rem;
+        }
+      }
+
+      .card-body {
+        padding: 1rem;
+
+        p {
+          font-size: 0.85rem;
+          margin-bottom: 0.5rem;
+        }
+
+        small {
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    // Ajustar espaçamento dos botões
+    .d-flex.gap-2 {
+      gap: 0.5rem !important;
+    }
+
+    // Compactar badges
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.25rem 0.5rem;
+    }
+
+    // Otimizar spinner de carregamento
+    .spinner-border {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    // Reduzir espaçamento em estados vazios
+    .text-center.py-5 {
+      padding: 2rem 0 !important;
+
+      .fa-3x {
+        font-size: 2rem !important;
+      }
+
+      h4 {
+        font-size: 1.25rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  // Ajustes específicos para o header da aplicação
+  .modern-header {
+    .navbar {
+      height: 60px;
+    }
+
+    .brand-section .brand-link {
+      .brand-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+
+      .brand-content {
+        .brand-title {
+          font-size: 1.1rem;
+        }
+
+        .brand-subtitle {
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    .nav-menu {
+      gap: 1rem;
+
+      .nav-list .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+
+        .nav-icon {
+          font-size: 0.9rem;
+        }
+      }
+
+      .user-section {
+        gap: 0.5rem;
+        padding-left: 0.5rem;
+
+        .user-info {
+          gap: 0.5rem;
+
+          .user-avatar {
+            width: 32px;
+            height: 32px;
+            font-size: 1rem;
+          }
+
+          .user-details {
+            .user-name {
+              font-size: 0.8rem;
+            }
+
+            .user-role {
+              font-size: 0.7rem;
+            }
+          }
+        }
+
+        .user-actions .action-btn {
+          width: 28px;
+          height: 28px;
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+
+  // Ajustar footer
+  .modern-footer {
+    padding: 0.5rem 0;
+
+    .footer-copyright p {
+      font-size: 0.75rem;
+    }
+  }
+
+  // Ajustar main content
+  .main-content {
+    padding-bottom: 50px;
+  }
+}
+
+/* Otimizações adicionais para altura muito limitada */
+@media (max-height: 720px) {
+  .relatorio-consulta-geral {
+    .row.mb-4 {
+      margin-bottom: 0.75rem !important;
+    }
+
+    .metric-card .card-body {
+      padding: 0.5rem;
+    }
+
+    .chart-placeholder {
+      min-height: 200px;
+    }
+
+    .alert-list .alert {
+      padding: 0.375rem;
+    }
+  }
+
+  .modern-header .navbar {
+    height: 50px;
+  }
+
+  .main-content {
+    padding-bottom: 40px;
+  }
+
+  .modern-footer {
+    padding: 0.375rem 0;
+  }
+}

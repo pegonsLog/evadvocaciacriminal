@@ -94,7 +94,6 @@ export class ClienteFormComponent implements OnInit {
       numeroParcelas: ['', [Validators.required, Validators.min(1)]],
       valorParcela: ['', [Validators.required, Validators.min(0.01)]],
       dataPrimeiroVencimento: ['', [Validators.required, this.dateNotInPastValidator.bind(this)]],
-      estimativaValorPrevisto: [''],
       relatorioContratosPendentes: ['']
     });
 
@@ -181,7 +180,6 @@ export class ClienteFormComponent implements OnInit {
         valorParcela: cliente.contrato.valorParcela,
         dataPrimeiroVencimento: cliente.contrato.dataPrimeiroVencimento ?
           this.formatarDataParaInput(cliente.contrato.dataPrimeiroVencimento) : '',
-        estimativaValorPrevisto: cliente.contrato.estimativaValorPrevisto,
         relatorioContratosPendentes: cliente.contrato.relatorioContratosPendentes
       });
     }
@@ -215,7 +213,6 @@ export class ClienteFormComponent implements OnInit {
       let valorEntrada = formValue.valorEntrada;
       let valorTotal = formValue.valorTotal;
       let valorParcela = formValue.valorParcela;
-      let estimativaValorPrevisto = formValue.estimativaValorPrevisto;
 
       if (typeof valorEntrada === 'string') {
         valorEntrada = parseFloat(valorEntrada.replace(/\./g, '').replace(',', '.'));
@@ -225,9 +222,6 @@ export class ClienteFormComponent implements OnInit {
       }
       if (typeof valorParcela === 'string') {
         valorParcela = parseFloat(valorParcela.replace(/\./g, '').replace(',', '.'));
-      }
-      if (typeof estimativaValorPrevisto === 'string' && estimativaValorPrevisto) {
-        estimativaValorPrevisto = parseFloat(estimativaValorPrevisto.replace(/\./g, '').replace(',', '.'));
       }
 
       const cliente: Cliente = {
@@ -246,7 +240,6 @@ export class ClienteFormComponent implements OnInit {
           valorParcela: valorParcela,
           dataContrato: new Date(),
           dataPrimeiroVencimento: new Date(formValue.dataPrimeiroVencimento + 'T12:00:00'),
-          estimativaValorPrevisto: estimativaValorPrevisto || 0,
           relatorioContratosPendentes: formValue.relatorioContratosPendentes || ''
         }
       };

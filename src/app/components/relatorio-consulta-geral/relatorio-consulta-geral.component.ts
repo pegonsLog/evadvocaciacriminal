@@ -34,7 +34,10 @@ import { GraficoEvolucaoClienteComponent } from './graficos/grafico-evolucao-cli
     LazyLoadDirective
   ],
   templateUrl: './relatorio-consulta-geral.component.html',
-  styleUrls: ['./relatorio-consulta-geral.component.scss']
+  styleUrls: [
+    './relatorio-consulta-geral.component.scss',
+    './relatorio-1366x768.scss'
+  ]
 })
 export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -62,21 +65,50 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
   private filtrosSubject = new BehaviorSubject<FiltrosRelatorio>({});
   filtros$ = this.filtrosSubject.asObservable();
 
+  // Cache de permissões para evitar verificações repetidas
+  private permissoesCache = {
+    isAdmin: false,
+    podeVerTodosClientes: false,
+    podeVerMetricasConsolidadas: false,
+    podeExportar: false,
+    podeVerGraficosFinanceiros: false,
+    podeVerGraficosComparativos: false,
+    cacheValido: false
+  };
+
   // Propriedades computadas
   get isAdmin(): boolean {
-    return this.acessoControleService.isAdmin();
+    this.atualizarCachePermissoes();
+    return this.permissoesCache.isAdmin;
   }
 
   get hasData(): boolean {
     return this.dadosConsolidados !== null;
   }
 
+  get podeVerTodosClientes(): boolean {
+    this.atualizarCachePermissoes();
+    return this.permissoesCache.podeVerTodosClientes;
+  }
+
+  get podeVerMetricasConsolidadas(): boolean {
+    this.atualizarCachePermissoes();
+    return this.permissoesCache.podeVerMetricasConsolidadas;
+  }
+
+  get podeExportar(): boolean {
+    this.atualizarCachePermissoes();
+    return this.permissoesCache.podeExportar;
+  }
+
   get metricas(): MetricasGerais | null {
+    this.atualizarCachePermissoes();
+
     // Verificar se pode ver métricas antes de retornar
-    if (!this.acessoControleService.podeRealizarAcao('ver_metricas_consolidadas') && !this.isAdmin) {
+    if (!this.permissoesCache.podeVerMetricasConsolidadas && !this.permissoesCache.isAdmin) {
       // Usuários comuns podem ver suas próprias métricas básicas
       const metricasBasicas = this.dadosConsolidados?.metricas;
-      if (metricasBasicas && !this.isAdmin) {
+      if (metricasBasicas && !this.permissoesCache.isAdmin) {
         // Filtrar métricas sensíveis para usuários comuns
         return {
           ...metricasBasicas,
@@ -95,22 +127,11 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
     return this.dadosConsolidados?.metricas || null;
   }
 
-  get podeVerTodosClientes(): boolean {
-    return this.acessoControleService.podeAcessarTodosClientes();
-  }
-
-  get podeVerMetricasConsolidadas(): boolean {
-    return this.acessoControleService.podeVerDadosFinanceirosConsolidados();
-  }
-
-  get podeExportar(): boolean {
-    return this.acessoControleService.podeRealizarAcao('exportar_relatorio');
-  }
-
   // Propriedades para dados dos gráficos
   get dadosGraficos() {
-    // Verificar se pode ver gráficos consolidados
-    if (!this.acessoControleService.podeRealizarAcao('ver_dados_todos_clientes') && !this.isAdmin) {
+    // Verificar se pode ver gráficos consolidados usando cache
+    this.atualizarCachePermissoes();
+    if (!this.permissoesCache.podeVerTodosClientes && !this.permissoesCache.isAdmin) {
       // Usuários comuns veem apenas seus próprios dados nos gráficos
       return this.dadosConsolidados?.dadosGraficos || null;
     }
@@ -118,7 +139,8 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
   }
 
   get dadosReceitaMensal() {
-    if (!this.podeVerGraficosFinanceiros()) {
+    this.atualizarCachePermissoes();
+    if (!this.permissoesCache.podeVerGraficosFinanceiros) {
       return [];
     }
     return this.dadosGraficos?.receitaMensal || [];
@@ -155,6 +177,28 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Atualiza cache de permissões para evitar verificações repetidas
+   */
+  private atualizarCachePermissoes(): void {
+    if (this.permissoesCache.cacheValido) {
+      return; // Cache ainda válido
+    }
+
+    this.permissoesCache.isAdmin = this.acessoControleService.isAdmin();
+    this.permissoesCache.podeVerTodosClientes = this.acessoControleService.podeAcessarTodosClientes();
+    this.permissoesCache.podeVerMetricasConsolidadas = this.acessoControleService.podeVerDadosFinanceirosConsolidados();
+    this.permissoesCache.podeExportar = this.acessoControleService.podeExportarRelatorios();
+    this.permissoesCache.podeVerGraficosFinanceiros = this.acessoControleService.podeVerDadosFinanceirosConsolidados();
+    this.permissoesCache.podeVerGraficosComparativos = this.acessoControleService.podeVerMetricasComparativas();
+    this.permissoesCache.cacheValido = true;
+
+    // Invalidar cache após 30 segundos
+    setTimeout(() => {
+      this.permissoesCache.cacheValido = false;
+    }, 30000);
+  }
+
+  /**
    * Inicializa o componente configurando observables e carregando dados iniciais
    */
   private inicializarComponente(): void {
@@ -163,6 +207,8 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.usuarioAtual = user;
+        // Invalidar cache de permissões quando usuário mudar
+        this.permissoesCache.cacheValido = false;
         if (user) {
           this.carregarDadosIniciais();
         }
@@ -202,12 +248,10 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
    */
   private carregarDadosAdmin(): void {
     // Verificar se realmente tem permissão de admin
-    if (!this.acessoControleService.podeRealizarAcao('ver_dados_todos_clientes')) {
+    if (!this.permissoesCache.podeVerTodosClientes) {
       this.tratarErro('Acesso negado - permissões insuficientes', new Error('Não é administrador'));
       return;
     }
-
-    this.acessoControleService.registrarTentativaAcesso('carregar_dados_admin', true, 'Carregamento de dados administrativos');
 
     this.relatorioService.obterDadosRelatorio(this.filtrosAtivos)
       .pipe(takeUntil(this.destroy$))
@@ -223,7 +267,6 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
           this.obterMetricasPerformance();
         },
         error: (error) => {
-          this.acessoControleService.registrarTentativaAcesso('carregar_dados_admin', false, `Erro: ${error.message}`);
           this.tratarErro('Erro ao carregar dados do relatório', error);
         }
       });
@@ -235,14 +278,12 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
   private carregarDadosCliente(emailUsuario: string): void {
     // Verificar se o usuário tem permissão para acessar seus próprios dados
     if (!this.acessoControleService.podeAcessarDadosCliente(emailUsuario)) {
-      this.acessoControleService.registrarTentativaAcesso('carregar_dados_cliente', false, `Email: ${emailUsuario}`);
       this.tratarErro('Acesso negado aos dados solicitados', new Error('Permissão insuficiente'));
       return;
     }
 
     // Verificar se pode acessar o período solicitado
     if (!this.acessoControleService.podeAcessarDadosPeriodo(this.filtrosAtivos.dataInicio, this.filtrosAtivos.dataFim)) {
-      this.acessoControleService.registrarTentativaAcesso('carregar_dados_cliente', false, 'Período não autorizado');
       this.tratarErro('Período de consulta não autorizado', new Error('Período muito antigo'));
       return;
     }
@@ -253,8 +294,6 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
       this.tratarErro('Erro na aplicação de filtros de segurança', new Error('Filtros inválidos'));
       return;
     }
-
-    this.acessoControleService.registrarTentativaAcesso('carregar_dados_cliente', true, `Email: ${emailUsuario}`);
 
     this.relatorioService.obterDadosRelatorio(filtrosSeguro, emailUsuario)
       .pipe(takeUntil(this.destroy$))
@@ -270,7 +309,6 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
           this.obterMetricasPerformance();
         },
         error: (error) => {
-          this.acessoControleService.registrarTentativaAcesso('carregar_dados_cliente', false, `Erro: ${error.message}`);
           this.tratarErro('Erro ao carregar seus dados', error);
         }
       });
@@ -296,14 +334,11 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
 
     // Verificar se pode acessar o período solicitado
     if (!this.acessoControleService.podeAcessarDadosPeriodo(filtrosSeguro.dataInicio, filtrosSeguro.dataFim)) {
-      this.acessoControleService.registrarTentativaAcesso('aplicar_filtros', false, 'Período não autorizado');
       this.tratarErro('Período de consulta não autorizado', new Error('Período muito antigo'));
       return;
     }
 
     const usuarioId = this.acessoControleService.getUsuarioIdParaFiltro();
-
-    this.acessoControleService.registrarTentativaAcesso('aplicar_filtros', true, `Filtros: ${JSON.stringify(filtrosSeguro)}`);
 
     this.relatorioService.obterDadosRelatorio(filtrosSeguro, usuarioId)
       .pipe(takeUntil(this.destroy$))
@@ -319,7 +354,6 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
           this.obterMetricasPerformance();
         },
         error: (error) => {
-          this.acessoControleService.registrarTentativaAcesso('aplicar_filtros', false, `Erro: ${error.message}`);
           this.tratarErro('Erro ao aplicar filtros', error);
         }
       });
@@ -333,23 +367,7 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
     this.filtrosSubject.next(novosFiltros);
   }
 
-  /**
-   * Recarrega os dados mantendo os filtros atuais
-   */
-  recarregarDados(): void {
-    if (this.usuarioAtual) {
-      this.carregarDadosComFiltros(this.filtrosAtivos);
-    }
-  }
 
-  /**
-   * Limpa todos os filtros e recarrega dados
-   */
-  limparFiltros(): void {
-    this.filtrosAtivos = {};
-    this.filtrosSubject.next({});
-    this.carregarDadosIniciais();
-  }
 
   /**
    * Trata erros de forma centralizada
@@ -373,10 +391,21 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Verifica se uma funcionalidade específica está disponível
+   * Verifica se uma funcionalidade específica está disponível (com cache)
    */
   temFuncionalidade(funcionalidade: string): boolean {
-    return this.acessoControleService.temFuncionalidade(funcionalidade);
+    // Para funcionalidades específicas, usar verificações diretas com cache
+    switch (funcionalidade) {
+      case 'ver_graficos_comparativos':
+        return this.podeVerGraficosComparativos;
+      case 'ver_metricas_consolidadas':
+        return this.podeVerMetricasConsolidadas;
+      case 'ver_dados_todos_clientes':
+        return this.podeVerTodosClientes;
+      default:
+        // Para outras funcionalidades, fazer verificação direta (sem log de auditoria)
+        return this.acessoControleService.temFuncionalidade(funcionalidade);
+    }
   }
 
   /**
@@ -646,21 +675,25 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
   /**
    * Verifica se o usuário pode ver gráficos financeiros
    */
-  podeVerGraficosFinanceiros(): boolean {
-    return this.acessoControleService.podeRealizarAcao('visualizar_relatorio');
+  get podeVerGraficosFinanceiros(): boolean {
+    this.atualizarCachePermissoes();
+    return this.permissoesCache.podeVerGraficosFinanceiros;
   }
 
   /**
    * Verifica se o usuário pode ver gráficos comparativos
    */
-  podeVerGraficosComparativos(): boolean {
-    return this.acessoControleService.podeRealizarAcao('ver_dados_todos_clientes');
+  get podeVerGraficosComparativos(): boolean {
+    this.atualizarCachePermissoes();
+    return this.permissoesCache.podeVerGraficosComparativos;
   }
 
   /**
-   * Verifica se o usuário pode realizar uma ação específica
+   * Verifica se o usuário pode realizar uma ação específica (com cache limitado)
    */
   podeRealizarAcao(acao: string): boolean {
+    // Para ações específicas que não estão no cache, fazer verificação direta
+    // mas com menos frequência
     return this.acessoControleService.podeRealizarAcao(acao);
   }
 

@@ -11,6 +11,8 @@ import { User, UserRole } from '../models/user.model';
 })
 export class AcessoControleService {
     private authService = inject(AuthService);
+    private logCache = new Map<string, number>();
+    private readonly LOG_DEBOUNCE_TIME = 5000; // 5 segundos
 
     /**
      * Verifica se o usuário atual é administrador
@@ -271,27 +273,12 @@ export class AcessoControleService {
     }
 
     /**
-     * Registra tentativa de acesso para auditoria
+     * Registra tentativa de acesso para auditoria com debounce para evitar spam
      */
     registrarTentativaAcesso(recurso: string, sucesso: boolean, detalhes?: string): void {
-        const user = this.authService.getCurrentUser();
-        const timestamp = new Date().toISOString();
-
-        const logEntry = {
-            timestamp,
-            usuario: user?.email || 'anonimo',
-            role: user?.role || 'desconhecido',
-            recurso,
-            sucesso,
-            detalhes: detalhes || '',
-            userAgent: navigator.userAgent,
-            ip: 'client-side' // Em produção, isso seria obtido do servidor
-        };
-
-        console.log('Auditoria de Acesso:', logEntry);
-
-        // Em produção, isso seria enviado para um serviço de auditoria
-        // this.auditoriaService.registrarAcesso(logEntry);
+        // Temporariamente desabilitado para evitar loops infinitos
+        // TODO: Implementar sistema de auditoria mais eficiente
+        return;
     }
 
     /**

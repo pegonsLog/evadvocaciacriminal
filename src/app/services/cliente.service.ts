@@ -34,7 +34,7 @@ export class ClienteService {
 
   async addCliente(cliente: Cliente): Promise<string> {
     console.log('🔍 [DEBUG] Cliente recebido:', cliente);
-    
+
     // Preparar dados para Firestore usando apenas o formato 'contrato'
     const clienteData = {
       ...cliente,
@@ -262,7 +262,7 @@ export class ClienteService {
               dataPrimeiroVencimento: contratoData?.dataPrimeiroVencimento?.toDate ?
                 contratoData.dataPrimeiroVencimento.toDate() :
                 (contratoData?.dataPrimeiroVencimento ? new Date(contratoData.dataPrimeiroVencimento) : undefined),
-              estimativaValorPrevisto: contratoData?.estimativaValorPrevisto,
+
               relatorioContratosPendentes: contratoData?.relatorioContratosPendentes
             }
           } as Cliente;

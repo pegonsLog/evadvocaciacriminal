@@ -201,14 +201,7 @@
               </div>
               <div class="info-value">{{ formatarDataPrimeiroVencimento() }}</div>
             </div>
-            <div class="info-item" *ngIf="cliente.contrato.estimativaValorPrevisto">
-              <div class="info-label">
-                <i class="bi bi-graph-up"></i>
-                Estimativa Mensal
-              </div>
-              <div class="info-value">{{ cliente.contrato.estimativaValorPrevisto |
-                currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
-            </div>
+
           </div>
         </div>
       </div>

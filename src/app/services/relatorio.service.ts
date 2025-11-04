@@ -33,6 +33,8 @@ export class RelatorioService {
    * Obtém dados consolidados do relatório baseados nos filtros aplicados
    */
   obterDadosRelatorio(filtros: FiltrosRelatorio, usuarioId?: string): Observable<DadosRelatorio> {
+    console.log('📊 RelatorioService.obterDadosRelatorio chamado', { filtros, usuarioId });
+
     // Usar cache para otimizar performance
     return this.cacheService.getDadosRelatorio(
       filtros,

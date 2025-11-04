@@ -17,7 +17,6 @@ export interface Contrato {
   valorParcela: number;
   dataContrato: Date;
   dataPrimeiroVencimento: Date; // Data específica do primeiro vencimento
-  estimativaValorPrevisto?: number;
   relatorioContratosPendentes?: string;
 }
 
