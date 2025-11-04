@@ -45,9 +45,6 @@ export const relatorioGuard: CanActivateFn = (route, state) => {
         return false;
     }
 
-    // Log de acesso para auditoria
-    console.log(`Acesso ao relatório autorizado para usuário: ${currentUser.email} (${currentUser.role})`);
-
     // Permite acesso para usuários autenticados e ativos
     // A lógica de filtro de dados será implementada no componente
     return true;

@@ -58,7 +58,7 @@ export class CacheService {
         // Verificar se já existe uma requisição em andamento
         const existingSubject = this.cacheSubjects.get(cacheKey);
         if (existingSubject) {
-            console.log(`Requisição em andamento para: ${key}`);
+
             return existingSubject.asObservable();
         }
 
@@ -147,7 +147,7 @@ export class CacheService {
             }
         }
 
-        console.log(`${invalidatedCount} entradas invalidadas com padrão: ${pattern}`);
+
         return invalidatedCount;
     }
 

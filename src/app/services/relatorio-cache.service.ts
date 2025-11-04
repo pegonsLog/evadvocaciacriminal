@@ -136,7 +136,7 @@ export class RelatorioCacheService {
                 break;
         }
 
-        console.log(`Cache invalidado para mudança do tipo: ${tipoMudanca}${clienteId ? ` (cliente: ${clienteId})` : ''}`);
+
     }
 
     /**
@@ -160,7 +160,7 @@ export class RelatorioCacheService {
             const cacheKey = this.generateRelatorioCacheKey(filtros, usuarioId);
             if (!this.cacheService.has(cacheKey)) {
                 this.getDadosRelatorio(filtros, usuarioId, fetchFn).subscribe({
-                    next: () => console.log(`Dados pré-carregados para filtros:`, filtros),
+                    next: () => { },
                     error: (error) => console.warn('Erro ao pré-carregar dados:', error)
                 });
             }

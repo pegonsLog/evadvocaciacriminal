@@ -17,7 +17,12 @@ import {
   DadosEvolucaoCliente,
   PagamentoHistorico,
   ProjecaoFutura,
-  MetricasCliente
+  MetricasCliente,
+  PrevisaoRecebimentosMes,
+  ParcelaPrevisao,
+  ResumoPrevisaoMes,
+  TipoParcela,
+  StatusPrevisao
 } from '../models/relatorio.model';
 import { Cliente, Parcela } from '../models/cliente.model';
 
@@ -33,8 +38,6 @@ export class RelatorioService {
    * Obtém dados consolidados do relatório baseados nos filtros aplicados
    */
   obterDadosRelatorio(filtros: FiltrosRelatorio, usuarioId?: string): Observable<DadosRelatorio> {
-    console.log('📊 RelatorioService.obterDadosRelatorio chamado', { filtros, usuarioId });
-
     // Usar cache para otimizar performance
     return this.cacheService.getDadosRelatorio(
       filtros,
@@ -636,5 +639,198 @@ export class RelatorioService {
         diasAtraso
       };
     });
+  }
+
+  // ========== MÉTODOS DE PREVISÃO DE RECEBIMENTOS ==========
+
+  /**
+   * Obtém previsão de recebimentos para um mês específico
+   */
+  obterPrevisaoRecebimentosMes(mes: number, ano: number, usuarioId?: string): Observable<PrevisaoRecebimentosMes> {
+    return combineLatest([
+      this.clienteService.getClientes(),
+      this.parcelaService.getParcelas()
+    ]).pipe(
+      map(([clientes, parcelas]) => {
+        // Filtrar dados baseado no usuário (se não for admin)
+        let clientesFiltrados = clientes;
+        let parcelasFiltradas = parcelas;
+
+        if (usuarioId) {
+          // Para usuários comuns, filtrar apenas seus próprios dados
+          clientesFiltrados = clientes.filter(cliente => cliente.email === usuarioId);
+          const clienteIds = clientesFiltrados.map(c => c.id);
+          parcelasFiltradas = parcelas.filter(parcela => clienteIds.includes(parcela.clienteId));
+        }
+
+        // Filtrar parcelas do mês específico
+        const parcelasDoMes = parcelasFiltradas.filter(parcela => {
+          const dataVencimento = parcela.dataVencimento;
+          return dataVencimento.getMonth() === mes && dataVencimento.getFullYear() === ano;
+        });
+
+        // Converter parcelas para formato de previsão
+        const parcelasPrevisao = this.converterParcelasParaPrevisao(parcelasDoMes, clientesFiltrados);
+
+        // Calcular resumo do mês
+        const resumo = this.calcularResumoPrevisaoMes(parcelasPrevisao);
+
+        // Calcular total previsto
+        const totalPrevisto = resumo.valorTotal;
+
+        return {
+          mes,
+          ano,
+          totalPrevisto,
+          parcelas: parcelasPrevisao,
+          resumo
+        };
+      })
+    );
+  }
+
+  /**
+   * Calcula total de parcelas com vencimento em um período específico
+   */
+  calcularTotalVencimentosPeriodo(dataInicio: Date, dataFim: Date, usuarioId?: string): Observable<number> {
+    return combineLatest([
+      this.clienteService.getClientes(),
+      this.parcelaService.getParcelas()
+    ]).pipe(
+      map(([clientes, parcelas]) => {
+        // Filtrar dados baseado no usuário (se não for admin)
+        let parcelasFiltradas = parcelas;
+
+        if (usuarioId) {
+          // Para usuários comuns, filtrar apenas seus próprios dados
+          const clientesFiltrados = clientes.filter(cliente => cliente.email === usuarioId);
+          const clienteIds = clientesFiltrados.map(c => c.id);
+          parcelasFiltradas = parcelas.filter(parcela => clienteIds.includes(parcela.clienteId));
+        }
+
+        // Filtrar parcelas do período
+        const parcelasDoPeriodo = parcelasFiltradas.filter(parcela => {
+          const dataVencimento = parcela.dataVencimento;
+          return dataVencimento >= dataInicio && dataVencimento <= dataFim;
+        });
+
+        // Calcular total
+        return parcelasDoPeriodo.reduce((total, parcela) => total + parcela.valorParcela, 0);
+      })
+    );
+  }
+
+  /**
+   * Converte parcelas do sistema para formato de previsão
+   */
+  private converterParcelasParaPrevisao(parcelas: Parcela[], clientes: Cliente[]): ParcelaPrevisao[] {
+    const clientesMap = new Map(clientes.map(c => [c.id, c]));
+
+    return parcelas.map(parcela => {
+      const cliente = clientesMap.get(parcela.clienteId);
+      const hoje = new Date();
+
+      // Calcular dias de atraso se aplicável
+      let diasAtraso: number | undefined;
+      if (parcela.status === 'atrasado') {
+        diasAtraso = Math.ceil((hoje.getTime() - parcela.dataVencimento.getTime()) / (1000 * 60 * 60 * 24));
+      }
+
+      // Determinar tipo da parcela
+      let tipoParcela: TipoParcela = TipoParcela.NORMAL;
+      // A entrada é um pagamento separado, não uma parcela
+      // Apenas a última parcela pode ser marcada como FINAL
+      if (cliente && parcela.numeroParcela === cliente.contrato.numeroParcelas) {
+        tipoParcela = TipoParcela.FINAL;
+      }
+      // Verificar se é renegociada (pode ser implementado com base em algum campo específico)
+      // Por enquanto, assumimos que todas são normais
+
+      return {
+        parcelaId: parcela.id,
+        clienteId: parcela.clienteId,
+        clienteNome: cliente?.nome || 'Cliente não encontrado',
+        numeroContrato: cliente?.contrato.numeroContrato || 'N/A',
+        numeroParcela: parcela.numeroParcela,
+        valorParcela: parcela.valorParcela,
+        dataVencimento: parcela.dataVencimento,
+        status: parcela.status as StatusPagamento,
+        diasAtraso,
+        observacoes: parcela.observacao,
+        tipoParcela
+      };
+    }).sort((a, b) => {
+      // Ordenar por data de vencimento, depois por nome do cliente
+      const dataComparacao = a.dataVencimento.getTime() - b.dataVencimento.getTime();
+      if (dataComparacao !== 0) return dataComparacao;
+      return a.clienteNome.localeCompare(b.clienteNome);
+    });
+  }
+
+  /**
+   * Calcula resumo da previsão do mês
+   */
+  private calcularResumoPrevisaoMes(parcelas: ParcelaPrevisao[]): ResumoPrevisaoMes {
+    const resumo: ResumoPrevisaoMes = {
+      totalParcelas: parcelas.length,
+      valorTotal: 0,
+      parcelasNormais: 0,
+      valorNormais: 0,
+      parcelasAtrasadas: 0,
+      valorAtrasadas: 0,
+      parcelasRenegociadas: 0,
+      valorRenegociadas: 0,
+      parcelasPendentes: 0,
+      valorPendentes: 0
+    };
+
+    parcelas.forEach(parcela => {
+      resumo.valorTotal += parcela.valorParcela;
+
+      // Contar por status
+      switch (parcela.status) {
+        case StatusPagamento.ATRASADO:
+          resumo.parcelasAtrasadas++;
+          resumo.valorAtrasadas += parcela.valorParcela;
+          break;
+        case StatusPagamento.PENDENTE:
+          resumo.parcelasPendentes++;
+          resumo.valorPendentes += parcela.valorParcela;
+          break;
+      }
+
+      // Contar por tipo
+      switch (parcela.tipoParcela) {
+        case TipoParcela.RENEGOCIADA:
+          resumo.parcelasRenegociadas++;
+          resumo.valorRenegociadas += parcela.valorParcela;
+          break;
+        default:
+          resumo.parcelasNormais++;
+          resumo.valorNormais += parcela.valorParcela;
+          break;
+      }
+    });
+
+    return resumo;
+  }
+
+  /**
+   * Obtém dados de previsão para múltiplos meses (útil para gráficos)
+   */
+  obterPrevisaoMultiplosMeses(meses: { mes: number, ano: number }[], usuarioId?: string): Observable<PrevisaoRecebimentosMes[]> {
+    const observables = meses.map(({ mes, ano }) =>
+      this.obterPrevisaoRecebimentosMes(mes, ano, usuarioId)
+    );
+
+    return combineLatest(observables);
+  }
+
+  /**
+   * Obtém previsão do ano completo
+   */
+  obterPrevisaoAnoCompleto(ano: number, usuarioId?: string): Observable<PrevisaoRecebimentosMes[]> {
+    const mesesDoAno = Array.from({ length: 12 }, (_, i) => ({ mes: i, ano }));
+    return this.obterPrevisaoMultiplosMeses(mesesDoAno, usuarioId);
   }
 }

@@ -203,7 +203,59 @@
   - _Requisitos: Todos_
 
 - [ ]\* 12.2 Refinamentos de UX
+
   - Implementar tooltips explicativos para métricas
   - Criar tour guiado para primeira utilização
   - Desenvolver mensagens de ajuda contextuais
   - _Requisitos: 5.2, 5.3_
+
+- [x] 13. Implementar componente de previsão de recebimentos mensais
+
+- [x] 13.1 Criar modelos de dados para previsão mensal
+
+  - Implementar interfaces PrevisaoRecebimentosMes, ParcelaPrevisao e ResumoPrevisaoMes
+  - Adicionar novos tipos ao arquivo relatorio.model.ts
+  - Criar enums para tipos de parcelas e status específicos
+  - _Requisitos: 5.1, 5.2, 5.3_
+
+- [x] 13.2 Estender RelatorioService com métodos de previsão
+
+  - Implementar método obterPrevisaoRecebimentosMes() para buscar dados de um mês específico
+  - Criar método calcularTotalVencimentosPeriodo() para cálculos de período
+  - Desenvolver lógica de agregação de parcelas por mês
+  - _Requisitos: 5.1, 5.2, 5.4_
+
+- [x] 13.3 Criar PrevisaoRecebimentosComponent
+
+  - Implementar componente standalone com seletor de mês/ano
+  - Criar lógica de navegação entre meses
+  - Desenvolver controles de filtro por cliente (para admins)
+  - _Requisitos: 5.1, 5.3, 5.5, 5.6_
+
+- [x] 13.4 Implementar template HTML do componente de previsão
+
+  - Criar interface responsiva com Bootstrap para seleção de mês
+  - Implementar cards para exibição do total mensal e resumo
+  - Desenvolver tabela detalhada das parcelas do mês
+  - _Requisitos: 5.2, 5.4, 5.6_
+
+- [x] 13.5 Integrar componente no relatório principal
+
+  - Adicionar PrevisaoRecebimentosComponent ao template principal
+  - Implementar controle de visibilidade baseado em permissões
+  - Criar seção dedicada para previsão de recebimentos
+  - _Requisitos: 5.1, 5.5, 5.6_
+
+- [x] 13.6 Implementar funcionalidades de navegação temporal
+
+  - Criar controles para navegar entre meses (anterior/próximo)
+  - Implementar seletor de mês/ano com dropdown
+  - Desenvolver atalhos para períodos comuns (mês atual, próximo mês)
+  - _Requisitos: 5.3, 5.4_
+
+- [ ]\* 13.7 Adicionar testes para componente de previsão
+
+  - Criar testes unitários para PrevisaoRecebimentosComponent
+  - Implementar testes para métodos de cálculo de previsão
+  - Desenvolver testes de integração com permissões de usuário
+  - _Requisitos: 5.1, 5.5, 5.6_

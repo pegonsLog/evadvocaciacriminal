@@ -26,10 +26,14 @@ src/app/components/relatorio-consulta-geral/
 │   ├── cards-metricas.component.ts           # Cards com métricas principais
 │   ├── cards-metricas.component.html
 │   └── cards-metricas.component.scss
-└── exportacao/
-    ├── exportacao-relatorio.component.ts     # Componente de exportação
-    ├── exportacao-relatorio.component.html
-    └── exportacao-relatorio.component.scss
+├── exportacao/
+│   ├── exportacao-relatorio.component.ts     # Componente de exportação
+│   ├── exportacao-relatorio.component.html
+│   └── exportacao-relatorio.component.scss
+└── previsao-recebimentos/
+    ├── previsao-recebimentos.component.ts    # Componente de previsão mensal
+    ├── previsao-recebimentos.component.html
+    └── previsao-recebimentos.component.scss
 ```
 
 ### Serviços
@@ -111,6 +115,67 @@ export class RelatorioConsultaGeralComponent {
 - Ticket médio por cliente
 - Tempo médio de pagamento
 
+### 5. Componente de Previsão de Recebimentos (PrevisaoRecebimentosComponent)
+
+**Funcionalidades:**
+
+- Seletor de mês/ano para visualização de previsões
+- Cálculo automático do total de parcelas com vencimento no mês selecionado
+- Lista detalhada das parcelas que compõem o total mensal
+- Navegação entre meses com controles de data
+- Filtros por cliente (apenas para administradores)
+- Indicadores visuais para diferentes tipos de parcelas (normais, atrasadas, renegociadas)
+
+**Propriedades principais:**
+
+```typescript
+export class PrevisaoRecebimentosComponent {
+  mesSelecionado: Date = new Date();
+  dadosPrevisao: PrevisaoRecebimentosMes | null = null;
+  carregando: boolean = false;
+  erro: string | null = null;
+
+  // Controles de navegação
+  mesMinimo: Date = new Date(2020, 0, 1); // Janeiro 2020
+  mesMaximo: Date = new Date();
+
+  // Filtros específicos
+  clienteFiltrado: string | null = null;
+  statusFiltrado: StatusPagamento[] = [];
+
+  // Paginação para tabela de parcelas
+  paginaAtual: number = 1;
+  itensPorPagina: number = 10;
+
+  // Permissões
+  podeVerTodosClientes: boolean = false;
+  podeEditarParcelas: boolean = false;
+}
+```
+
+**Métodos principais:**
+
+```typescript
+// Navegação temporal
+navegarMesAnterior(): void;
+navegarMesProximo(): void;
+selecionarMes(mes: number, ano: number): void;
+
+// Carregamento de dados
+carregarDadosMes(): void;
+aplicarFiltros(): void;
+
+// Utilitários
+formatarMesAno(data: Date): string;
+obterResumoMes(): ResumoPrevisaoMes;
+calcularPercentualTipo(tipo: string): number;
+
+// Eventos
+onClienteChange(clienteId: string): void;
+onStatusChange(status: StatusPagamento[]): void;
+onPaginaChange(pagina: number): void;
+```
+
 ## Modelos de Dados
 
 ### Interface DadosRelatorio
@@ -177,6 +242,38 @@ export interface DistribuicaoStatus {
   pendentes: number;
   atrasados: number;
 }
+
+export interface PrevisaoRecebimentosMes {
+  mes: number;
+  ano: number;
+  totalPrevisto: number;
+  parcelas: ParcelaPrevisao[];
+  resumo: ResumoPrevisaoMes;
+}
+
+export interface ParcelaPrevisao {
+  parcelaId: string;
+  clienteId: string;
+  clienteNome: string;
+  numeroContrato: string;
+  numeroParcela: number;
+  valorParcela: number;
+  dataVencimento: Date;
+  status: StatusPagamento;
+  diasAtraso?: number;
+  observacoes?: string;
+}
+
+export interface ResumoPrevisaoMes {
+  totalParcelas: number;
+  valorTotal: number;
+  parcelasNormais: number;
+  valorNormais: number;
+  parcelasAtrasadas: number;
+  valorAtrasadas: number;
+  parcelasRenegociadas: number;
+  valorRenegociadas: number;
+}
 ```
 
 ## Lógica de Negócio
@@ -198,6 +295,12 @@ export class RelatorioService {
 
   // Identifica alertas de inadimplência
   identificarAlertas(parcelas: Parcela[]): AlertaInadimplencia[];
+
+  // Obtém previsão de recebimentos para um mês específico
+  obterPrevisaoRecebimentosMes(mes: number, ano: number, usuarioId?: string): Observable<PrevisaoRecebimentosMes>;
+
+  // Calcula total de parcelas com vencimento em um período
+  calcularTotalVencimentosPeriodo(dataInicio: Date, dataFim: Date, usuarioId?: string): Observable<number>;
 }
 ```
 
@@ -260,19 +363,38 @@ ngOnInit() {
 
 - Layout em grid 3x2 para cards de métricas
 - Gráficos lado a lado em duas colunas
+- Componente de previsão de recebimentos em seção dedicada
 - Filtros em sidebar lateral
 
 **Tablet (768px-991px):**
 
 - Cards de métricas em grid 2x3
 - Gráficos empilhados verticalmente
+- Previsão de recebimentos em largura total
 - Filtros em modal/drawer
 
 **Mobile (<768px):**
 
 - Cards de métricas em coluna única
 - Gráficos adaptados para tela pequena
+- Previsão de recebimentos com navegação simplificada
 - Filtros em modal fullscreen
+
+### Seção de Previsão de Recebimentos
+
+**Localização no Layout:**
+
+- Posicionada após os gráficos principais
+- Antes da seção de exportação
+- Largura total da tela em todos os breakpoints
+
+**Componentes da Seção:**
+
+- Header com título e controles de navegação temporal
+- Card principal com total do mês selecionado
+- Cards de resumo por tipo de parcela
+- Tabela detalhada das parcelas (com paginação se necessário)
+- Controles de filtro (apenas para administradores)
 
 ### Componentes Bootstrap
 
@@ -358,3 +480,65 @@ ngOnInit() {
 
 - Para listas extensas de contratos
 - Renderização apenas dos itens visíveis
+
+## Integração do Componente de Previsão
+
+### Comunicação entre Componentes
+
+**Eventos do PrevisaoRecebimentosComponent:**
+
+```typescript
+@Output() mesAlterado = new EventEmitter<{mes: number, ano: number}>();
+@Output() parcelaClicada = new EventEmitter<ParcelaPrevisao>();
+@Output() filtroAplicado = new EventEmitter<FiltrosRelatorio>();
+```
+
+**Inputs do PrevisaoRecebimentosComponent:**
+
+```typescript
+@Input() usuarioAtual: User | null = null;
+@Input() filtrosGlobais: FiltrosRelatorio = {};
+@Input() mesInicial?: Date;
+```
+
+### Posicionamento no Template
+
+O componente será inserido no template principal entre a seção de gráficos e a seção de exportação:
+
+```html
+<!-- Após os gráficos -->
+<div class="row mb-4">
+  <div class="col-12">
+    <app-previsao-recebimentos [usuarioAtual]="usuarioAtual" [filtrosGlobais]="filtrosAtivos" [mesInicial]="new Date()" (mesAlterado)="onMesPrevisaoAlterado($event)" (parcelaClicada)="onParcelaClicada($event)" (filtroAplicado)="onFiltroPrevisaoAplicado($event)"> </app-previsao-recebimentos>
+  </div>
+</div>
+```
+
+### Métodos de Integração no Componente Principal
+
+```typescript
+/**
+ * Manipula mudança de mês na previsão de recebimentos
+ */
+onMesPrevisaoAlterado(data: { mes: number; ano: number }): void {
+  console.log(`Mês de previsão alterado para: ${data.mes}/${data.ano}`);
+  // Opcional: sincronizar com outros componentes
+}
+
+/**
+ * Manipula clique em parcela na previsão
+ */
+onParcelaClicada(parcela: ParcelaPrevisao): void {
+  console.log('Parcela selecionada:', parcela);
+  // Opcional: navegar para detalhes ou destacar no gráfico
+}
+
+/**
+ * Manipula aplicação de filtros específicos da previsão
+ */
+onFiltroPrevisaoAplicado(filtros: FiltrosRelatorio): void {
+  // Mesclar filtros da previsão com filtros globais
+  const filtrosMesclados = { ...this.filtrosAtivos, ...filtros };
+  this.onFiltrosChange(filtrosMesclados);
+}
+```

@@ -1,0 +1,574 @@
+<!-- Seção de Previsão de Recebimentos Mensais -->
+<div class="previsao-recebimentos-container" (click)="fecharDropdownSeClicouFora($event)">
+  <!-- Header com Navegação Temporal -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">
+        <i class="fas fa-calendar-alt me-2"></i>
+        Previsão de Recebimentos - {{ formatarMesAno(mesSelecionado) }}
+      </h5>
+
+      <!-- Controles de Navegação -->
+      <div class="navegacao-temporal d-flex align-items-center gap-2">
+        <!-- Botão Mês Anterior -->
+        <button type="button" class="btn btn-outline-primary btn-sm" [disabled]="!podeNavegar('anterior') || carregando"
+          (click)="navegarMesAnterior()" title="Mês anterior">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <!-- Seletor de Mês/Ano -->
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
+            [disabled]="carregando">
+            {{ formatarMesAno(mesSelecionado) }}
+          </button>
+          <ul class="dropdown-menu">
+            <!-- Navegação Rápida -->
+            <li>
+              <h6 class="dropdown-header">Navegação Rápida</h6>
+            </li>
+            <li>
+              <button class="dropdown-item" (click)="irParaMesAtual()">
+                <i class="fas fa-calendar-day me-2"></i>Mês Atual
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" (click)="irParaProximoMes()">
+                <i class="fas fa-calendar-plus me-2"></i>Próximo Mês
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" (click)="irParaMesAnterior()">
+                <i class="fas fa-calendar-minus me-2"></i>Mês Anterior
+              </button>
+            </li>
+
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <!-- Períodos Comuns -->
+            <li>
+              <h6 class="dropdown-header">Períodos Comuns</h6>
+            </li>
+            <li>
+              <button class="dropdown-item" (click)="irParaTrimestre('atual')">
+                <i class="fas fa-calendar-week me-2"></i>Trimestre Atual
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" (click)="irParaTrimestre('proximo')">
+                <i class="fas fa-forward me-2"></i>Próximo Trimestre
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" (click)="irParaAno('atual')">
+                <i class="fas fa-calendar me-2"></i>Ano Atual
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" (click)="irParaAno('proximo')">
+                <i class="fas fa-fast-forward me-2"></i>Próximo Ano
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Botão Próximo Mês -->
+        <button type="button" class="btn btn-outline-primary btn-sm" [disabled]="!podeNavegar('proximo') || carregando"
+          (click)="navegarMesProximo()" title="Próximo mês">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado de Carregamento -->
+  <div *ngIf="carregando" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+    <p class="mt-2 text-muted">Carregando previsão de recebimentos...</p>
+  </div>
+
+  <!-- Estado de Erro -->
+  <div *ngIf="erro && !carregando" class="alert alert-danger" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ erro }}
+    <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="carregarDadosMes()">
+      <i class="fas fa-redo me-1"></i>Tentar Novamente
+    </button>
+  </div>
+
+  <!-- Conteúdo Principal -->
+  <div *ngIf="dadosPrevisao && !carregando && !erro">
+
+    <!-- Cards de Resumo -->
+    <div class="row mb-4">
+      <!-- Card Total Mensal -->
+      <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-title mb-1">Total do Mês</h6>
+                <h4 class="mb-0">{{ dadosPrevisao.totalPrevisto | currency:'BRL':'symbol':'1.2-2' }}
+                </h4>
+                <small class="opacity-75">{{ dadosPrevisao.resumo.totalParcelas }} parcelas</small>
+              </div>
+              <i class="fas fa-calendar-check fa-2x opacity-50"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Parcelas Pendentes -->
+      <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-dark">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-title mb-1">Pendentes</h6>
+                <h5 class="mb-0">{{ dadosPrevisao.resumo.valorPendentes |
+                  currency:'BRL':'symbol':'1.2-2' }}</h5>
+                <small>{{ dadosPrevisao.resumo.parcelasPendentes }} parcelas ({{
+                  calcularPercentualTipo('pendentes') | number:'1.1-1' }}%)</small>
+              </div>
+              <i class="fas fa-clock fa-2x opacity-50"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Parcelas Atrasadas -->
+      <div class="col-md-3 mb-3">
+        <div class="card bg-danger text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-title mb-1">Atrasadas</h6>
+                <h5 class="mb-0">{{ dadosPrevisao.resumo.valorAtrasadas |
+                  currency:'BRL':'symbol':'1.2-2' }}</h5>
+                <small class="opacity-75">{{ dadosPrevisao.resumo.parcelasAtrasadas }} parcelas ({{
+                  calcularPercentualTipo('atrasadas') | number:'1.1-1' }}%)</small>
+              </div>
+              <i class="fas fa-exclamation-triangle fa-2x opacity-50"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Parcelas Renegociadas -->
+      <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-title mb-1">Renegociadas</h6>
+                <h5 class="mb-0">{{ dadosPrevisao.resumo.valorRenegociadas |
+                  currency:'BRL':'symbol':'1.2-2' }}</h5>
+                <small class="opacity-75">{{ dadosPrevisao.resumo.parcelasRenegociadas }} parcelas ({{
+                  calcularPercentualTipo('renegociadas') | number:'1.1-1' }}%)</small>
+              </div>
+              <i class="fas fa-handshake fa-2x opacity-50"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros (apenas para administradores) -->
+    <div *ngIf="podeVerTodosClientes" class="card mb-4">
+      <div class="card-header">
+        <h6 class="card-title mb-0">
+          <i class="fas fa-filter me-2"></i>
+          Filtros
+        </h6>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="filtroForm" class="row g-3">
+          <!-- Filtro por Cliente -->
+          <div class="col-md-6">
+            <label for="clienteFiltrado" class="form-label">Cliente</label>
+            <select id="clienteFiltrado" class="form-select" formControlName="clienteFiltrado">
+              <option value="">Todos os clientes</option>
+              <!-- Lista de clientes seria carregada dinamicamente -->
+            </select>
+          </div>
+
+          <!-- Filtro por Status -->
+          <div class="col-md-6">
+            <label class="form-label">Status das Parcelas</label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="statusPendente"
+                  [checked]="statusFiltrado.includes(StatusPagamento.PENDENTE)"
+                  (change)="onStatusCheckboxChange(StatusPagamento.PENDENTE, $event)">
+                <label class="form-check-label" for="statusPendente">
+                  Pendentes
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="statusAtrasado"
+                  [checked]="statusFiltrado.includes(StatusPagamento.ATRASADO)"
+                  (change)="onStatusCheckboxChange(StatusPagamento.ATRASADO, $event)">
+                <label class="form-check-label" for="statusAtrasado">
+                  Atrasadas
+                </label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tabela Detalhada das Parcelas -->
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="card-title mb-0">
+            <i class="fas fa-list me-2"></i>
+            Parcelas do Mês ({{ dadosPrevisao.parcelas.length }})
+          </h6>
+
+          <!-- Botão de Exportação com Dropdown Customizado -->
+          <div class="d-flex gap-2">
+            <div class="dropdown" [class.show]="dropdownAberto">
+              <button class="btn btn-outline-success btn-sm dropdown-toggle" type="button"
+                [disabled]="exportandoPDF || dadosPrevisao.parcelas.length === 0" [attr.aria-expanded]="dropdownAberto"
+                (click)="toggleDropdown()">
+                <i class="fas fa-file-pdf me-1"></i>
+                <span *ngIf="!exportandoPDF">Exportar PDF</span>
+                <span *ngIf="exportandoPDF">
+                  <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                  Gerando...
+                </span>
+              </button>
+              <ul class="dropdown-menu" [class.show]="dropdownAberto">
+                <li>
+                  <button class="dropdown-item" [disabled]="exportandoPDF"
+                    (click)="selecionarOpcaoExportacao('detalhado')">
+                    <i class="fas fa-table me-2"></i>
+                    Relatório Detalhado
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" [disabled]="exportandoPDF"
+                    (click)="selecionarOpcaoExportacao('resumo')">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Resumo Executivo
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informações de Paginação -->
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            Clique em uma parcela para ver detalhes completos
+          </small>
+          <small class="text-muted" *ngIf="dadosPrevisao.parcelas.length > itensPorPagina">
+            Página {{ paginaAtual }} de {{ obterTotalPaginas() }}
+          </small>
+        </div>
+      </div>
+
+      <div class="card-body p-0">
+        <!-- Tabela Responsiva -->
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Cliente</th>
+                <th scope="col">Contrato</th>
+                <th scope="col">Parcela</th>
+                <th scope="col">Vencimento</th>
+                <th scope="col">Valor</th>
+                <th scope="col">Status</th>
+                <th scope="col">Tipo</th>
+                <th scope="col" *ngIf="podeEditarParcelas">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let parcela of parcelasPaginadas; trackBy: trackByParcelaId" class="cursor-pointer"
+                (click)="onParcelaClick(parcela)">
+
+                <!-- Cliente -->
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div>
+                      <div class="fw-semibold">{{ parcela.clienteNome }}</div>
+                      <small class="text-muted">ID: {{ parcela.clienteId }}</small>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Contrato -->
+                <td>
+                  <span class="badge bg-light text-dark">{{ parcela.numeroContrato }}</span>
+                </td>
+
+                <!-- Parcela -->
+                <td>
+                  <span class="fw-semibold">{{ parcela.numeroParcela }}</span>
+                </td>
+
+                <!-- Vencimento -->
+                <td>
+                  <div>
+                    <div>{{ parcela.dataVencimento | date:'dd/MM/yyyy' }}</div>
+                    <small *ngIf="parcela.diasAtraso && parcela.diasAtraso > 0" class="text-danger">
+                      {{ parcela.diasAtraso }} dias de atraso
+                    </small>
+                  </div>
+                </td>
+
+                <!-- Valor -->
+                <td>
+                  <span class="fw-semibold">{{ parcela.valorParcela | currency:'BRL':'symbol':'1.2-2'
+                    }}</span>
+                </td>
+
+                <!-- Status -->
+                <td>
+                  <span [class]="obterClasseStatus(parcela.status)">
+                    {{ parcela.status | titlecase }}
+                  </span>
+                </td>
+
+                <!-- Tipo -->
+                <td>
+                  <span [class]="obterClasseTipo(parcela.tipoParcela)">
+                    {{ parcela.tipoParcela | titlecase }}
+                  </span>
+                </td>
+
+                <!-- Ações (apenas para admins) -->
+                <td *ngIf="podeEditarParcelas">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-primary" title="Ver detalhes"
+                      (click)="onParcelaClick(parcela); $event.stopPropagation()">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Estado vazio -->
+              <tr *ngIf="parcelasPaginadas.length === 0">
+                <td [attr.colspan]="podeEditarParcelas ? 8 : 7" class="text-center py-4 text-muted">
+                  <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                  <div>Nenhuma parcela encontrada para este mês</div>
+                  <small>Tente selecionar outro período ou ajustar os filtros</small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginação -->
+        <nav *ngIf="obterTotalPaginas() > 1" class="d-flex justify-content-center mt-3 mb-3">
+          <ul class="pagination pagination-sm mb-0">
+            <!-- Primeira página -->
+            <li class="page-item" [class.disabled]="paginaAtual === 1">
+              <button class="page-link" (click)="onPaginaChange(1)" [disabled]="paginaAtual === 1">
+                <i class="fas fa-angle-double-left"></i>
+              </button>
+            </li>
+
+            <!-- Página anterior -->
+            <li class="page-item" [class.disabled]="paginaAtual === 1">
+              <button class="page-link" (click)="onPaginaChange(paginaAtual - 1)" [disabled]="paginaAtual === 1">
+                <i class="fas fa-angle-left"></i>
+              </button>
+            </li>
+
+            <!-- Páginas numeradas -->
+            <li *ngFor="let pagina of obterPaginas()" class="page-item" [class.active]="pagina === paginaAtual">
+              <button class="page-link" (click)="onPaginaChange(pagina)">
+                {{ pagina }}
+              </button>
+            </li>
+
+            <!-- Próxima página -->
+            <li class="page-item" [class.disabled]="paginaAtual === obterTotalPaginas()">
+              <button class="page-link" (click)="onPaginaChange(paginaAtual + 1)"
+                [disabled]="paginaAtual === obterTotalPaginas()">
+                <i class="fas fa-angle-right"></i>
+              </button>
+            </li>
+
+            <!-- Última página -->
+            <li class="page-item" [class.disabled]="paginaAtual === obterTotalPaginas()">
+              <button class="page-link" (click)="onPaginaChange(obterTotalPaginas())"
+                [disabled]="paginaAtual === obterTotalPaginas()">
+                <i class="fas fa-angle-double-right"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Observações adicionais -->
+    <div class="mt-3">
+      <small class="text-muted">
+        <i class="fas fa-info-circle me-1"></i>
+        Clique em uma parcela para ver mais detalhes.
+        <span *ngIf="podeVerTodosClientes">Use os filtros acima para refinar a visualização.</span>
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalhes da Parcela -->
+<div class="modal fade" [class.show]="mostrarModalDetalhes" [style.display]="mostrarModalDetalhes ? 'block' : 'none'"
+  tabindex="-1" role="dialog" aria-labelledby="modalDetalhesLabel" [attr.aria-hidden]="!mostrarModalDetalhes">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" *ngIf="parcelaSelecionada">
+      <!-- Header do Modal -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDetalhesLabel">
+          <i class="fas fa-file-invoice-dollar me-2"></i>
+          Detalhes da Parcela #{{ parcelaSelecionada.numeroParcela }}
+        </h5>
+        <button type="button" class="btn-close" (click)="fecharModalDetalhes()" aria-label="Fechar"></button>
+      </div>
+
+      <!-- Corpo do Modal -->
+      <div class="modal-body">
+        <div class="row">
+          <!-- Informações do Cliente -->
+          <div class="col-md-6 mb-4">
+            <div class="card h-100">
+              <div class="card-header">
+                <h6 class="card-title mb-0">
+                  <i class="fas fa-user me-2"></i>
+                  Informações do Cliente
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Nome:</label>
+                  <div>{{ parcelaSelecionada.clienteNome }}</div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">ID do Cliente:</label>
+                  <div>
+                    <span class="badge bg-light text-dark">{{ parcelaSelecionada.clienteId }}</span>
+                  </div>
+                </div>
+                <div class="mb-0">
+                  <label class="form-label fw-semibold">Número do Contrato:</label>
+                  <div>
+                    <span class="badge bg-primary">{{ parcelaSelecionada.numeroContrato }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informações da Parcela -->
+          <div class="col-md-6 mb-4">
+            <div class="card h-100">
+              <div class="card-header">
+                <h6 class="card-title mb-0">
+                  <i class="fas fa-receipt me-2"></i>
+                  Detalhes da Parcela
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Número da Parcela:</label>
+                  <div>{{ parcelaSelecionada.numeroParcela }}</div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Valor:</label>
+                  <div class="fs-5 fw-bold text-primary">
+                    {{ parcelaSelecionada.valorParcela | currency:'BRL':'symbol':'1.2-2' }}
+                  </div>
+                </div>
+                <div class="mb-0">
+                  <label class="form-label fw-semibold">Tipo:</label>
+                  <div>
+                    <span [class]="obterClasseTipo(parcelaSelecionada.tipoParcela)">
+                      {{ obterTipoFormatado(parcelaSelecionada.tipoParcela) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status e Situação -->
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-header">
+                <h6 class="card-title mb-0">
+                  <i class="fas fa-info-circle me-2"></i>
+                  Status e Situação
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold">Status Atual:</label>
+                    <div>
+                      <span [class]="obterClasseStatus(parcelaSelecionada.status)">
+                        {{ obterStatusFormatado(parcelaSelecionada.status) }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold">Data de Vencimento:</label>
+                    <div>{{ parcelaSelecionada.dataVencimento | date:'dd/MM/yyyy' }}</div>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold">Situação:</label>
+                    <div>
+                      <i
+                        [class]="obterSituacaoParcela(parcelaSelecionada).icone + ' me-2 ' + obterSituacaoParcela(parcelaSelecionada).classe"></i>
+                      <span [class]="obterSituacaoParcela(parcelaSelecionada).classe">
+                        {{ obterSituacaoParcela(parcelaSelecionada).situacao }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Informações de Atraso (se aplicável) -->
+                <div *ngIf="parcelaSelecionada.diasAtraso && parcelaSelecionada.diasAtraso > 0"
+                  class="alert alert-warning">
+                  <i class="fas fa-exclamation-triangle me-2"></i>
+                  <strong>Atenção:</strong> Esta parcela está em atraso há
+                  <strong>{{ parcelaSelecionada.diasAtraso }} dias</strong>.
+                </div>
+
+                <!-- Observações (se houver) -->
+                <div *ngIf="parcelaSelecionada.observacoes" class="mt-3">
+                  <label class="form-label fw-semibold">Observações:</label>
+                  <div class="p-3 bg-light rounded">
+                    {{ parcelaSelecionada.observacoes }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer do Modal -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="fecharModalDetalhes()">
+          <i class="fas fa-times me-1"></i>
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop do Modal -->
+<div *ngIf="mostrarModalDetalhes" class="modal-backdrop fade show" (click)="fecharModalDetalhes()"></div>

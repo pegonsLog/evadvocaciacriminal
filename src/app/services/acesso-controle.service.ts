@@ -77,7 +77,6 @@ export class AcessoControleService {
 
         // Admin pode acessar dados de qualquer cliente
         if (user.role === UserRole.ADMIN) {
-            console.log(`Admin ${user.email} acessando dados do cliente: ${clienteEmail}`);
             return true;
         }
 

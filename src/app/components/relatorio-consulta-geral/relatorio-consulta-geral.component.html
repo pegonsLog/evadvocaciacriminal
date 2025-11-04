@@ -257,6 +257,16 @@
         </div>
       </div>
 
+      <!-- Seção de Previsão de Recebimentos -->
+      <div class="row mb-4" *ngIf="mostrarPrevisaoRecebimentos">
+        <div class="col-12">
+          <app-previsao-recebimentos [usuarioAtual]="usuarioAtual" [filtrosGlobais]="filtrosAtivos"
+            [mesInicial]="mesAtual" (mesAlterado)="onMesPrevisaoAlterado($event)"
+            (parcelaClicada)="onParcelaClicada($event)" (filtroAplicado)="onFiltroPrevisaoAplicado($event)">
+          </app-previsao-recebimentos>
+        </div>
+      </div>
+
       <!-- Seção de Alertas -->
       <div class="row mb-4" *ngIf="dadosConsolidados?.alertas && (dadosConsolidados?.alertas?.length || 0) > 0">
         <div class="col-12">

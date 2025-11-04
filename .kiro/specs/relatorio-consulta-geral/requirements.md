@@ -67,6 +67,19 @@ O Relatório de Consulta Geral é um componente abrangente que permitirá aos ge
 
 ### Requisito 5
 
+**História do Usuário:** Como gestor ou cliente, eu quero visualizar a somatória dos valores de parcelas que vencerão em um determinado mês, para que eu possa planejar o fluxo de caixa e acompanhar as receitas esperadas.
+
+#### Critérios de Aceitação
+
+1. O Sistema_Relatorio DEVE exibir um componente de previsão de recebimentos por mês
+2. QUANDO o usuário seleciona um mês específico, O Sistema_Relatorio DEVE calcular e exibir o valor total das parcelas com vencimento naquele mês
+3. O Sistema_Relatorio DEVE permitir navegação entre diferentes meses através de controles de data
+4. O Sistema_Relatorio DEVE mostrar detalhamento das parcelas que compõem o total do mês selecionado
+5. ONDE o usuário é administrador, O Sistema_Relatorio DEVE exibir dados de todos os clientes
+6. ONDE o usuário é cliente comum, O Sistema_Relatorio DEVE exibir apenas suas próprias parcelas
+
+### Requisito 6
+
 **História do Usuário:** Como usuário do sistema, eu quero que o relatório seja responsivo e tenha boa performance, para que eu possa acessá-lo de qualquer dispositivo sem demora.
 
 #### Critérios de Aceitação

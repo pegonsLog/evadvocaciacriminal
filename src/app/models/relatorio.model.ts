@@ -110,3 +110,53 @@ export enum StatusPagamento {
   PAGO = 'pago',
   ATRASADO = 'atrasado'
 }
+
+// Interfaces para Previsão de Recebimentos Mensais
+export interface PrevisaoRecebimentosMes {
+  mes: number;
+  ano: number;
+  totalPrevisto: number;
+  parcelas: ParcelaPrevisao[];
+  resumo: ResumoPrevisaoMes;
+}
+
+export interface ParcelaPrevisao {
+  parcelaId: string;
+  clienteId: string;
+  clienteNome: string;
+  numeroContrato: string;
+  numeroParcela: number;
+  valorParcela: number;
+  dataVencimento: Date;
+  status: StatusPagamento;
+  diasAtraso?: number;
+  observacoes?: string;
+  tipoParcela: TipoParcela;
+}
+
+export interface ResumoPrevisaoMes {
+  totalParcelas: number;
+  valorTotal: number;
+  parcelasNormais: number;
+  valorNormais: number;
+  parcelasAtrasadas: number;
+  valorAtrasadas: number;
+  parcelasRenegociadas: number;
+  valorRenegociadas: number;
+  parcelasPendentes: number;
+  valorPendentes: number;
+}
+
+export enum TipoParcela {
+  NORMAL = 'normal',
+  RENEGOCIADA = 'renegociada',
+  ENTRADA = 'entrada',
+  FINAL = 'final'
+}
+
+export enum StatusPrevisao {
+  NO_PRAZO = 'no_prazo',
+  VENCENDO = 'vencendo',
+  VENCIDA = 'vencida',
+  PAGA = 'paga'
+}

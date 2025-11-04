@@ -19,6 +19,7 @@ import { GraficoReceitaComponent } from './graficos/grafico-receita.component';
 import { GraficoStatusComponent } from './graficos/grafico-status.component';
 import { GraficoInadimplenciaComponent } from './graficos/grafico-inadimplencia.component';
 import { GraficoEvolucaoClienteComponent } from './graficos/grafico-evolucao-cliente.component';
+import { PrevisaoRecebimentosComponent } from './previsao-recebimentos/previsao-recebimentos.component';
 
 @Component({
   selector: 'app-relatorio-consulta-geral',
@@ -31,6 +32,7 @@ import { GraficoEvolucaoClienteComponent } from './graficos/grafico-evolucao-cli
     GraficoStatusComponent,
     GraficoInadimplenciaComponent,
     GraficoEvolucaoClienteComponent,
+    PrevisaoRecebimentosComponent,
     LazyLoadDirective
   ],
   templateUrl: './relatorio-consulta-geral.component.html',
@@ -460,8 +462,6 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
    */
   onExportacaoConcluida(): void {
     // Pode implementar feedback visual ou log da exportação
-    console.log('Exportação concluída com sucesso');
-
     // Opcional: mostrar toast de sucesso
     // this.toastService.success('Relatório exportado com sucesso!');
   }
@@ -492,7 +492,6 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
    */
   onGraficoVisible(graficoId: string): void {
     if (!this.graficosCarregados.has(graficoId)) {
-      console.log(`Carregando gráfico: ${graficoId}`);
       this.graficosCarregados.add(graficoId);
 
       // Aqui você pode implementar lógica específica para cada gráfico
@@ -701,4 +700,43 @@ export class RelatorioConsultaGeralComponent implements OnInit, OnDestroy {
    * Referência ao Math para uso no template
    */
   Math = Math;
+
+  /**
+   * Data atual para uso no template
+   */
+  mesAtual = new Date();
+
+  // ========== MÉTODOS DE INTEGRAÇÃO COM PREVISÃO DE RECEBIMENTOS ==========
+
+  /**
+   * Manipula mudança de mês na previsão de recebimentos
+   */
+  onMesPrevisaoAlterado(data: { mes: number; ano: number }): void {
+    // Opcional: sincronizar com outros componentes ou atualizar filtros globais
+  }
+
+  /**
+   * Manipula clique em parcela na previsão
+   */
+  onParcelaClicada(parcela: any): void {
+    // Opcional: navegar para detalhes da parcela ou destacar no gráfico
+    // Pode implementar modal de detalhes ou navegação para página específica
+  }
+
+  /**
+   * Manipula aplicação de filtros específicos da previsão
+   */
+  onFiltroPrevisaoAplicado(filtros: FiltrosRelatorio): void {
+    // Mesclar filtros da previsão com filtros globais
+    const filtrosMesclados = { ...this.filtrosAtivos, ...filtros };
+    this.onFiltrosChange(filtrosMesclados);
+  }
+
+  /**
+   * Verifica se deve mostrar o componente de previsão de recebimentos
+   */
+  get mostrarPrevisaoRecebimentos(): boolean {
+    // Mostrar para todos os usuários autenticados
+    return this.usuarioAtual !== null && this.mostrarConteudo();
+  }
 }
