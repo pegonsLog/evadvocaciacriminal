@@ -7,10 +7,11 @@ Para configurar o projeto localmente, você precisa criar os arquivos de ambient
 ### Passo 1: Copiar os templates
 
 ```bash
-# Copie os arquivos template para os arquivos de ambiente
-copy "src\environments\environment.template.ts" "src\environments\environment.ts"
-copy "src\environments\environment.development.template.ts" "src\environments\environment.development.ts"
-copy "src\environments\environment.production.template.ts" "src\environments\environment.production.ts"
+# Os arquivos de ambiente já existem com placeholders seguros
+# Edite diretamente os arquivos existentes com suas chaves reais:
+# - src/environments/environment.ts
+# - src/environments/environment.development.ts
+# - src/environments/environment.production.ts
 ```
 
 ### Passo 2: Configurar as chaves do Firebase
