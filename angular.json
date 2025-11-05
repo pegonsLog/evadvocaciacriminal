@@ -89,6 +89,20 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "local": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local.ts"
+                }
+              ],
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
           },
           "defaultConfiguration": "production"
@@ -101,6 +115,9 @@
             },
             "development": {
               "buildTarget": "evadvociacriminal:build:development"
+            },
+            "local": {
+              "buildTarget": "evadvociacriminal:build:local"
             }
           },
           "defaultConfiguration": "development"

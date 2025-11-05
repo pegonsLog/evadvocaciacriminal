@@ -22,14 +22,20 @@ npm install
 3. Nunca commite chaves de API reais no repositório
 
 ```bash
-# Copie os templates e configure suas chaves
-copy "src\environments\environment.template.ts" "src\environments\environment.ts"
-# Edite o arquivo copiado com suas chaves reais do Firebase
+# Para desenvolvimento local com chaves reais
+npm run start:local
+
+# Para desenvolvimento padrão (com placeholders)
+npm start
 ```
 
 ## Executar o projeto
 
 ```bash
+# Desenvolvimento local (com suas chaves reais do Firebase)
+npm run start:local
+
+# Desenvolvimento padrão (com placeholders - não funcionará)
 npm start
 ```
 

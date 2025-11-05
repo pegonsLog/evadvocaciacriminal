@@ -63,6 +63,21 @@ export const environment = {
 - **environment.development.ts**: Ambiente de desenvolvimento com debug ativado
 - **environment.production.ts**: Ambiente de produção
 
+## Como usar o ambiente local
+
+Para usar suas chaves reais em desenvolvimento local:
+
+```bash
+# Iniciar servidor de desenvolvimento com chaves reais
+npm run start:local
+
+# Ou usar o comando Angular CLI diretamente
+ng serve --configuration local
+
+# Build com chaves reais
+npm run build:local
+```
+
 ## Deploy
 
 Para deploy em produção, configure as variáveis de ambiente no seu provedor de hosting (Firebase Hosting, Vercel, etc.) ou use um sistema de CI/CD que injete as chaves durante o build.
