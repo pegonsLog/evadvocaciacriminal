@@ -1,0 +1,186 @@
+<div class="offline-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header Offline -->
+                <div class="offline-header text-center mb-5">
+                    <div class="offline-icon mb-3">
+                        <i class="fas fa-wifi-slash"></i>
+                    </div>
+                    <h1 class="offline-title">Modo Offline</h1>
+                    <p class="offline-subtitle">
+                        Você está sem conexão com a internet. Algumas funcionalidades estão limitadas,
+                        mas você ainda pode acessar dados previamente carregados.
+                    </p>
+                </div>
+
+                <!-- Status de Conexão -->
+                <div class="connection-status-card mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="status-indicator offline mb-3">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h5 class="card-title">Sem Conexão</h5>
+                            <p class="card-text">
+                                Verifique sua conexão com a internet e tente novamente.
+                            </p>
+                            <button class="btn btn-primary" (click)="syncWhenOnline()"
+                                [disabled]="!isOnline() || isSyncing">
+                                <i class="fas" [ngClass]="isSyncing ? 'fa-spinner fa-spin' : 'fa-sync-alt'"
+                                    [class.me-2]="!isSyncing"></i>
+                                <span *ngIf="!isSyncing">Tentar Reconectar</span>
+                                <span *ngIf="isSyncing">Sincronizando...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dados Disponíveis Offline -->
+                <div class="offline-data-section">
+                    <h3 class="section-title mb-4">
+                        <i class="fas fa-database me-2"></i>
+                        Dados Disponíveis Offline
+                    </h3>
+
+                    <div class="row">
+                        <!-- Clientes Cacheados -->
+                        <div class="col-md-6 mb-4">
+                            <div class="data-card">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="data-icon mb-3">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <h5 class="card-title">Clientes</h5>
+                                        <div class="data-count" *ngIf="cachedClients$ | async as clientes">
+                                            <span class="count-number">{{ getClientesCount(clientes) }}</span>
+                                            <span class="count-label">registros disponíveis</span>
+                                        </div>
+                                        <p class="card-text">
+                                            Dados de clientes carregados anteriormente estão disponíveis para consulta.
+                                        </p>
+                                        <a routerLink="/clientes" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-2"></i>
+                                            Visualizar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Parcelas Cacheadas -->
+                        <div class="col-md-6 mb-4">
+                            <div class="data-card">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="data-icon mb-3">
+                                            <i class="fas fa-credit-card"></i>
+                                        </div>
+                                        <h5 class="card-title">Parcelas</h5>
+                                        <div class="data-count" *ngIf="cachedParcelas$ | async as parcelas">
+                                            <span class="count-number">{{ getParcelasCount(parcelas) }}</span>
+                                            <span class="count-label">registros disponíveis</span>
+                                        </div>
+                                        <p class="card-text">
+                                            Informações de parcelas e pagamentos previamente carregadas.
+                                        </p>
+                                        <a routerLink="/controle-pagamentos" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-2"></i>
+                                            Visualizar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações de Sincronização -->
+                <div class="sync-info-section mb-4" *ngIf="cacheStats$ | async as stats">
+                    <div class="row">
+                        <!-- Última Sincronização -->
+                        <div class="col-md-8 mb-3" *ngIf="stats.lastSync">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="sync-info">
+                                        <div class="sync-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="sync-details">
+                                            <h6 class="sync-title">Última Sincronização</h6>
+                                            <p class="sync-time">{{ formatDate(stats.lastSync) }}</p>
+                                            <small class="text-muted" *ngIf="offlineDataService.isCacheStale(15)">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                                Dados podem estar desatualizados
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mudanças Pendentes -->
+                        <div class="col-md-4 mb-3" *ngIf="stats.pendingChanges > 0">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <div class="pending-icon mb-2">
+                                        <i class="fas fa-hourglass-half text-warning"></i>
+                                    </div>
+                                    <h6 class="card-title">Mudanças Pendentes</h6>
+                                    <div class="pending-count">
+                                        <span class="count-number text-warning">{{ stats.pendingChanges }}</span>
+                                        <small class="d-block text-muted">aguardando sincronização</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Limitações do Modo Offline -->
+                <div class="offline-limitations">
+                    <h4 class="section-title mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Limitações do Modo Offline
+                    </h4>
+
+                    <div class="limitations-list">
+                        <div class="limitation-item">
+                            <i class="fas fa-times-circle text-danger me-2"></i>
+                            <span>Não é possível criar novos registros</span>
+                        </div>
+                        <div class="limitation-item">
+                            <i class="fas fa-times-circle text-danger me-2"></i>
+                            <span>Edições não serão salvas até reconectar</span>
+                        </div>
+                        <div class="limitation-item">
+                            <i class="fas fa-times-circle text-danger me-2"></i>
+                            <span>Relatórios podem estar desatualizados</span>
+                        </div>
+                        <div class="limitation-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Consulta de dados previamente carregados</span>
+                        </div>
+                        <div class="limitation-item">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Navegação entre páginas disponíveis</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ações Disponíveis -->
+                <div class="offline-actions text-center mt-5">
+                    <a routerLink="/home" class="btn btn-primary me-3">
+                        <i class="fas fa-home me-2"></i>
+                        Ir para Dashboard
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="window.location.reload()">
+                        <i class="fas fa-redo me-2"></i>
+                        Recarregar Página
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

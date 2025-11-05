@@ -95,6 +95,30 @@
     </nav>
   </header>
 
+  <!-- PWA Update Notification -->
+  <div class="pwa-update-notification" *ngIf="showUpdateNotification">
+    <div class="update-content">
+      <div class="update-icon">
+        <i class="bi bi-arrow-clockwise"></i>
+      </div>
+      <div class="update-message">
+        <h6>Nova versão disponível!</h6>
+        <p>Uma atualização da aplicação está disponível.</p>
+      </div>
+      <div class="update-actions">
+        <button class="btn btn-sm btn-primary" (click)="applyPWAUpdate()">
+          Atualizar
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" (click)="dismissUpdateNotification()">
+          Mais tarde
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offline Status Component -->
+  <app-offline-status></app-offline-status>
+
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>

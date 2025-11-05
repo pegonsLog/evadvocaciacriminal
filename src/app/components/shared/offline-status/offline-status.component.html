@@ -1,0 +1,44 @@
+<!-- Indicador de status de conexão -->
+<div class="connection-status" [ngClass]="getConnectionStatus()">
+    <div class="status-indicator">
+        <i class="fas" [ngClass]="{
+      'fa-wifi text-success': isOnline,
+      'fa-wifi-slash text-danger': !isOnline
+    }"></i>
+        <span class="status-text ms-2">{{ getConnectionStatus() === 'online' ? 'Online' : 'Offline' }}</span>
+    </div>
+</div>
+
+<!-- Mensagem informativa quando offline -->
+<div class="offline-message alert alert-warning alert-dismissible fade show" *ngIf="showOfflineMessage && !isOnline"
+    role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <div class="message-content">
+        <strong>Modo Offline</strong>
+        <p class="mb-2">{{ getStatusMessage() }}</p>
+        <div class="message-actions">
+            <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="goToOfflinePage()"
+                *ngIf="offlineDataService.hasCachedData()">
+                <i class="fas fa-database me-1"></i>
+                Ver dados offline
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="showOfflineMessage = false">
+                Entendi
+            </button>
+        </div>
+    </div>
+    <button type="button" class="btn-close" (click)="showOfflineMessage = false" aria-label="Fechar">
+    </button>
+</div>
+
+<!-- Mensagem de reconexão -->
+<div class="online-message alert alert-success alert-dismissible fade show" *ngIf="isOnline && showOfflineMessage"
+    role="alert">
+    <i class="fas fa-check-circle me-2"></i>
+    <div class="message-content">
+        <strong>Conectado!</strong>
+        <p class="mb-0">Conexão com a internet restaurada. Sincronizando dados...</p>
+    </div>
+    <button type="button" class="btn-close" (click)="showOfflineMessage = false" aria-label="Fechar">
+    </button>
+</div>

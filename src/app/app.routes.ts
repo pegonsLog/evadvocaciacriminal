@@ -12,6 +12,7 @@ import { LoginComponent } from './components/auth/login/login.component';
 import { UserManagementComponent } from './components/auth/user-management/user-management.component';
 import { InitialSetupComponent } from './components/auth/initial-setup/initial-setup.component';
 import { AcessoNegadoComponent } from './components/shared/acesso-negado/acesso-negado.component';
+import { OfflinePageComponent } from './components/shared/offline-page/offline-page.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 import { relatorioGuard } from './guards/relatorio.guard';
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'setup', component: InitialSetupComponent },
   { path: 'acesso-negado', component: AcessoNegadoComponent },
+  { path: 'offline', component: OfflinePageComponent },
 
   // Redireciona para home se autenticado, senão para login
   { path: '', redirectTo: '/home', pathMatch: 'full' },

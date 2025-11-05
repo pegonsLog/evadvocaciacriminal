@@ -1,8 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, collectionSnapshots, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, onSnapshot } from '@angular/fire/firestore';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { Cliente, Pagamento, ResumoPagamento } from '../models/cliente.model';
 import { ParcelaService } from './parcela.service';
+import { CacheService } from './cache.service';
+import { OfflineDataService } from './offline-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +13,8 @@ import { ParcelaService } from './parcela.service';
 export class ClienteService {
   private firestore = inject(Firestore);
   private parcelaService = inject(ParcelaService);
+  private cacheService = inject(CacheService);
+  private offlineDataService = inject(OfflineDataService);
   private clientesCollection = collection(this.firestore, 'clientes');
   private pagamentosCollection = collection(this.firestore, 'pagamentos');
 
@@ -22,6 +27,13 @@ export class ClienteService {
   private listenersInitialized = false;
 
   constructor() {
+    // Configurar cache para dados críticos
+    this.cacheService.configure({
+      ttl: 10 * 60 * 1000, // 10 minutos para dados críticos
+      maxSize: 200,
+      enableOfflineMode: true
+    });
+
     if (!this.listenersInitialized) {
       this.carregarDados();
       this.listenersInitialized = true;
@@ -33,8 +45,30 @@ export class ClienteService {
     return this.clientesSubject.asObservable();
   }
 
+  /**
+   * Obtém clientes com cache para melhor performance offline
+   */
+  getClientesWithCache(): Observable<Cliente[]> {
+    return this.cacheService.get(
+      'clientes_all',
+      () => this.getClientes(),
+      15 * 60 * 1000 // 15 minutos de cache
+    );
+  }
+
   getClienteById(id: string): Cliente | undefined {
     return this.clientes.find(c => c.id === id);
+  }
+
+  /**
+   * Obtém cliente por ID com cache
+   */
+  getClienteByIdWithCache(id: string): Observable<Cliente | undefined> {
+    return this.cacheService.get(
+      `cliente_${id}`,
+      () => of(this.getClienteById(id)),
+      20 * 60 * 1000 // 20 minutos de cache para dados individuais
+    );
   }
 
   async addCliente(cliente: Cliente): Promise<string> {
@@ -60,6 +94,10 @@ export class ClienteService {
 
     const docRef = await addDoc(this.clientesCollection, clienteData);
     console.log('✅ [SERVICE] Cliente adicionado ao Firestore com ID:', docRef.id);
+
+    // Invalidar cache relacionado
+    this.cacheService.invalidatePattern('clientes_.*');
+    this.cacheService.delete(`cliente_${docRef.id}`);
 
     // Gerar parcelas automaticamente usando a nova lógica
     const clienteComId = { ...cliente, id: docRef.id };
@@ -87,6 +125,11 @@ export class ClienteService {
     const precisaRecalcularParcelas = this.verificarSeNecessarioRecalcularParcelas(clienteAnterior, cliente);
 
     await updateDoc(clienteDoc, clienteData);
+
+    // Invalidar cache relacionado
+    this.cacheService.invalidatePattern('clientes_.*');
+    this.cacheService.delete(`cliente_${cliente.id}`);
+    this.cacheService.delete(`resumo_pagamento_${cliente.id}`);
 
     // Recalcular parcelas se necessário, preservando histórico de pagamentos
     if (precisaRecalcularParcelas) {
@@ -117,6 +160,12 @@ export class ClienteService {
 
     // Deletar o cliente
     await deleteDoc(clienteDoc);
+
+    // Invalidar cache relacionado
+    this.cacheService.invalidatePattern('clientes_.*');
+    this.cacheService.delete(`cliente_${id}`);
+    this.cacheService.delete(`resumo_pagamento_${id}`);
+    this.cacheService.invalidatePattern(`pagamentos_cliente_${id}`);
   }
 
   // Pagamentos
@@ -128,6 +177,17 @@ export class ClienteService {
     return this.pagamentos.filter(p => p.clienteId === clienteId);
   }
 
+  /**
+   * Obtém pagamentos por cliente com cache
+   */
+  getPagamentosByClienteWithCache(clienteId: string): Observable<Pagamento[]> {
+    return this.cacheService.get(
+      `pagamentos_cliente_${clienteId}`,
+      () => of(this.getPagamentosByCliente(clienteId)),
+      10 * 60 * 1000 // 10 minutos de cache
+    );
+  }
+
   async addPagamento(pagamento: Pagamento): Promise<void> {
     const pagamentoData = {
       ...pagamento,
@@ -135,6 +195,10 @@ export class ClienteService {
     };
     delete (pagamentoData as any).id;
     await addDoc(this.pagamentosCollection, pagamentoData);
+
+    // Invalidar cache relacionado
+    this.cacheService.invalidatePattern('pagamentos_.*');
+    this.cacheService.delete(`resumo_pagamento_${pagamento.clienteId}`);
   }
 
   async updatePagamento(pagamento: Pagamento): Promise<void> {
@@ -225,6 +289,17 @@ export class ClienteService {
     };
   }
 
+  /**
+   * Obtém resumo de pagamento por cliente com cache
+   */
+  getResumoPagamentoByClienteWithCache(clienteId: string): Observable<ResumoPagamento | undefined> {
+    return this.cacheService.get(
+      `resumo_pagamento_${clienteId}`,
+      () => of(this.getResumoPagamentoByCliente(clienteId)),
+      5 * 60 * 1000 // 5 minutos de cache para resumos
+    );
+  }
+
   // Utilitários
   private gerarId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -285,6 +360,9 @@ export class ClienteService {
         });
         console.log('📤 [SERVICE] Emitindo', this.clientes.length, 'clientes para subscribers');
         this.clientesSubject.next([...this.clientes]);
+
+        // Cache dados para uso offline
+        this.offlineDataService.cacheData(this.clientes, []);
       },
       (error) => {
         console.error('Erro ao carregar clientes:', error);
@@ -304,6 +382,9 @@ export class ClienteService {
           } as Pagamento;
         });
         this.pagamentosSubject.next([...this.pagamentos]);
+
+        // Atualizar cache com dados de pagamentos
+        this.offlineDataService.cacheData(this.clientes, this.pagamentos);
       },
       (error) => {
         console.error('Erro ao carregar pagamentos:', error);
