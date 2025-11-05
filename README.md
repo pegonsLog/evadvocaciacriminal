@@ -13,6 +13,20 @@ Aplicação Angular para gestão de advocacia criminal.
 npm install
 ```
 
+## ⚠️ Configuração de Ambiente
+
+**IMPORTANTE**: Antes de executar o projeto, você precisa configurar as chaves do Firebase.
+
+1. Leia o arquivo `CONFIGURACAO_AMBIENTE.md` para instruções detalhadas
+2. Configure seus arquivos de ambiente com suas chaves do Firebase
+3. Nunca commite chaves de API reais no repositório
+
+```bash
+# Copie os templates e configure suas chaves
+copy "src\environments\environment.template.ts" "src\environments\environment.ts"
+# Edite o arquivo copiado com suas chaves reais do Firebase
+```
+
 ## Executar o projeto
 
 ```bash

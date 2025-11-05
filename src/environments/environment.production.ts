@@ -5,12 +5,12 @@ export const environment = {
   version: '0.0.0',
   debug: false,
   firebase: {
-    apiKey: "AIzaSyCcGJ16qwGjWaXqnoHEpHoXpyZjkjvynaI",
-    authDomain: "evac-contratos.firebaseapp.com",
-    projectId: "evac-contratos",
-    storageBucket: "evac-contratos.firebasestorage.app",
-    messagingSenderId: "12166093901",
-    appId: "1:12166093901:web:a61b9124b069eab539d004",
-    measurementId: "G-KE6QM3WKFZ"
+    apiKey: "YOUR_PROD_API_KEY_HERE",
+    authDomain: "YOUR_PROD_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROD_PROJECT_ID",
+    storageBucket: "YOUR_PROD_PROJECT_ID.firebasestorage.app",
+    messagingSenderId: "YOUR_PROD_MESSAGING_SENDER_ID",
+    appId: "YOUR_PROD_APP_ID",
+    measurementId: "YOUR_PROD_MEASUREMENT_ID"
   }
 };
