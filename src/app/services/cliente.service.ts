@@ -19,8 +19,13 @@ export class ClienteService {
   private clientesSubject = new BehaviorSubject<Cliente[]>([]);
   private pagamentosSubject = new BehaviorSubject<Pagamento[]>([]);
 
+  private listenersInitialized = false;
+
   constructor() {
-    this.carregarDados();
+    if (!this.listenersInitialized) {
+      this.carregarDados();
+      this.listenersInitialized = true;
+    }
   }
 
   // Clientes
@@ -54,10 +59,12 @@ export class ClienteService {
     });
 
     const docRef = await addDoc(this.clientesCollection, clienteData);
+    console.log('✅ [SERVICE] Cliente adicionado ao Firestore com ID:', docRef.id);
 
     // Gerar parcelas automaticamente usando a nova lógica
     const clienteComId = { ...cliente, id: docRef.id };
     await this.parcelaService.gerarParcelas(clienteComId);
+    console.log('✅ [SERVICE] Parcelas geradas para o cliente');
 
     return docRef.id;
   }
@@ -96,9 +103,17 @@ export class ClienteService {
     // Deletar pagamentos relacionados
     const pagamentosQuery = query(this.pagamentosCollection, where('clienteId', '==', id));
     const snapshot = await getDocs(pagamentosQuery);
-    snapshot.forEach(async (docSnapshot) => {
-      await deleteDoc(docSnapshot.ref);
-    });
+
+    // Processar deletions sequencialmente para evitar sobrecarga
+    for (const docSnapshot of snapshot.docs) {
+      try {
+        await deleteDoc(docSnapshot.ref);
+        // Pequeno delay para evitar sobrecarga
+        await new Promise(resolve => setTimeout(resolve, 50));
+      } catch (error) {
+        console.error(`Erro ao deletar pagamento ${docSnapshot.id}:`, error);
+      }
+    }
 
     // Deletar o cliente
     await deleteDoc(clienteDoc);
@@ -240,6 +255,7 @@ export class ClienteService {
     // Carregar clientes do Firestore usando onSnapshot
     onSnapshot(this.clientesCollection,
       (snapshot) => {
+        console.log('🔄 [SERVICE] onSnapshot executado, docs:', snapshot.docs.length);
         this.clientes = snapshot.docs.map(doc => {
           const data = doc.data() as any;
 
@@ -267,6 +283,7 @@ export class ClienteService {
             }
           } as Cliente;
         });
+        console.log('📤 [SERVICE] Emitindo', this.clientes.length, 'clientes para subscribers');
         this.clientesSubject.next([...this.clientes]);
       },
       (error) => {

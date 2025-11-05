@@ -13,8 +13,13 @@ export class ParcelaService {
   private parcelas: Parcela[] = [];
   private parcelasSubject = new BehaviorSubject<Parcela[]>([]);
 
+  private listenersInitialized = false;
+
   constructor() {
-    this.carregarParcelas();
+    if (!this.listenersInitialized) {
+      this.carregarParcelas();
+      this.listenersInitialized = true;
+    }
   }
 
   private carregarParcelas(): void {
@@ -99,7 +104,14 @@ export class ParcelaService {
         status: 'pendente'
       };
 
-      await addDoc(this.parcelasCollection, parcela);
+      try {
+        await addDoc(this.parcelasCollection, parcela);
+        // Pequeno delay para evitar sobrecarga no Firebase
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (error) {
+        console.error(`Erro ao criar parcela ${i + 1}:`, error);
+        throw error; // Re-throw para interromper o processo se houver erro
+      }
     }
   }
 
@@ -133,7 +145,14 @@ export class ParcelaService {
         status: 'pendente'
       };
 
-      await addDoc(this.parcelasCollection, parcela);
+      try {
+        await addDoc(this.parcelasCollection, parcela);
+        // Pequeno delay para evitar sobrecarga no Firebase
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (error) {
+        console.error(`Erro ao criar parcela ${i}:`, error);
+        throw error; // Re-throw para interromper o processo se houver erro
+      }
     }
   }
 
@@ -260,10 +279,11 @@ export class ParcelaService {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
-    this.parcelas.forEach(async (parcela) => {
+    // Processar parcelas sequencialmente para evitar sobrecarga no Firebase
+    for (const parcela of this.parcelas) {
       // Não atualizar parcelas que foram recentemente limpas
       if (this.parcelasRecentementeLimpas.has(parcela.id)) {
-        return;
+        continue;
       }
 
       if (parcela.status === 'pendente') {
@@ -271,14 +291,22 @@ export class ParcelaService {
         const novoStatus = diasAtraso > 0 ? 'atrasado' : 'pendente';
 
         if (parcela.status !== novoStatus || parcela.diasAtraso !== diasAtraso) {
-          const parcelaDoc = doc(this.firestore, `parcelas/${parcela.id}`);
-          await updateDoc(parcelaDoc, {
-            diasAtraso: diasAtraso,
-            status: novoStatus
-          });
+          try {
+            const parcelaDoc = doc(this.firestore, `parcelas/${parcela.id}`);
+            await updateDoc(parcelaDoc, {
+              diasAtraso: diasAtraso,
+              status: novoStatus
+            });
+
+            // Pequeno delay para evitar sobrecarga
+            await new Promise(resolve => setTimeout(resolve, 100));
+          } catch (error) {
+            console.error(`Erro ao atualizar parcela ${parcela.id}:`, error);
+            // Continuar com as outras parcelas mesmo se uma falhar
+          }
         }
       }
-    });
+    }
   }
 
   private calcularDiasAtraso(dataVencimento: Date, dataReferencia: Date): number {
@@ -302,9 +330,17 @@ export class ParcelaService {
   async deleteParcelasByCliente(clienteId: string): Promise<void> {
     const parcelasQuery = query(this.parcelasCollection, where('clienteId', '==', clienteId));
     const snapshot = await getDocs(parcelasQuery);
-    snapshot.forEach(async (docSnapshot) => {
-      await deleteDoc(docSnapshot.ref);
-    });
+
+    // Processar deletions sequencialmente para evitar sobrecarga
+    for (const docSnapshot of snapshot.docs) {
+      try {
+        await deleteDoc(docSnapshot.ref);
+        // Pequeno delay para evitar sobrecarga
+        await new Promise(resolve => setTimeout(resolve, 50));
+      } catch (error) {
+        console.error(`Erro ao deletar parcela ${docSnapshot.id}:`, error);
+      }
+    }
   }
 
   /**
@@ -386,7 +422,14 @@ export class ParcelaService {
         status: 'pendente'
       };
 
-      await addDoc(this.parcelasCollection, parcela);
+      try {
+        await addDoc(this.parcelasCollection, parcela);
+        // Pequeno delay para evitar sobrecarga no Firebase
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (error) {
+        console.error(`Erro ao criar parcela restante ${parcelasJaPagas + i + 1}:`, error);
+        throw error; // Re-throw para interromper o processo se houver erro
+      }
     }
   }
 }

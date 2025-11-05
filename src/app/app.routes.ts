@@ -10,6 +10,7 @@ import { ControlePagamentosComponent } from './components/controle-pagamentos/co
 import { RelatorioConsultaGeralComponent } from './components/relatorio-consulta-geral/relatorio-consulta-geral.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { UserManagementComponent } from './components/auth/user-management/user-management.component';
+import { InitialSetupComponent } from './components/auth/initial-setup/initial-setup.component';
 import { AcessoNegadoComponent } from './components/shared/acesso-negado/acesso-negado.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
@@ -18,6 +19,7 @@ import { relatorioGuard } from './guards/relatorio.guard';
 export const routes: Routes = [
   // Rotas públicas
   { path: 'login', component: LoginComponent },
+  { path: 'setup', component: InitialSetupComponent },
   { path: 'acesso-negado', component: AcessoNegadoComponent },
 
   // Redireciona para home se autenticado, senão para login

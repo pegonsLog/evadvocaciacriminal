@@ -35,8 +35,8 @@ export class LoginComponent {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
 
     this.loginForm = this.fb.group({
-      email: ['evadvocaciacriminal@gmail.com', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      email: ['evac.contratos@gmail.com', [Validators.required, Validators.email]],
+      password: ['Criminal13@', [Validators.required, Validators.minLength(6)]]
     });
   }
 

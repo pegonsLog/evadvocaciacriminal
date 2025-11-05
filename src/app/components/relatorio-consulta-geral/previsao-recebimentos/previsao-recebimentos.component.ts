@@ -1119,40 +1119,7 @@ export class PrevisaoRecebimentosComponent implements OnInit, OnDestroy {
         yPos = 30;
       }
 
-      // ========== ANÁLISE E RECOMENDAÇÕES ==========
 
-      // Título da seção
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-      doc.setTextColor(40, 40, 40);
-      doc.text('ANÁLISE E RECOMENDAÇÕES', 20, yPos);
-      yPos += 15;
-
-      // Box de análise
-      doc.setFillColor(248, 248, 248);
-      doc.roundedRect(20, yPos, pageWidth - 40, 45, 3, 3, 'F');
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(0.3);
-      doc.roundedRect(20, yPos, pageWidth - 40, 45, 3, 3, 'S');
-
-      // Conteúdo da análise
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.setTextColor(60, 60, 60);
-
-      const analises = [
-        `▪ Total previsto para o período: ${this.formatarMoeda(resumo.valorTotal)}`,
-        `▪ ${resumo.parcelasAtrasadas > 0 ? 'ATENÇÃO: ' + resumo.parcelasAtrasadas + ' parcelas em atraso' : 'Nenhuma parcela em atraso no período'}`,
-        `▪ Taxa de pendências: ${this.calcularPercentualTipo('pendentes').toFixed(1)}% do valor total`,
-        `▪ ${resumo.parcelasRenegociadas > 0 ? resumo.parcelasRenegociadas + ' parcelas renegociadas em acompanhamento' : 'Nenhuma renegociação no período'}`,
-        `▪ Recomenda-se acompanhamento próximo das parcelas com vencimento iminente`
-      ];
-
-      let yAnalise = yPos + 8;
-      analises.forEach(analise => {
-        doc.text(analise, 25, yAnalise);
-        yAnalise += 7;
-      });
 
       // ========== RODAPÉ EXECUTIVO ==========
 

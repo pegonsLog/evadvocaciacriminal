@@ -40,13 +40,9 @@ export class AuthService {
     // Observa mudanças no estado de autenticação do Firebase
     this.user$.pipe(
       switchMap(firebaseUser => {
-
-
         if (firebaseUser) {
           return this.getUserData(firebaseUser.uid).pipe(
             switchMap(userData => {
-
-
               // Se o usuário não tem documento no Firestore, cria um
               if (!userData) {
                 console.log('⚠️ [AUTH] Usuário sem documento no Firestore, criando...');
@@ -59,9 +55,14 @@ export class AuthService {
           return of(null);
         }
       })
-    ).subscribe(userData => {
-
-      this.currentUserSubject.next(userData);
+    ).subscribe({
+      next: (userData) => {
+        this.currentUserSubject.next(userData);
+      },
+      error: (error) => {
+        console.error('❌ [AUTH] Erro no observable de autenticação:', error);
+        this.currentUserSubject.next(null);
+      }
     });
   }
 
@@ -179,7 +180,7 @@ export class AuthService {
       uid: firebaseUser.uid,
       email: firebaseUser.email,
       displayName: firebaseUser.displayName || firebaseUser.email,
-      role: firebaseUser.email === 'evadvocaciacriminal@gmail.com' ? UserRole.ADMIN : UserRole.COMUM,
+      role: firebaseUser.email === 'evac.contratos@gmail.com' ? UserRole.ADMIN : UserRole.COMUM,
       createdAt: new Date(),
       updatedAt: new Date(),
       active: true

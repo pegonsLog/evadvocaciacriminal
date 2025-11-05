@@ -28,8 +28,14 @@ export class ClienteListaComponent implements OnInit {
 
   ngOnInit(): void {
     this.clienteService.getClientes().subscribe(clientes => {
+      console.log('📋 [LISTA] Clientes recebidos:', clientes.length);
       this.clientes = clientes;
       this.filteredClients = clientes;
+
+      // Aplicar filtro se houver termo de busca
+      if (this.searchTerm.trim()) {
+        this.filterClients();
+      }
     });
   }
 
