@@ -7,8 +7,6 @@ import { PWAErrorHandlerService } from './services/pwa-error-handler.service';
 import { PWAErrorRecoveryService } from './services/pwa-error-recovery.service';
 import { UserRole } from './models/user.model';
 import { ModalComponent } from './components/shared/modal/modal.component';
-import { PWAErrorStatusComponent } from './components/shared/pwa-error-status/pwa-error-status.component';
-import { LogControlComponent } from './components/shared/log-control/log-control.component';
 
 import { ModalService } from './services/modal.service';
 import { Subscription } from 'rxjs';
@@ -16,7 +14,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterModule, ModalComponent, PWAErrorStatusComponent, LogControlComponent],
+  imports: [CommonModule, RouterOutlet, RouterModule, ModalComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -271,10 +269,10 @@ export class AppComponent implements OnInit, OnDestroy {
     try {
       // Tenta recuperar service worker
       await this.pwaErrorRecovery.forceRecovery('service-worker');
-      
+
       // Tenta recuperar cache
       await this.pwaErrorRecovery.forceRecovery('cache');
-      
+
       this.modalService.showSuccess('Recuperação do PWA executada com sucesso.');
     } catch (error) {
       console.error('❌ [APP] Erro na recuperação manual do PWA:', error);

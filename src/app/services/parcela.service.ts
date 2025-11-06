@@ -2,14 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, onSnapshot, getDoc } from '@angular/fire/firestore';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Parcela, Cliente } from '../models/cliente.model';
-import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ParcelaService {
   private firestore = inject(Firestore);
-  private logger = inject(LoggerService);
   private parcelasCollection = collection(this.firestore, 'parcelas');
 
   private parcelas: Parcela[] = [];
@@ -25,10 +23,8 @@ export class ParcelaService {
   }
 
   private carregarParcelas(): void {
-    this.logger.service('Inicializando listener de parcelas...');
     onSnapshot(this.parcelasCollection,
       (snapshot) => {
-        this.logger.service(`onSnapshot executado, docs: ${snapshot.docs.length}`);
         this.parcelas = snapshot.docs.map(doc => {
           const data = doc.data() as any;
           return {
@@ -38,11 +34,10 @@ export class ParcelaService {
             dataPagamento: data.dataPagamento ? (data.dataPagamento?.toDate ? data.dataPagamento.toDate() : new Date(data.dataPagamento)) : undefined
           } as Parcela;
         });
-        this.logger.service(`Emitindo ${this.parcelas.length} parcelas para subscribers`);
         this.parcelasSubject.next([...this.parcelas]);
       },
       (error) => {
-        this.logger.error('PARCELA-SERVICE', 'Erro ao carregar parcelas', error);
+        console.error('Erro ao carregar parcelas:', error);
       }
     );
   }
