@@ -1,0 +1,162 @@
+{
+  "testConfig": {
+    "name": "EV Advocacia Criminal PWA Tests",
+    "version": "1.0.0",
+    "baseUrl": "http://localhost:4200",
+    "timeout": 30000,
+    "retries": 2
+  },
+  "validation": {
+    "requiredFiles": [
+      "src/manifest.json",
+      "src/assets/icons/icon-72x72.png",
+      "src/assets/icons/icon-96x96.png",
+      "src/assets/icons/icon-128x128.png",
+      "src/assets/icons/icon-144x144.png",
+      "src/assets/icons/icon-152x152.png",
+      "src/assets/icons/icon-192x192.png",
+      "src/assets/icons/icon-384x384.png",
+      "src/assets/icons/icon-512x512.png",
+      "ngsw-config.json"
+    ],
+    "manifestRequiredFields": [
+      "name",
+      "short_name",
+      "description",
+      "start_url",
+      "display",
+      "theme_color",
+      "background_color",
+      "icons"
+    ],
+    "minIconSizes": [
+      "72x72",
+      "96x96", 
+      "128x128",
+      "144x144",
+      "152x152",
+      "192x192",
+      "384x384",
+      "512x512"
+    ],
+    "requiredMetaTags": [
+      "viewport",
+      "theme-color",
+      "apple-mobile-web-app-capable",
+      "apple-mobile-web-app-status-bar-style"
+    ]
+  },
+  "installation": {
+    "testDevices": [
+      {
+        "name": "iPhone 12",
+        "viewport": { "width": 390, "height": 844 },
+        "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1"
+      },
+      {
+        "name": "iPad",
+        "viewport": { "width": 768, "height": 1024 },
+        "userAgent": "Mozilla/5.0 (iPad; CPU OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1"
+      },
+      {
+        "name": "Android Phone",
+        "viewport": { "width": 360, "height": 640 },
+        "userAgent": "Mozilla/5.0 (Linux; Android 11; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36"
+      },
+      {
+        "name": "Desktop Chrome",
+        "viewport": { "width": 1920, "height": 1080 },
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+      }
+    ],
+    "offlineTestPages": [
+      "/",
+      "/home",
+      "/clientes",
+      "/pagamentos"
+    ]
+  },
+  "cache": {
+    "expectedCacheNames": [
+      "ngsw:/:cache",
+      "ngsw:/:db"
+    ],
+    "criticalResources": [
+      "main.js",
+      "polyfills.js",
+      "styles.css",
+      "manifest.json"
+    ],
+    "performanceThresholds": {
+      "firstLoadTime": 5000,
+      "cachedLoadTime": 2000,
+      "cacheHitRatio": 0.6,
+      "offlineLoadTime": 3000
+    },
+    "resourceTypes": [
+      {
+        "name": "html",
+        "patterns": [".html", "/"],
+        "strategy": "freshness"
+      },
+      {
+        "name": "css",
+        "patterns": [".css"],
+        "strategy": "performance"
+      },
+      {
+        "name": "js",
+        "patterns": [".js"],
+        "strategy": "performance"
+      },
+      {
+        "name": "images",
+        "patterns": [".png", ".jpg", ".jpeg", ".svg", ".ico"],
+        "strategy": "performance"
+      },
+      {
+        "name": "fonts",
+        "patterns": [".woff", ".woff2", ".ttf"],
+        "strategy": "performance"
+      },
+      {
+        "name": "api",
+        "patterns": ["/api/", ".json"],
+        "strategy": "freshness"
+      }
+    ]
+  },
+  "performance": {
+    "budgets": {
+      "initialBundle": 2097152,
+      "totalBundle": 5242880,
+      "individualAsset": 1048576
+    },
+    "metrics": {
+      "firstContentfulPaint": 2000,
+      "largestContentfulPaint": 4000,
+      "firstInputDelay": 100,
+      "cumulativeLayoutShift": 0.1
+    }
+  },
+  "scoring": {
+    "weights": {
+      "validation": 0.3,
+      "installation": 0.25,
+      "cache": 0.25,
+      "performance": 0.2
+    },
+    "thresholds": {
+      "excellent": 90,
+      "good": 80,
+      "fair": 70,
+      "poor": 0
+    }
+  },
+  "reporting": {
+    "outputFormats": ["json", "html", "console"],
+    "includeScreenshots": true,
+    "includeNetworkLogs": true,
+    "includePerformanceMetrics": true
+  }
+}

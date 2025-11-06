@@ -1,0 +1,16 @@
+/* Import the main splash screen styles */
+@import '../../../../splash-screen.css';
+
+/* Component-specific overrides if needed */
+:host {
+  display: block;
+}
+
+.splash-screen {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Ensure proper z-index stacking */
+.splash-screen {
+  z-index: 10001;
+}

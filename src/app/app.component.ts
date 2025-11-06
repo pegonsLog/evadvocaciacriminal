@@ -3,16 +3,19 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { PWAUpdateService } from './services/pwa-update.service';
+import { PWAErrorHandlerService } from './services/pwa-error-handler.service';
+import { PWAErrorRecoveryService } from './services/pwa-error-recovery.service';
 import { UserRole } from './models/user.model';
 import { ModalComponent } from './components/shared/modal/modal.component';
-import { OfflineStatusComponent } from './components/shared/offline-status/offline-status.component';
+import { PWAErrorStatusComponent } from './components/shared/pwa-error-status/pwa-error-status.component';
+
 import { ModalService } from './services/modal.service';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterModule, ModalComponent, OfflineStatusComponent],
+  imports: [CommonModule, RouterOutlet, RouterModule, ModalComponent, PWAErrorStatusComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -25,11 +28,14 @@ export class AppComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private modalService = inject(ModalService);
   private pwaUpdateService = inject(PWAUpdateService);
+  private pwaErrorHandler = inject(PWAErrorHandlerService);
+  private pwaErrorRecovery = inject(PWAErrorRecoveryService);
 
   currentUser$ = this.authService.currentUser$;
   UserRole = UserRole;
 
   private updateSubscription?: Subscription;
+  private errorSubscription?: Subscription;
 
   ngOnInit(): void {
     // Cleanup on component init
@@ -37,6 +43,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Inicializar verificação de atualizações PWA
     this.initializePWAUpdates();
+
+    // Inicializar monitoramento de erros PWA
+    this.initializePWAErrorHandling();
   }
 
   ngOnDestroy(): void {
@@ -45,9 +54,12 @@ export class AppComponent implements OnInit, OnDestroy {
       document.body.classList.remove('mobile-menu-open');
     }
 
-    // Cleanup subscription
+    // Cleanup subscriptions
     if (this.updateSubscription) {
       this.updateSubscription.unsubscribe();
+    }
+    if (this.errorSubscription) {
+      this.errorSubscription.unsubscribe();
     }
   }
 
@@ -171,6 +183,11 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('❌ [APP] Erro ao aplicar atualização PWA:', error);
+      this.pwaErrorHandler.handleUpdateError(
+        error as Error,
+        'activate',
+        { source: 'user-initiated' }
+      );
       this.modalService.showError('Erro ao aplicar atualização. Tente novamente mais tarde.');
     }
   }
@@ -195,7 +212,86 @@ export class AppComponent implements OnInit, OnDestroy {
       // Se uma atualização for encontrada, a notificação será exibida automaticamente
     } catch (error) {
       console.error('❌ [APP] Erro ao verificar atualizações:', error);
+      this.pwaErrorHandler.handleUpdateError(
+        error as Error,
+        'check',
+        { source: 'manual-check' }
+      );
       this.modalService.showError('Erro ao verificar atualizações. Tente novamente mais tarde.');
     }
+  }
+
+  /**
+   * Inicializa monitoramento de erros PWA
+   */
+  private initializePWAErrorHandling(): void {
+    // Monitora erros críticos
+    this.errorSubscription = this.pwaErrorHandler.errorStats$.subscribe(stats => {
+      // Se há muitos erros ativos, pode indicar problema sistêmico
+      if (stats.activeErrors > 5) {
+        console.warn('⚠️ [APP] Muitos erros PWA ativos detectados:', stats);
+      }
+
+      // Se há erros críticos, tenta recuperação
+      if (this.pwaErrorHandler.hasCriticalErrors()) {
+        console.error('🚨 [APP] Erros críticos PWA detectados');
+        this.handleCriticalPWAErrors();
+      }
+    });
+
+    // Limpa erros antigos periodicamente
+    setInterval(() => {
+      this.pwaErrorHandler.clearResolvedErrors();
+      this.pwaErrorRecovery.clearOldOperations();
+    }, 60 * 60 * 1000); // A cada hora
+  }
+
+  /**
+   * Trata erros críticos do PWA
+   */
+  private async handleCriticalPWAErrors(): Promise<void> {
+    const activeErrors = this.pwaErrorHandler.getActiveErrors();
+    const criticalErrors = activeErrors.filter(error => error.severity === 'critical');
+
+    for (const error of criticalErrors) {
+      try {
+        await this.pwaErrorRecovery.forceRecovery(error.type);
+        console.log(`✅ [APP] Recuperação forçada bem-sucedida para erro ${error.type}`);
+      } catch (recoveryError) {
+        console.error(`❌ [APP] Falha na recuperação forçada para erro ${error.type}:`, recoveryError);
+      }
+    }
+  }
+
+  /**
+   * Força recuperação manual do PWA (método público para debugging)
+   */
+  async forcePWARecovery(): Promise<void> {
+    try {
+      // Tenta recuperar service worker
+      await this.pwaErrorRecovery.forceRecovery('service-worker');
+      
+      // Tenta recuperar cache
+      await this.pwaErrorRecovery.forceRecovery('cache');
+      
+      this.modalService.showSuccess('Recuperação do PWA executada com sucesso.');
+    } catch (error) {
+      console.error('❌ [APP] Erro na recuperação manual do PWA:', error);
+      this.modalService.showError('Erro na recuperação do PWA. Verifique o console para mais detalhes.');
+    }
+  }
+
+  /**
+   * Obtém estatísticas de recuperação PWA
+   */
+  getPWARecoveryStats() {
+    return this.pwaErrorRecovery.getCurrentStats();
+  }
+
+  /**
+   * Verifica se há erros PWA ativos
+   */
+  hasPWAErrors(): boolean {
+    return this.pwaErrorHandler.getActiveErrors().length > 0;
   }
 }

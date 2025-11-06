@@ -25,6 +25,8 @@ export class HomeComponent implements OnInit {
   parcelas: Parcela[] = [];
   resumos: Map<string, ResumoCliente> = new Map();
   filtroNome: string = '';
+  private clientesCarregados = false;
+  private parcelasCarregadas = false;
 
   constructor(
     private clienteService: ClienteService,
@@ -34,14 +36,26 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.clienteService.getClientes().subscribe(clientes => {
+      console.log('📋 [HOME] Clientes carregados:', clientes.length);
       this.clientes = clientes;
+      this.clientesCarregados = true;
       this.aplicarFiltro();
+      this.verificarECalcularResumos();
     });
 
     this.parcelaService.getParcelas().subscribe(parcelas => {
+      console.log('💰 [HOME] Parcelas carregadas:', parcelas.length);
       this.parcelas = parcelas;
-      this.calcularResumos();
+      this.parcelasCarregadas = true;
+      this.verificarECalcularResumos();
     });
+  }
+
+  private verificarECalcularResumos(): void {
+    if (this.clientesCarregados && this.parcelasCarregadas) {
+      console.log('🔄 [HOME] Calculando resumos...');
+      this.calcularResumos();
+    }
   }
 
   aplicarFiltro(): void {
@@ -56,8 +70,15 @@ export class HomeComponent implements OnInit {
   }
 
   calcularResumos(): void {
+    console.log('📊 [HOME] Iniciando cálculo de resumos...');
+    console.log('📋 [HOME] Total de clientes:', this.clientes.length);
+    console.log('💰 [HOME] Total de parcelas:', this.parcelas.length);
+
+    this.resumos.clear(); // Limpar resumos anteriores
+
     this.clientes.forEach(cliente => {
       const parcelasCliente = this.parcelas.filter(p => p.clienteId === cliente.id);
+      console.log(`👤 [HOME] Cliente ${cliente.nome}: ${parcelasCliente.length} parcelas`);
 
       const totalPago = parcelasCliente
         .filter(p => p.status === 'pago')
@@ -66,7 +87,9 @@ export class HomeComponent implements OnInit {
       const parcelasPagas = parcelasCliente.filter(p => p.status === 'pago').length;
       // Saldo devedor = (Valor total - Entrada) - Total pago
       const valorParcelado = cliente.contrato.valorTotal - cliente.contrato.valorEntrada;
-      const saldoDevedor = valorParcelado - totalPago;
+      const saldoDevedor = Math.max(0, valorParcelado - totalPago); // Garantir que não seja negativo
+
+      console.log(`💵 [HOME] Cliente ${cliente.nome}: Pago=${totalPago}, Devedor=${saldoDevedor}, Parcelas pagas=${parcelasPagas}`);
 
       this.resumos.set(cliente.id, {
         totalPago,
@@ -74,6 +97,10 @@ export class HomeComponent implements OnInit {
         parcelasPagas
       });
     });
+
+    console.log('📈 [HOME] Total recebido:', this.getTotalRecebido());
+    console.log('📉 [HOME] Total pendente:', this.getTotalPendente());
+    console.log('📊 [HOME] Percentual recebido:', this.getPercentualRecebido());
   }
 
   getResumo(clienteId: string): ResumoCliente {

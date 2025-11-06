@@ -26,7 +26,7 @@
     <!-- Summary Cards -->
     <div class="summary-section mb-5" *ngIf="resumos.length > 0">
       <div class="row g-4">
-        <div class="col-md-4">
+        <div class="col-lg-3 col-md-6">
           <div class="summary-card total">
             <div class="summary-icon">
               <i class="bi bi-file-earmark-text"></i>
@@ -37,7 +37,18 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-lg-3 col-md-6">
+          <div class="summary-card entrada">
+            <div class="summary-icon">
+              <i class="bi bi-cash-coin"></i>
+            </div>
+            <div class="summary-content">
+              <h3>{{ totalGeralEntradas | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</h3>
+              <p>Total em Entradas</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
           <div class="summary-card success">
             <div class="summary-icon">
               <i class="bi bi-check-circle"></i>
@@ -48,7 +59,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-lg-3 col-md-6">
           <div class="summary-card pending">
             <div class="summary-icon">
               <i class="bi bi-clock-history"></i>

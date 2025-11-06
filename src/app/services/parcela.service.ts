@@ -23,8 +23,10 @@ export class ParcelaService {
   }
 
   private carregarParcelas(): void {
+    console.log('🚀 [PARCELA-SERVICE] Inicializando listener de parcelas...');
     onSnapshot(this.parcelasCollection,
       (snapshot) => {
+        console.log('💰 [PARCELA-SERVICE] onSnapshot executado, docs:', snapshot.docs.length);
         this.parcelas = snapshot.docs.map(doc => {
           const data = doc.data() as any;
           return {
@@ -34,10 +36,11 @@ export class ParcelaService {
             dataPagamento: data.dataPagamento ? (data.dataPagamento?.toDate ? data.dataPagamento.toDate() : new Date(data.dataPagamento)) : undefined
           } as Parcela;
         });
+        console.log('📤 [PARCELA-SERVICE] Emitindo', this.parcelas.length, 'parcelas para subscribers');
         this.parcelasSubject.next([...this.parcelas]);
       },
       (error) => {
-        console.error('Erro ao carregar parcelas:', error);
+        console.error('❌ [PARCELA-SERVICE] Erro ao carregar parcelas:', error);
       }
     );
   }

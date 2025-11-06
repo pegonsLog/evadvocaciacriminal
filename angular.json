@@ -27,10 +27,21 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
+              "src/favicon.png",
               "src/assets",
               "src/manifest.webmanifest",
               "src/manifest.json",
-              "src/browserconfig.xml"
+              "src/browserconfig.xml",
+              {
+                "glob": "**/*",
+                "input": "src/assets/icons",
+                "output": "/assets/icons"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/splash",
+                "output": "/assets/splash"
+              }
             ],
             "styles": [
               "src/styles.scss"
@@ -57,6 +68,12 @@
                   "type": "anyComponentStyle",
                   "maximumWarning": "16kb",
                   "maximumError": "16kb"
+                },
+                {
+                  "type": "bundle",
+                  "name": "ngsw-worker",
+                  "maximumWarning": "50kb",
+                  "maximumError": "100kb"
                 }
               ],
               "outputHashing": "all",
@@ -144,10 +161,21 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
+              "src/favicon.png",
               "src/assets",
               "src/manifest.webmanifest",
               "src/manifest.json",
-              "src/browserconfig.xml"
+              "src/browserconfig.xml",
+              {
+                "glob": "**/*",
+                "input": "src/assets/icons",
+                "output": "/assets/icons"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/splash",
+                "output": "/assets/splash"
+              }
             ],
             "styles": [
               "src/styles.scss"

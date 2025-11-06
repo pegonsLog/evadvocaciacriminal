@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { CacheService } from './cache.service';
+import { PWAErrorHandlerService } from './pwa-error-handler.service';
 
 export interface PWACacheConfig {
     clientesCacheTTL: number;
@@ -15,6 +16,7 @@ export interface PWACacheConfig {
 })
 export class PWACacheService {
     private cacheService = inject(CacheService);
+    private errorHandler = inject(PWAErrorHandlerService);
 
     private readonly defaultConfig: PWACacheConfig = {
         clientesCacheTTL: 15 * 60 * 1000, // 15 minutos
@@ -35,14 +37,23 @@ export class PWACacheService {
      * Inicializa configurações específicas do PWA para cache
      */
     private initializePWACache(): void {
-        this.cacheService.configure({
-            ttl: this.config.clientesCacheTTL,
-            maxSize: this.config.maxCacheSize,
-            enableOfflineMode: this.config.enableOfflineMode
-        });
+        try {
+            this.cacheService.configure({
+                ttl: this.config.clientesCacheTTL,
+                maxSize: this.config.maxCacheSize,
+                enableOfflineMode: this.config.enableOfflineMode
+            });
 
-        // Configurar limpeza automática de cache expirado
-        this.scheduleAutomaticCleanup();
+            // Configurar limpeza automática de cache expirado
+            this.scheduleAutomaticCleanup();
+        } catch (error) {
+            console.error('❌ [PWA-CACHE] Erro ao inicializar cache PWA:', error);
+            this.errorHandler.handleCacheError(
+                error as Error,
+                'initialize',
+                { config: this.config }
+            );
+        }
     }
 
     /**
@@ -80,21 +91,39 @@ export class PWACacheService {
      * Invalida cache relacionado a um cliente específico
      */
     invalidateClienteCache(clienteId: string): void {
-        this.cacheService.delete(`cliente_${clienteId}`);
-        this.cacheService.delete(`parcelas_cliente_${clienteId}`);
-        this.cacheService.delete(`pagamentos_cliente_${clienteId}`);
-        this.cacheService.delete(`resumo_pagamento_${clienteId}`);
-        this.cacheService.invalidatePattern('clientes_.*');
+        try {
+            this.cacheService.delete(`cliente_${clienteId}`);
+            this.cacheService.delete(`parcelas_cliente_${clienteId}`);
+            this.cacheService.delete(`pagamentos_cliente_${clienteId}`);
+            this.cacheService.delete(`resumo_pagamento_${clienteId}`);
+            this.cacheService.invalidatePattern('clientes_.*');
+        } catch (error) {
+            console.error('❌ [PWA-CACHE] Erro ao invalidar cache do cliente:', error);
+            this.errorHandler.handleCacheError(
+                error as Error,
+                'invalidate',
+                { clienteId }
+            );
+        }
     }
 
     /**
      * Invalida todo o cache de dados críticos
      */
     invalidateAllCriticalData(): void {
-        this.cacheService.invalidatePattern('clientes_.*');
-        this.cacheService.invalidatePattern('parcelas_.*');
-        this.cacheService.invalidatePattern('pagamentos_.*');
-        this.cacheService.invalidatePattern('resumo_.*');
+        try {
+            this.cacheService.invalidatePattern('clientes_.*');
+            this.cacheService.invalidatePattern('parcelas_.*');
+            this.cacheService.invalidatePattern('pagamentos_.*');
+            this.cacheService.invalidatePattern('resumo_.*');
+        } catch (error) {
+            console.error('❌ [PWA-CACHE] Erro ao invalidar todos os dados críticos:', error);
+            this.errorHandler.handleCacheError(
+                error as Error,
+                'invalidateAll',
+                { operation: 'invalidateAllCriticalData' }
+            );
+        }
     }
 
     /**

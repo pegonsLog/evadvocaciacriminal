@@ -1,0 +1,286 @@
+{
+  "timestamp": "2025-11-06T01:18:08.357Z",
+  "score": 100,
+  "totalTests": 39,
+  "summary": {
+    "passed": 39,
+    "failed": 0,
+    "warnings": 0,
+    "info": 0
+  },
+  "results": [
+    {
+      "status": "pass",
+      "category": "Manifest",
+      "message": "Nome da aplicação presente",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.354Z"
+    },
+    {
+      "status": "pass",
+      "category": "Manifest",
+      "message": "Nome curto presente",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Manifest",
+      "message": "URL de início presente",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Manifest",
+      "message": "Modo de exibição presente",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Manifest",
+      "message": "Ícones da aplicação presente",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Manifest",
+      "message": "Display mode 'standalone' adequado para PWA",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Manifest",
+      "message": "Ícones com tamanhos adequados (192x192, 512x512)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Manifest",
+      "message": "Ícones maskable encontrados",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Manifest",
+      "message": "Theme color definido",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Manifest",
+      "message": "Background color definido",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Service Worker",
+      "message": "Arquivo ngsw-config.json encontrado",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Service Worker",
+      "message": "Index definido na configuração",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Service Worker",
+      "message": "3 grupos de assets configurados",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Service Worker",
+      "message": "Grupo de assets da aplicação configurado",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.355Z"
+    },
+    {
+      "status": "pass",
+      "category": "Service Worker",
+      "message": "Grupo de assets estáticos configurado",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Service Worker",
+      "message": "2 grupos de dados configurados",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Service Worker",
+      "message": "Cache configurado para Firebase APIs",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Icons",
+      "message": "Diretório de ícones encontrado",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Icons",
+      "message": "Ícone 72x72 válido (8KB)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Icons",
+      "message": "Ícone 96x96 válido (13KB)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Icons",
+      "message": "Ícone 128x128 válido (20KB)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Icons",
+      "message": "Ícone 144x144 válido (25KB)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Icons",
+      "message": "Ícone 152x152 válido (27KB)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Icons",
+      "message": "Ícone 192x192 válido (41KB)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Icons",
+      "message": "Ícone 384x384 válido (143KB)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Icons",
+      "message": "Ícone 512x512 válido (234KB)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Icons",
+      "message": "8/8 ícones encontrados (100%)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "HTML Meta",
+      "message": "Meta viewport presente",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "HTML Meta",
+      "message": "Theme color presente",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "HTML Meta",
+      "message": "Link para manifest presente",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "HTML Meta",
+      "message": "iOS web app capable presente",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "HTML Meta",
+      "message": "9 apple-touch-icon(s) configurado(s)",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "HTML Meta",
+      "message": "Splash screens iOS configurados",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.356Z"
+    },
+    {
+      "status": "pass",
+      "category": "Build Config",
+      "message": "Service Worker habilitado no build",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.357Z"
+    },
+    {
+      "status": "pass",
+      "category": "Build Config",
+      "message": "Caminho para ngsw-config configurado",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.357Z"
+    },
+    {
+      "status": "pass",
+      "category": "Build Config",
+      "message": "Manifest incluído nos assets",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.357Z"
+    },
+    {
+      "status": "pass",
+      "category": "Build Config",
+      "message": "Ícones incluídos nos assets",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.357Z"
+    },
+    {
+      "status": "pass",
+      "category": "Build Config",
+      "message": "Configuração de produção encontrada",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.357Z"
+    },
+    {
+      "status": "pass",
+      "category": "Build Config",
+      "message": "Budget para Service Worker configurado",
+      "details": null,
+      "timestamp": "2025-11-06T01:18:08.357Z"
+    }
+  ]
+}

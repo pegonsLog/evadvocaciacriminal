@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject, fromEvent, merge, of } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { OfflineDataService } from '../../../services/offline-data.service';
+import { PWAErrorHandlerService } from '../../../services/pwa-error-handler.service';
 
 @Component({
     selector: 'app-offline-status',
@@ -16,6 +17,8 @@ export class OfflineStatusComponent implements OnInit, OnDestroy {
     private destroy$ = new Subject<void>();
     isOnline = navigator.onLine;
     showOfflineMessage = false;
+
+    private pwaErrorHandler = inject(PWAErrorHandlerService);
 
     constructor(
         private router: Router,
@@ -84,6 +87,11 @@ export class OfflineStatusComponent implements OnInit, OnDestroy {
             }
         } catch (error) {
             console.error('Erro ao sincronizar dados pendentes:', error);
+            this.pwaErrorHandler.handleOfflineError(
+                error as Error,
+                'sync-pending-data',
+                { context: 'network-recovery' }
+            );
         }
     }
 

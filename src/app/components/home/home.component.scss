@@ -545,7 +545,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       .client-preview-body {
         .client-metrics {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(2, 1fr);
           gap: 0.75rem;
           margin-bottom: 0.75rem;
 
@@ -572,6 +572,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
               &.pending {
                 color: #f59e0b;
+              }
+
+              &.entrada {
+                color: #14b8a6;
+                font-weight: 700;
               }
             }
           }
@@ -647,10 +652,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   .client-metrics {
     grid-template-columns: 1fr 1fr !important;
-    
-    .metric:last-child {
-      grid-column: 1 / -1;
-    }
   }
 }
 

@@ -1,7 +1,7 @@
 // Variables
 $primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$header-height: 80px;
-$mobile-header-height: 70px;
+$header-height: 95px;
+$mobile-header-height: 80px;
 $shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -58,22 +58,21 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .brand-icon {
-        width: 50px;
-        height: 50px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
+        width: 85px;
+        height: 85px;
+        background: transparent;
+        border-radius: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.5rem;
-        backdrop-filter: blur(10px);
         overflow: hidden;
 
         .brand-logo {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          border-radius: 8px;
+          border-radius: 0;
           display: block;
           max-width: 100%;
           max-height: 100%;
@@ -426,9 +425,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         gap: 0.75rem !important;
 
         .brand-icon {
-          width: 40px !important;
-          height: 40px !important;
+          width: 65px !important;
+          height: 65px !important;
           font-size: 1.25rem !important;
+          background: transparent !important;
+          border-radius: 0 !important;
 
           .brand-logo {
             width: 100% !important;
@@ -633,9 +634,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         gap: 0.5rem !important;
 
         .brand-icon {
-          width: 36px !important;
-          height: 36px !important;
+          width: 50px !important;
+          height: 50px !important;
           font-size: 1.1rem !important;
+          background: transparent !important;
+          border-radius: 0 !important;
 
           .brand-logo {
             width: 100% !important;
@@ -669,14 +672,14 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 @media (max-width: 1400px) and (min-width: 1200px) {
   .modern-header {
     .navbar {
-      height: 70px; // Reduzir altura do header
+      height: 80px; // Altura do header para resoluções médias
     }
 
     .brand-section {
       .brand-link {
         .brand-icon {
-          width: 45px;
-          height: 45px;
+          width: 55px;
+          height: 55px;
           font-size: 1.4rem;
 
           .brand-logo {

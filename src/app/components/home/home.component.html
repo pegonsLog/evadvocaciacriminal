@@ -211,6 +211,11 @@
                     <span class="metric-value">{{ cliente.contrato.valorTotal | currency:'BRL':'symbol':'1.0-0':'pt-BR'
                       }}</span>
                   </div>
+                  <div class="metric">
+                    <span class="metric-label">Entrada</span>
+                    <span class="metric-value entrada">{{ cliente.contrato.valorEntrada | currency:'BRL':'symbol':'1.0-0':'pt-BR'
+                      }}</span>
+                  </div>
                   <div class="metric" *ngIf="getResumo(cliente.id) as resumo">
                     <span class="metric-label">Pago</span>
                     <span class="metric-value paid">{{ resumo.totalPago | currency:'BRL':'symbol':'1.0-0':'pt-BR'

@@ -131,6 +131,11 @@
                   currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
               </div>
               <div class="contract-item">
+                <span class="contract-label">Entrada</span>
+                <span class="contract-value entrada">{{ cliente.contrato.valorEntrada |
+                  currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
+              </div>
+              <div class="contract-item">
                 <span class="contract-label">Parcelas</span>
                 <span class="contract-value">{{ cliente.contrato.numeroParcelas }}x de {{ cliente.contrato.valorParcela
                   |

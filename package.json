@@ -7,8 +7,17 @@
     "start:local": "ng serve --configuration local",
     "build": "ng build",
     "build:local": "ng build --configuration local",
+    "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "serve:sw": "ng build --configuration production && npx http-server dist/evadvociacriminal -p 8080",
+    "test:pwa": "node run-pwa-tests.js",
+    "test:pwa-validation": "node test-pwa-validation.js",
+    "test:pwa-installation": "node test-pwa-installation.js",
+    "test:pwa-cache": "node test-pwa-cache.js",
+    "validate:pwa": "npm run test:pwa-validation",
+    "test:pwa-full": "npm run build:prod && npm run test:pwa",
+    "test:cache-only": "npm run test:pwa-cache"
   },
   "private": true,
   "dependencies": {
@@ -50,6 +59,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "puppeteer": "^21.0.0",
     "typescript": "~5.2.2"
   }
 }

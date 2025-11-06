@@ -6,11 +6,11 @@
         <div class="brand-section">
           <a class="brand-link" routerLink="/home">
             <div class="brand-icon">
-              <img src="assets/logo-temp.svg" alt="EV Advocacia Criminal" class="brand-logo">
+              <img src="assets/icons/LogoEvac128.png" alt="EV Advocacia Criminal" class="brand-logo">
             </div>
             <div class="brand-content">
               <h1 class="brand-title">{{ title }}</h1>
-              <span class="brand-subtitle">Sistema de Gestão</span>
+              <span class="brand-subtitle">Sistema de Gestão de Contratos</span>
             </div>
           </a>
         </div>
@@ -116,8 +116,10 @@
     </div>
   </div>
 
-  <!-- Offline Status Component -->
-  <app-offline-status></app-offline-status>
+  <!-- PWA Error Status (opcional - apenas para debugging) -->
+  <!-- <app-pwa-error-status></app-pwa-error-status> -->
+
+
 
   <main class="main-content">
     <router-outlet></router-outlet>

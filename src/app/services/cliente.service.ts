@@ -34,7 +34,13 @@ export class ClienteService {
       enableOfflineMode: true
     });
 
+    // Inicializar listeners após a configuração
+    this.inicializarListeners();
+  }
+
+  private inicializarListeners(): void {
     if (!this.listenersInitialized) {
+      console.log('🚀 [SERVICE] Inicializando listeners...');
       this.carregarDados();
       this.listenersInitialized = true;
     }

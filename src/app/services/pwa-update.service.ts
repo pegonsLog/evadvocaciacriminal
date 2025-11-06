@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { BehaviorSubject, filter, map } from 'rxjs';
+import { PWAErrorHandlerService } from './pwa-error-handler.service';
 
 export interface UpdateStatus {
     isAvailable: boolean;
@@ -15,6 +16,7 @@ export interface UpdateStatus {
 })
 export class PWAUpdateService {
     private swUpdate = inject(SwUpdate);
+    private errorHandler = inject(PWAErrorHandlerService);
 
     private updateStatusSubject = new BehaviorSubject<UpdateStatus>({
         isAvailable: false,
@@ -62,6 +64,13 @@ export class PWAUpdateService {
         ).subscribe(event => {
             console.error('❌ [PWA-UPDATE] Falha na instalação da atualização:', event);
 
+            // Reporta erro ao error handler
+            this.errorHandler.handleUpdateError(
+                new Error('Falha na instalação da atualização'),
+                'install',
+                { event }
+            );
+
             this.updateStatusSubject.next({
                 ...this.updateStatusSubject.value,
                 isDownloading: false,
@@ -92,6 +101,11 @@ export class PWAUpdateService {
             return updateFound;
         } catch (error) {
             console.error('❌ [PWA-UPDATE] Erro ao verificar atualizações:', error);
+            this.errorHandler.handleUpdateError(
+                error as Error,
+                'check',
+                { method: 'checkForUpdate' }
+            );
             return false;
         }
     }
@@ -158,6 +172,13 @@ export class PWAUpdateService {
             }
         } catch (error) {
             console.error('❌ [PWA-UPDATE] Erro ao ativar atualização:', error);
+
+            // Reporta erro ao error handler
+            this.errorHandler.handleUpdateError(
+                error as Error,
+                'activate',
+                { method: 'activateUpdate' }
+            );
 
             // Reset do status em caso de erro
             this.updateStatusSubject.next({
