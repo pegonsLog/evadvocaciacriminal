@@ -5,10 +5,10 @@
       <div class="welcome-content">
         <div class="welcome-text">
           <h1 class="welcome-title">
-            <i class="bi bi-house-heart me-3"></i>
-            Dashboard
+            <i class="bi bi-speedometer2 me-3"></i>
+            Painel
           </h1>
-          <p class="welcome-subtitle">Bem-vindo ao painel de controle do sistema</p>
+          <p class="welcome-subtitle">Bem-vindo ao painel principal do sistema</p>
         </div>
         <div class="welcome-actions">
           <button class="btn btn-welcome" (click)="novoCliente()">
@@ -213,7 +213,8 @@
                   </div>
                   <div class="metric">
                     <span class="metric-label">Entrada</span>
-                    <span class="metric-value entrada">{{ cliente.contrato.valorEntrada | currency:'BRL':'symbol':'1.0-0':'pt-BR'
+                    <span class="metric-value entrada">{{ cliente.contrato.valorEntrada |
+                      currency:'BRL':'symbol':'1.0-0':'pt-BR'
                       }}</span>
                   </div>
                   <div class="metric" *ngIf="getResumo(cliente.id) as resumo">
