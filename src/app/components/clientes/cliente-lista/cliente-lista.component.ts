@@ -125,6 +125,29 @@ export class ClienteListaComponent implements OnInit {
     return this.authService.isAdmin();
   }
 
+  async duplicarCliente(id: string): Promise<void> {
+    const cliente = this.clienteService.getClienteById(id);
+
+    if (!cliente) {
+      this.modalService.showError('Cliente não encontrado.');
+      return;
+    }
+
+    const confirmado = await this.modalService.showConfirm(
+      `Deseja duplicar o cliente "${cliente.nome}"?\n\nOs dados pessoais serão copiados e você poderá preencher um novo contrato.`,
+      'Confirmar Duplicação'
+    );
+
+    if (confirmado) {
+      // Navegar para o formulário de novo cliente com os dados para duplicação
+      this.router.navigate(['/clientes/novo'], {
+        queryParams: {
+          duplicar: id
+        }
+      });
+    }
+  }
+
   getDiaVencimento(cliente: Cliente): number {
     if (cliente.contrato.dataPrimeiroVencimento) {
       return this.criarDataSegura(cliente.contrato.dataPrimeiroVencimento).getDate();

@@ -406,6 +406,16 @@ $shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
               }
             }
 
+            &.duplicate {
+              background: rgba(99, 102, 241, 0.1);
+              color: #6366f1;
+
+              &:hover {
+                background: rgba(99, 102, 241, 0.2);
+                transform: scale(1.1);
+              }
+            }
+
             &.delete {
               background: rgba(244, 63, 94, 0.1);
               color: #f43f5e;

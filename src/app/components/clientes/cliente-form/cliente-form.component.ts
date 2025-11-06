@@ -75,9 +75,14 @@ export class ClienteFormComponent implements OnInit {
     this.initForm();
 
     this.clienteId = this.route.snapshot.paramMap.get('id') || undefined;
+    const duplicarId = this.route.snapshot.queryParamMap.get('duplicar');
+
     if (this.clienteId) {
       this.isEditMode = true;
       this.carregarCliente(this.clienteId);
+    } else if (duplicarId) {
+      // Modo duplicação - carregar dados pessoais do cliente
+      this.carregarClienteParaDuplicacao(duplicarId);
     }
   }
 
@@ -182,6 +187,37 @@ export class ClienteFormComponent implements OnInit {
           this.formatarDataParaInput(cliente.contrato.dataPrimeiroVencimento) : '',
         relatorioContratosPendentes: cliente.contrato.relatorioContratosPendentes
       });
+    }
+  }
+
+  carregarClienteParaDuplicacao(id: string): void {
+    const cliente = this.clienteService.getClienteById(id);
+    if (cliente) {
+      // Carregar apenas os dados pessoais, deixando os dados do contrato em branco
+      this.clienteForm.patchValue({
+        nome: cliente.nome,
+        cpf: cliente.cpf,
+        telefone: cliente.telefone,
+        email: cliente.email,
+        endereco: cliente.endereco,
+        // Dados do contrato ficam em branco para preenchimento
+        numeroContrato: '',
+        valorEntrada: '',
+        valorTotal: '',
+        numeroParcelas: '',
+        valorParcela: '',
+        dataPrimeiroVencimento: '',
+        relatorioContratosPendentes: ''
+      });
+
+      // Mostrar mensagem informativa
+      this.modalService.showInfo(
+        `Dados pessoais de "${cliente.nome}" foram carregados. Preencha os dados do novo contrato.`,
+        'Cliente Duplicado'
+      );
+    } else {
+      this.modalService.showError('Cliente não encontrado para duplicação.');
+      this.router.navigate(['/clientes']);
     }
   }
 

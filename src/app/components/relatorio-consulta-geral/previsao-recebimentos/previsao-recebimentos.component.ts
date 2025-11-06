@@ -6,6 +6,7 @@ import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { RelatorioService } from '../../../services/relatorio.service';
 import { AuthService } from '../../../services/auth.service';
+import { ParcelaService } from '../../../services/parcela.service';
 import {
   PrevisaoRecebimentosMes,
   ParcelaPrevisao,
@@ -27,6 +28,7 @@ export class PrevisaoRecebimentosComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private relatorioService = inject(RelatorioService);
   private authService = inject(AuthService);
+  private parcelaService = inject(ParcelaService);
   private fb = inject(FormBuilder);
 
   // Inputs e Outputs
@@ -82,10 +84,8 @@ export class PrevisaoRecebimentosComponent implements OnInit, OnDestroy {
       statusFiltrado: [[]]
     });
 
-    // Configurar mês máximo para o próximo ano
-    const proximoAno = new Date();
-    proximoAno.setFullYear(proximoAno.getFullYear() + 1);
-    this.mesMaximo = proximoAno;
+    // Inicializar mês máximo - será calculado dinamicamente baseado nas parcelas
+    this.mesMaximo = new Date();
   }
 
   ngOnInit(): void {
@@ -99,6 +99,9 @@ export class PrevisaoRecebimentosComponent implements OnInit, OnDestroy {
 
     // Configurar observadores do formulário
     this.configurarObservadoresFormulario();
+
+    // Calcular mês máximo baseado nas parcelas existentes
+    this.calcularMesMaximo();
 
     // Carregar dados iniciais
     this.carregarDadosMes();
@@ -134,6 +137,43 @@ export class PrevisaoRecebimentosComponent implements OnInit, OnDestroy {
         this.clienteFiltrado = valores.clienteFiltrado || null;
         this.statusFiltrado = valores.statusFiltrado || [];
         this.aplicarFiltros();
+      });
+  }
+
+  /**
+   * Calcula o mês máximo baseado nas parcelas existentes
+   */
+  private calcularMesMaximo(): void {
+    // Obter todas as parcelas para determinar o mês máximo
+    this.parcelaService.getParcelas()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(parcelas => {
+        if (parcelas.length === 0) {
+          // Se não há parcelas, permitir navegação até 5 anos no futuro
+          const cincoAnosNoFuturo = new Date();
+          cincoAnosNoFuturo.setFullYear(cincoAnosNoFuturo.getFullYear() + 5);
+          this.mesMaximo = cincoAnosNoFuturo;
+          return;
+        }
+
+        // Encontrar a data de vencimento mais distante no futuro
+        const datasMaisDistantes = parcelas
+          .filter(parcela => parcela.status !== 'pago') // Apenas parcelas não pagas
+          .map(parcela => new Date(parcela.dataVencimento))
+          .sort((a, b) => b.getTime() - a.getTime()); // Ordenar do mais recente para o mais antigo
+
+        if (datasMaisDistantes.length > 0) {
+          // Usar a data mais distante como base e adicionar 6 meses de margem
+          const dataMaisDistante = datasMaisDistantes[0];
+          const mesMaximoCalculado = new Date(dataMaisDistante);
+          mesMaximoCalculado.setMonth(mesMaximoCalculado.getMonth() + 6);
+          this.mesMaximo = mesMaximoCalculado;
+        } else {
+          // Se todas as parcelas estão pagas, permitir navegação até 2 anos no futuro
+          const doisAnosNoFuturo = new Date();
+          doisAnosNoFuturo.setFullYear(doisAnosNoFuturo.getFullYear() + 2);
+          this.mesMaximo = doisAnosNoFuturo;
+        }
       });
   }
 

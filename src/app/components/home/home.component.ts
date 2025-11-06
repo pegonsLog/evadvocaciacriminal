@@ -94,6 +94,21 @@ export class HomeComponent implements OnInit {
   }
 
   getTotalRecebido(): number {
+    const totalPagamentos = Array.from(this.resumos.values())
+      .reduce((total, resumo) => total + resumo.totalPago, 0);
+
+    const totalEntradas = this.clientes
+      .reduce((total, cliente) => total + cliente.contrato.valorEntrada, 0);
+
+    return totalPagamentos + totalEntradas;
+  }
+
+  getTotalEntradas(): number {
+    return this.clientes
+      .reduce((total, cliente) => total + cliente.contrato.valorEntrada, 0);
+  }
+
+  getTotalPagamentos(): number {
     return Array.from(this.resumos.values())
       .reduce((total, resumo) => total + resumo.totalPago, 0);
   }
