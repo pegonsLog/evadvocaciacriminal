@@ -6,6 +6,7 @@ import { Cliente, Pagamento, ResumoPagamento } from '../models/cliente.model';
 import { ParcelaService } from './parcela.service';
 import { CacheService } from './cache.service';
 import { OfflineDataService } from './offline-data.service';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,7 @@ export class ClienteService {
   private parcelaService = inject(ParcelaService);
   private cacheService = inject(CacheService);
   private offlineDataService = inject(OfflineDataService);
+  private logger = inject(LoggerService);
   private clientesCollection = collection(this.firestore, 'clientes');
   private pagamentosCollection = collection(this.firestore, 'pagamentos');
 
@@ -40,7 +42,7 @@ export class ClienteService {
 
   private inicializarListeners(): void {
     if (!this.listenersInitialized) {
-      console.log('🚀 [SERVICE] Inicializando listeners...');
+      this.logger.service('Inicializando listeners...');
       this.carregarDados();
       this.listenersInitialized = true;
     }
@@ -99,7 +101,7 @@ export class ClienteService {
     });
 
     const docRef = await addDoc(this.clientesCollection, clienteData);
-    console.log('✅ [SERVICE] Cliente adicionado ao Firestore com ID:', docRef.id);
+    this.logger.service(`Cliente adicionado ao Firestore com ID: ${docRef.id}`);
 
     // Invalidar cache relacionado
     this.cacheService.invalidatePattern('clientes_.*');
@@ -108,7 +110,7 @@ export class ClienteService {
     // Gerar parcelas automaticamente usando a nova lógica
     const clienteComId = { ...cliente, id: docRef.id };
     await this.parcelaService.gerarParcelas(clienteComId);
-    console.log('✅ [SERVICE] Parcelas geradas para o cliente');
+    this.logger.service('Parcelas geradas para o cliente');
 
     return docRef.id;
   }
@@ -336,7 +338,7 @@ export class ClienteService {
     // Carregar clientes do Firestore usando onSnapshot
     onSnapshot(this.clientesCollection,
       (snapshot) => {
-        console.log('🔄 [SERVICE] onSnapshot executado, docs:', snapshot.docs.length);
+        this.logger.service(`onSnapshot executado, docs: ${snapshot.docs.length}`);
         this.clientes = snapshot.docs.map(doc => {
           const data = doc.data() as any;
 
@@ -364,7 +366,7 @@ export class ClienteService {
             }
           } as Cliente;
         });
-        console.log('📤 [SERVICE] Emitindo', this.clientes.length, 'clientes para subscribers');
+        this.logger.service(`Emitindo ${this.clientes.length} clientes para subscribers`);
         this.clientesSubject.next([...this.clientes]);
 
         // Cache dados para uso offline

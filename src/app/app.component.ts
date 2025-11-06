@@ -8,6 +8,7 @@ import { PWAErrorRecoveryService } from './services/pwa-error-recovery.service';
 import { UserRole } from './models/user.model';
 import { ModalComponent } from './components/shared/modal/modal.component';
 import { PWAErrorStatusComponent } from './components/shared/pwa-error-status/pwa-error-status.component';
+import { LogControlComponent } from './components/shared/log-control/log-control.component';
 
 import { ModalService } from './services/modal.service';
 import { Subscription } from 'rxjs';
@@ -15,7 +16,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterModule, ModalComponent, PWAErrorStatusComponent],
+  imports: [CommonModule, RouterOutlet, RouterModule, ModalComponent, PWAErrorStatusComponent, LogControlComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

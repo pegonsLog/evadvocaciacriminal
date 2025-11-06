@@ -47,7 +47,7 @@ export class OfflineStatusComponent implements OnInit, OnDestroy {
                 this.isOnline = isOnline;
 
                 if (!isOnline) {
-                    console.log('🔴 Aplicação está offline');
+                    // Aplicação offline - log removido para reduzir ruído
                     this.showOfflineMessage = true;
 
                     // Redirecionar para página offline se houver dados em cache após 3 segundos

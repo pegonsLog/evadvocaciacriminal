@@ -70,11 +70,8 @@ export class OfflineDataService {
             localStorage.setItem(this.CACHE_KEY, JSON.stringify(data));
             this.cachedDataSubject.next(data);
 
-            console.log('Dados salvos no cache offline:', {
-                clientes: data.clientes.length,
-                parcelas: data.parcelas.length,
-                lastSync: data.lastSync
-            });
+            // Dados salvos no cache offline - log removido para reduzir ruído
+            // { clientes: data.clientes.length, parcelas: data.parcelas.length, lastSync: data.lastSync }
         } catch (error) {
             console.error('Erro ao salvar dados no cache:', error);
         }
@@ -239,7 +236,7 @@ export class OfflineDataService {
         localStorage.removeItem(this.PENDING_CHANGES_KEY);
         this.cachedDataSubject.next(null);
         this.pendingChanges = [];
-        console.log('Cache offline limpo');
+        // Cache offline limpo - log removido
     }
 
     /**

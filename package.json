@@ -17,7 +17,9 @@
     "test:pwa-cache": "node test-pwa-cache.js",
     "validate:pwa": "npm run test:pwa-validation",
     "test:pwa-full": "npm run build:prod && npm run test:pwa",
-    "test:cache-only": "npm run test:pwa-cache"
+    "test:cache-only": "npm run test:pwa-cache",
+    "verify:production": "node verify-production-fix.js",
+    "deploy:verify": "npm run build:prod && firebase deploy && npm run verify:production"
   },
   "private": true,
   "dependencies": {

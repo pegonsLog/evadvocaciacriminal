@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ClienteService } from '../../services/cliente.service';
 import { ParcelaService } from '../../services/parcela.service';
+import { LoggerService } from '../../services/logger.service';
 import { Cliente, Parcela } from '../../models/cliente.model';
 
 interface ResumoCliente {
@@ -31,12 +32,13 @@ export class HomeComponent implements OnInit {
   constructor(
     private clienteService: ClienteService,
     private parcelaService: ParcelaService,
-    private router: Router
+    private router: Router,
+    private logger: LoggerService
   ) { }
 
   ngOnInit(): void {
     this.clienteService.getClientes().subscribe(clientes => {
-      console.log('📋 [HOME] Clientes carregados:', clientes.length);
+      this.logger.home(`Clientes carregados: ${clientes.length}`);
       this.clientes = clientes;
       this.clientesCarregados = true;
       this.aplicarFiltro();
@@ -44,7 +46,7 @@ export class HomeComponent implements OnInit {
     });
 
     this.parcelaService.getParcelas().subscribe(parcelas => {
-      console.log('💰 [HOME] Parcelas carregadas:', parcelas.length);
+      this.logger.home(`Parcelas carregadas: ${parcelas.length}`);
       this.parcelas = parcelas;
       this.parcelasCarregadas = true;
       this.verificarECalcularResumos();
@@ -53,7 +55,7 @@ export class HomeComponent implements OnInit {
 
   private verificarECalcularResumos(): void {
     if (this.clientesCarregados && this.parcelasCarregadas) {
-      console.log('🔄 [HOME] Calculando resumos...');
+      this.logger.home('Calculando resumos...');
       this.calcularResumos();
     }
   }
@@ -70,15 +72,15 @@ export class HomeComponent implements OnInit {
   }
 
   calcularResumos(): void {
-    console.log('📊 [HOME] Iniciando cálculo de resumos...');
-    console.log('📋 [HOME] Total de clientes:', this.clientes.length);
-    console.log('💰 [HOME] Total de parcelas:', this.parcelas.length);
+    this.logger.home('Iniciando cálculo de resumos...');
+    this.logger.home(`Total de clientes: ${this.clientes.length}`);
+    this.logger.home(`Total de parcelas: ${this.parcelas.length}`);
 
     this.resumos.clear(); // Limpar resumos anteriores
 
     this.clientes.forEach(cliente => {
       const parcelasCliente = this.parcelas.filter(p => p.clienteId === cliente.id);
-      console.log(`👤 [HOME] Cliente ${cliente.nome}: ${parcelasCliente.length} parcelas`);
+      this.logger.home(`Cliente ${cliente.nome}: ${parcelasCliente.length} parcelas`);
 
       const totalPago = parcelasCliente
         .filter(p => p.status === 'pago')
@@ -89,7 +91,7 @@ export class HomeComponent implements OnInit {
       const valorParcelado = cliente.contrato.valorTotal - cliente.contrato.valorEntrada;
       const saldoDevedor = Math.max(0, valorParcelado - totalPago); // Garantir que não seja negativo
 
-      console.log(`💵 [HOME] Cliente ${cliente.nome}: Pago=${totalPago}, Devedor=${saldoDevedor}, Parcelas pagas=${parcelasPagas}`);
+      this.logger.home(`Cliente ${cliente.nome}: Pago=${totalPago}, Devedor=${saldoDevedor}, Parcelas pagas=${parcelasPagas}`);
 
       this.resumos.set(cliente.id, {
         totalPago,
@@ -98,9 +100,9 @@ export class HomeComponent implements OnInit {
       });
     });
 
-    console.log('📈 [HOME] Total recebido:', this.getTotalRecebido());
-    console.log('📉 [HOME] Total pendente:', this.getTotalPendente());
-    console.log('📊 [HOME] Percentual recebido:', this.getPercentualRecebido());
+    this.logger.home(`Total recebido: ${this.getTotalRecebido()}`);
+    this.logger.home(`Total pendente: ${this.getTotalPendente()}`);
+    this.logger.home(`Percentual recebido: ${this.getPercentualRecebido()}`);
   }
 
   getResumo(clienteId: string): ResumoCliente {
