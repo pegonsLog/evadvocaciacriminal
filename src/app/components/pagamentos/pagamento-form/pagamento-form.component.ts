@@ -27,11 +27,11 @@ export class PagamentoFormComponent implements OnInit {
     private clienteService: ClienteService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
-    
+
     const pagamentoId = this.route.snapshot.paramMap.get('id');
     this.clienteId = this.route.snapshot.paramMap.get('clienteId') || undefined;
 
@@ -46,7 +46,7 @@ export class PagamentoFormComponent implements OnInit {
 
   initForm(): void {
     this.pagamentoForm = this.fb.group({
-      valorPago: ['', [Validators.required, Validators.min(0.01)]],
+      valorPago: [{ value: '', disabled: true }, [Validators.required, Validators.min(0.01)]],
       dataVencimento: ['', [Validators.required]],
       dataPagamento: ['', [Validators.required]],
       observacao: ['']
@@ -64,13 +64,13 @@ export class PagamentoFormComponent implements OnInit {
     if (dataVencimento && dataPagamento) {
       const vencimento = new Date(dataVencimento);
       const pagamento = new Date(dataPagamento);
-      
+
       vencimento.setHours(0, 0, 0, 0);
       pagamento.setHours(0, 0, 0, 0);
-      
+
       const diffTime = pagamento.getTime() - vencimento.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+
       this.diasAtraso = diffDays > 0 ? diffDays : 0;
     }
   }
@@ -92,8 +92,9 @@ export class PagamentoFormComponent implements OnInit {
 
   async onSubmit(): Promise<void> {
     if (this.pagamentoForm.valid && this.cliente) {
-      const formValue = this.pagamentoForm.value;
-      
+      // Usar getRawValue() para incluir campos desabilitados
+      const formValue = this.pagamentoForm.getRawValue();
+
       // Remove formatação do valor e garante que seja número
       let valorPago = formValue.valorPago;
       if (typeof valorPago === 'string') {
@@ -101,7 +102,7 @@ export class PagamentoFormComponent implements OnInit {
       }
       // Garante que é um número válido
       valorPago = Number(valorPago) || 0;
-      
+
       const pagamento: Pagamento = {
         id: this.pagamentoId || '',
         clienteId: this.cliente.id,

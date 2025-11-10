@@ -190,6 +190,7 @@ export class RelatorioService {
   identificarAlertas(parcelas: Parcela[]): AlertaInadimplencia[] {
     const alertas: AlertaInadimplencia[] = [];
     const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0); // Normalizar para meia-noite
 
     parcelas.forEach(parcela => {
       // Parcelas vencidas (atrasadas)
@@ -212,8 +213,11 @@ export class RelatorioService {
 
       // Parcelas com vencimento próximo (próximos 7 dias)
       if (parcela.status === 'pendente') {
+        const dataVencimento = new Date(parcela.dataVencimento);
+        dataVencimento.setHours(0, 0, 0, 0); // Normalizar para meia-noite
+
         const diasParaVencimento = Math.ceil(
-          (parcela.dataVencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24)
+          (dataVencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24)
         );
 
         if (diasParaVencimento <= 7 && diasParaVencimento >= 0) {
@@ -224,7 +228,8 @@ export class RelatorioService {
             diasAtraso: 0,
             valorEmAtraso: 0,
             proximoVencimento: parcela.dataVencimento,
-            tipo: 'vencimento_proximo'
+            tipo: 'vencimento_proximo',
+            numeroParcela: parcela.numeroParcela
           });
         }
       }

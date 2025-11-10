@@ -1522,4 +1522,35 @@ export class PrevisaoRecebimentosComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  /**
+   * Obtém alertas de parcelas com vencimento próximo (próximos 7 dias)
+   */
+  obterAlertasVencimentoProximo(): ParcelaPrevisao[] {
+    if (!this.dadosPrevisao) {
+      return [];
+    }
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    // Filtrar parcelas pendentes com vencimento nos próximos 7 dias
+    return this.dadosPrevisao.parcelas.filter(parcela => {
+      if (parcela.status !== StatusPagamento.PENDENTE) {
+        return false;
+      }
+
+      const dataVencimento = new Date(parcela.dataVencimento);
+      dataVencimento.setHours(0, 0, 0, 0);
+
+      const diasParaVencimento = Math.ceil(
+        (dataVencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      return diasParaVencimento >= 0 && diasParaVencimento <= 7;
+    }).sort((a, b) => {
+      // Ordenar por data de vencimento (mais próximo primeiro)
+      return a.dataVencimento.getTime() - b.dataVencimento.getTime();
+    });
+  }
 }

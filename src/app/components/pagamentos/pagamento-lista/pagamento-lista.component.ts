@@ -19,7 +19,7 @@ export class PagamentoListaComponent implements OnInit {
   parcelas: Parcela[] = [];
   parcelaEditando?: Parcela;
   dataPagamentoInput: string = '';
-  valorPagoInput: string = '';
+  valorPagoInput: number = 0;
   observacaoInput: string = '';
   editandoData: boolean = false;
 
@@ -60,14 +60,14 @@ export class PagamentoListaComponent implements OnInit {
     const mes = String(hoje.getMonth() + 1).padStart(2, '0');
     const dia = String(hoje.getDate()).padStart(2, '0');
     this.dataPagamentoInput = `${ano}-${mes}-${dia}`;
-    this.valorPagoInput = parcela.valorParcela.toString();
+    this.valorPagoInput = parcela.valorParcela;
     this.observacaoInput = '';
   }
 
   cancelarPagamento(): void {
     this.parcelaEditando = undefined;
     this.dataPagamentoInput = '';
-    this.valorPagoInput = '';
+    this.valorPagoInput = 0;
     this.observacaoInput = '';
   }
 
@@ -89,7 +89,8 @@ export class PagamentoListaComponent implements OnInit {
     // Criar data no meio-dia para evitar problemas de fuso horário
     const [ano, mes, dia] = this.dataPagamentoInput.split('-').map(Number);
     const data = new Date(ano, mes - 1, dia, 12, 0, 0, 0);
-    const valor = parseFloat(this.valorPagoInput) || this.parcelaEditando.valorParcela;
+    // Usar sempre o valor da parcela (campo somente leitura)
+    const valor = this.valorPagoInput;
 
     console.log('📊 Dados processados:', {
       data: data,

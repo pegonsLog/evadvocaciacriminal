@@ -280,13 +280,14 @@
             </div>
             <div class="card-body">
               <div class="alert-list">
-                <div *ngFor="let alerta of dadosConsolidados?.alertas?.slice(0, 5)" class="alert mb-2"
+                <div *ngFor="let alerta of dadosConsolidados?.alertas" class="alert mb-2"
                   [class.alert-danger]="alerta.tipo === 'atraso_critico'"
                   [class.alert-warning]="alerta.tipo === 'atraso_moderado'"
                   [class.alert-info]="alerta.tipo === 'vencimento_proximo'">
                   <div class="d-flex justify-content-between align-items-center">
                     <div>
                       <strong>{{ alerta.clienteNome }}</strong> - {{ alerta.numeroContrato }}
+                      <span *ngIf="alerta.numeroParcela"> - Parcela {{ alerta.numeroParcela }}</span>
                       <br>
                       <small>
                         <span *ngIf="alerta.tipo === 'vencimento_proximo'">
@@ -305,12 +306,6 @@
                       </i>
                     </div>
                   </div>
-                </div>
-
-                <div *ngIf="(dadosConsolidados?.alertas?.length || 0) > 5" class="text-center mt-3">
-                  <small class="text-muted">
-                    E mais {{ (dadosConsolidados?.alertas?.length || 0) - 5 }} alertas...
-                  </small>
                 </div>
               </div>
             </div>

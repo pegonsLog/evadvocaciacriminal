@@ -72,6 +72,7 @@ export interface AlertaInadimplencia {
   valorEmAtraso: number;
   proximoVencimento?: Date;
   tipo: 'vencimento_proximo' | 'atraso_moderado' | 'atraso_critico';
+  numeroParcela?: number;
 }
 
 export interface DadosEvolucaoCliente {
