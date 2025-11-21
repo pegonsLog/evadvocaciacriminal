@@ -231,23 +231,40 @@
           <div class="row g-4">
             <div class="col-md-6">
               <div class="form-group">
+                <label for="dataContrato" class="form-label">
+                  <i class="bi bi-calendar-check me-2"></i>
+                  Data do Contrato *
+                </label>
+                <input type="date" class="form-control modern-input" id="dataContrato" formControlName="dataContrato"
+                  min="2000-01-01" max="2099-12-31"
+                  [class.is-invalid]="f['dataContrato'].invalid && f['dataContrato'].touched">
+                <div class="invalid-feedback" *ngIf="f['dataContrato'].invalid && f['dataContrato'].touched">
+                  <div *ngIf="f['dataContrato'].errors?.['required']">Data do contrato é obrigatória</div>
+                </div>
+                <small class="form-hint">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Data em que o contrato foi assinado (pode ser anterior)
+                </small>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
                 <label for="dataPrimeiroVencimento" class="form-label">
                   <i class="bi bi-calendar-event me-2"></i>
                   Data do Primeiro Vencimento *
                 </label>
                 <input type="date" class="form-control modern-input" id="dataPrimeiroVencimento"
-                  formControlName="dataPrimeiroVencimento"
+                  formControlName="dataPrimeiroVencimento" min="2000-01-01" max="2099-12-31"
                   [class.is-invalid]="f['dataPrimeiroVencimento'].invalid && f['dataPrimeiroVencimento'].touched">
                 <div class="invalid-feedback"
                   *ngIf="f['dataPrimeiroVencimento'].invalid && f['dataPrimeiroVencimento'].touched">
                   <div *ngIf="f['dataPrimeiroVencimento'].errors?.['required']">Data do primeiro vencimento é
                     obrigatória</div>
-                  <div *ngIf="f['dataPrimeiroVencimento'].errors?.['dateInPast']">Data não pode ser anterior à data
-                    atual</div>
                 </div>
                 <small class="form-hint">
                   <i class="bi bi-info-circle me-1"></i>
-                  Data específica para o vencimento da primeira parcela
+                  Data específica para o vencimento da primeira parcela (pode ser anterior)
                 </small>
               </div>
             </div>

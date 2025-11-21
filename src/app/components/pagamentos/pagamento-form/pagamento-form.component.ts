@@ -46,7 +46,7 @@ export class PagamentoFormComponent implements OnInit {
 
   initForm(): void {
     this.pagamentoForm = this.fb.group({
-      valorPago: [{ value: '', disabled: true }, [Validators.required, Validators.min(0.01)]],
+      valorPago: ['', [Validators.required, Validators.min(0.01)]],
       dataVencimento: ['', [Validators.required]],
       dataPagamento: ['', [Validators.required]],
       observacao: ['']

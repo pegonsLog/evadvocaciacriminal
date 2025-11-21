@@ -74,6 +74,10 @@
                 <div class="invalid-feedback" *ngIf="f['dataVencimento'].invalid && f['dataVencimento'].touched">
                   Data de vencimento é obrigatória
                 </div>
+                <small class="form-text text-muted">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Você pode incluir datas anteriores para contratos antigos
+                </small>
               </div>
             </div>
 
@@ -88,6 +92,10 @@
                 <div class="invalid-feedback" *ngIf="f['dataPagamento'].invalid && f['dataPagamento'].touched">
                   Data do pagamento é obrigatória
                 </div>
+                <small class="form-text text-muted">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Você pode incluir datas anteriores para contratos antigos
+                </small>
               </div>
             </div>
           </div>

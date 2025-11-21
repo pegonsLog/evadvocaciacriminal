@@ -31,22 +31,7 @@ export class ClienteFormComponent implements OnInit {
     private modalService: ModalService
   ) { }
 
-  // Validador customizado para verificar se a data não é anterior à data atual
-  dateNotInPastValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) {
-      return null;
-    }
-
-    const inputDate = new Date(control.value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Remove horas para comparar apenas a data
-
-    if (inputDate < today) {
-      return { dateInPast: true };
-    }
-
-    return null;
-  }
+  // Validador removido - permitir datas anteriores para contratos antigos
 
   // Validador customizado para verificar se entrada não é maior que o total
   entradaMenorQueTotal(control: AbstractControl): ValidationErrors | null {
@@ -97,8 +82,9 @@ export class ClienteFormComponent implements OnInit {
       valorEntrada: ['', [Validators.required, Validators.min(0), this.entradaMenorQueTotal.bind(this)]],
       valorTotal: ['', [Validators.required, Validators.min(0.01)]],
       numeroParcelas: ['', [Validators.required, Validators.min(1)]],
-      valorParcela: ['', [Validators.required, Validators.min(0.01)]],
-      dataPrimeiroVencimento: ['', [Validators.required, this.dateNotInPastValidator.bind(this)]],
+      valorParcela: [''],
+      dataContrato: ['', [Validators.required]],
+      dataPrimeiroVencimento: ['', [Validators.required]],
       relatorioContratosPendentes: ['']
     });
 
@@ -183,6 +169,8 @@ export class ClienteFormComponent implements OnInit {
         valorTotal: cliente.contrato.valorTotal,
         numeroParcelas: cliente.contrato.numeroParcelas,
         valorParcela: cliente.contrato.valorParcela,
+        dataContrato: cliente.contrato.dataContrato ?
+          this.formatarDataParaInput(cliente.contrato.dataContrato) : '',
         dataPrimeiroVencimento: cliente.contrato.dataPrimeiroVencimento ?
           this.formatarDataParaInput(cliente.contrato.dataPrimeiroVencimento) : '',
         relatorioContratosPendentes: cliente.contrato.relatorioContratosPendentes
@@ -274,7 +262,7 @@ export class ClienteFormComponent implements OnInit {
           valorTotal: valorTotal,
           numeroParcelas: parseInt(formValue.numeroParcelas),
           valorParcela: valorParcela,
-          dataContrato: new Date(),
+          dataContrato: new Date(formValue.dataContrato + 'T12:00:00'),
           dataPrimeiroVencimento: new Date(formValue.dataPrimeiroVencimento + 'T12:00:00'),
           relatorioContratosPendentes: formValue.relatorioContratosPendentes || ''
         }
@@ -335,11 +323,15 @@ export class ClienteFormComponent implements OnInit {
     const novaDataPrimeiroVencimento = new Date(formValue.dataPrimeiroVencimento + 'T12:00:00');
     const dataAnterior = this.criarDataSegura(clienteAnterior.contrato.dataPrimeiroVencimento);
 
+    const novaDataContrato = new Date(formValue.dataContrato + 'T12:00:00');
+    const dataContratoAnterior = this.criarDataSegura(clienteAnterior.contrato.dataContrato);
+
     return (
       clienteAnterior.contrato.valorTotal !== valorTotal ||
       clienteAnterior.contrato.valorEntrada !== valorEntrada ||
       clienteAnterior.contrato.numeroParcelas !== parseInt(formValue.numeroParcelas) ||
-      dataAnterior.getTime() !== novaDataPrimeiroVencimento.getTime()
+      dataAnterior.getTime() !== novaDataPrimeiroVencimento.getTime() ||
+      dataContratoAnterior.getTime() !== novaDataContrato.getTime()
     );
   }
 

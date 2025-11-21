@@ -186,17 +186,6 @@ export class ParcelaService {
       throw new Error('O valor de entrada não pode ser maior que o valor total do contrato');
     }
 
-    // Validar que data do primeiro vencimento não seja anterior à data atual
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-
-    const dataPrimeiroVencimento = this.criarDataSegura(cliente.contrato.dataPrimeiroVencimento);
-    dataPrimeiroVencimento.setHours(0, 0, 0, 0);
-
-    if (dataPrimeiroVencimento < hoje) {
-      throw new Error('A data do primeiro vencimento não pode ser anterior à data atual');
-    }
-
     // Validar que o número de parcelas seja válido
     if (cliente.contrato.numeroParcelas <= 0) {
       throw new Error('O número de parcelas deve ser maior que zero');
